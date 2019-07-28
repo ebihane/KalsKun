@@ -1,0 +1,105 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|ARM">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM">
+      <Configuration>Release</Configuration>
+      <Platform>ARM</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{b37723db-d26f-445f-a029-0eac37f568ab}</ProjectGuid>
+    <Keyword>Linux</Keyword>
+    <RootNamespace>CommanderLibrary</RootNamespace>
+    <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
+    <ApplicationType>Linux</ApplicationType>
+    <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
+    <TargetLinuxPlatform>Raspberry</TargetLinuxPlatform>
+    <LinuxProjectType>{8748239F-558C-44D1-944B-07B09C35B330}</LinuxProjectType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
+    <UseDebugLibraries>false</UseDebugLibraries>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'" Label="Configuration">
+    <UseDebugLibraries>true</UseDebugLibraries>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <TargetExt>.so</TargetExt>
+    <IncludePath>D:\Tools\OpenCV\4.1.0\opencv\build\include;$(ProjectDir)\Source</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <TargetExt>.so</TargetExt>
+    <IncludePath>D:\Tools\OpenCV\4.1.0\opencv\build\include;$(ProjectDir)\Source</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <Link>
+      <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc</LibraryDependencies>
+    </Link>
+    <RemotePostBuildEvent>
+      <Command>sudo cp $(RemoteTargetPath) /usr/lib</Command>
+      <Message>
+      </Message>
+    </RemotePostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <Link>
+      <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc</LibraryDependencies>
+    </Link>
+    <RemotePostBuildEvent>
+      <Command>sudo cp $(RemoteTargetPath) /usr/lib</Command>
+      <Message>
+      </Message>
+    </RemotePostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Include\Common.h" />
+    <ClInclude Include="Source\Logger\Logger.h" />
+    <ClInclude Include="Source\Logger\Thread\LogWriter.h" />
+    <ClInclude Include="Source\Queue\Queue.h" />
+    <ClInclude Include="Source\Socket\SocketBase.h" />
+    <ClInclude Include="Source\Socket\TcpClient\TcpClient.h" />
+    <ClInclude Include="Source\Socket\TcpServer\TcpServer.h" />
+    <ClInclude Include="Source\Socket\UdpReceiver\UdpReceiver.h" />
+    <ClInclude Include="Source\Socket\UdpSender\UdpSender.h" />
+    <ClInclude Include="Source\ThreadBase\ThreadBase.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Logger\Logger.cpp" />
+    <ClCompile Include="Source\Logger\Thread\LogWriter.cpp" />
+    <ClCompile Include="Source\Queue\Queue.cpp" />
+    <ClCompile Include="Source\Socket\SocketBase.cpp" />
+    <ClCompile Include="Source\Socket\TcpClient\TcpClient.cpp" />
+    <ClCompile Include="Source\Socket\TcpServer\TcpServer.cpp" />
+    <ClCompile Include="Source\Socket\UdpReceiver\UdpReceiver.cpp" />
+    <ClCompile Include="Source\Socket\UdpSender\UdpSender.cpp" />
+    <ClCompile Include="Source\ThreadBase\ThreadBase.cpp" />
+  </ItemGroup>
+  <ItemDefinitionGroup />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets" />
+</Project>

@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="LogWriter\LogWriter.cpp">
+      <Filter>LogWriter</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="LogWriter">
+      <UniqueIdentifier>{1d97d21c-b49c-4052-9fba-bd94bad9be8e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="LogWriter\LogWriter.h">
+      <Filter>LogWriter</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

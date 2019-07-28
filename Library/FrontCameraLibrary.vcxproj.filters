@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ThreadBase">
+      <UniqueIdentifier>{5a5da09c-589a-43d6-8b53-e3651df6aab8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Socket">
+      <UniqueIdentifier>{18df26cb-6330-428b-ac4a-c3fa2dc61508}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Queue">
+      <UniqueIdentifier>{821eb792-95fd-42d4-8f64-6d14180086e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Logger">
+      <UniqueIdentifier>{445508bf-4e5e-4e26-a3b7-d1c8921362e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Include">
+      <UniqueIdentifier>{e1699579-04fe-47e5-9286-1e21f01ffc5c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Logger\Thread">
+      <UniqueIdentifier>{dbdff7fd-77d9-4f1d-a7c5-7c790f493744}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Socket\UdpSender">
+      <UniqueIdentifier>{86028717-1553-4de6-958e-2c31a857846d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Socket\UdpReceiver">
+      <UniqueIdentifier>{f35a5ec4-99bd-409e-b7d1-3124d72bf4be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Socket\TcpServer">
+      <UniqueIdentifier>{9ed77dc5-09d5-4182-94f8-9e5dfdeda6ba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Socket\TcpClient">
+      <UniqueIdentifier>{e256272f-c546-48bd-9597-1f2b5a42b741}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Logger\Logger.cpp">
+      <Filter>Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Queue\Queue.cpp">
+      <Filter>Queue</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Socket\SocketBase.cpp">
+      <Filter>Socket</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Socket\TcpClient\TcpClient.cpp">
+      <Filter>Socket\TcpClient</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Socket\TcpServer\TcpServer.cpp">
+      <Filter>Socket\TcpServer</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Socket\UdpReceiver\UdpReceiver.cpp">
+      <Filter>Socket\UdpReceiver</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Socket\UdpSender\UdpSender.cpp">
+      <Filter>Socket\UdpSender</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ThreadBase\ThreadBase.cpp">
+      <Filter>ThreadBase</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\Logger\Logger.h">
+      <Filter>Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Include\Common.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Queue\Queue.h">
+      <Filter>Queue</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Socket\SocketBase.h">
+      <Filter>Socket</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Socket\TcpClient\TcpClient.h">
+      <Filter>Socket\TcpClient</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Socket\TcpServer\TcpServer.h">
+      <Filter>Socket\TcpServer</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Socket\UdpReceiver\UdpReceiver.h">
+      <Filter>Socket\UdpReceiver</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Socket\UdpSender\UdpSender.h">
+      <Filter>Socket\UdpSender</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ThreadBase\ThreadBase.h">
+      <Filter>ThreadBase</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
