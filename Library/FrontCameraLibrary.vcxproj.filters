@@ -16,9 +16,6 @@
     <Filter Include="Include">
       <UniqueIdentifier>{e1699579-04fe-47e5-9286-1e21f01ffc5c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Logger\Thread">
-      <UniqueIdentifier>{dbdff7fd-77d9-4f1d-a7c5-7c790f493744}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Socket\UdpSender">
       <UniqueIdentifier>{86028717-1553-4de6-958e-2c31a857846d}</UniqueIdentifier>
     </Filter>

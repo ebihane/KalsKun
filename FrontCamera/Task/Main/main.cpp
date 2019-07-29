@@ -11,15 +11,13 @@ wiringPi; pthread; dl; rt;  opencv_core; opencv_video; opencv_videoio; opencv_hi
 #define MEMORY_MAIN
 
 #include "Include/Common.h"
-#include "Logger/Thread/LogWriter.h"
+#include "Logger/Logger.h"
 #include "Parts/ShareMemory/ShareMemory.h"
 #include "MasterMain.h"
 #include "SlaveMain.h"
 
 ResultEnum initialize(const int controllerType);
 void finalize();
-
-static LogWriter* g_pLogWriter = NULL;
 
 int main(int argc, char* argv[])
 {
@@ -30,7 +28,13 @@ int main(int argc, char* argv[])
 
     if (argc <= 1)
     {
-        masterMain();
+        int cameraNo = 0;
+        if (2 <= argc)
+        {
+            cameraNo = atoi(argv[1]);
+        }
+        printf("[masterMain] CameraNo = %d\n", cameraNo);
+        masterMain(cameraNo);
     }
     else
     {
@@ -56,19 +60,12 @@ ResultEnum initialize(const int controllerType)
 
     if (controllerType <= 1)
     {
-        g_pLogWriter = new LogWriter((char *)"FrontCameraM");
+        StartLoggerProcess((char *)"FrontCameraM");
     }
     else
     {
-        g_pLogWriter = new LogWriter((char *)"FrontCameraS");
+        StartLoggerProcess((char*)"FrontCameraS");
     }
-
-    if (g_pLogWriter == NULL)
-    {
-        goto FINISH;
-    }
-
-    g_pLogWriter->Run();
 
     retVal = ResultEnum::NormalEnd;
 
@@ -78,12 +75,6 @@ FINISH :
 
 void finalize()
 {
-    if (g_pLogWriter != NULL)
-    {
-        delete g_pLogWriter;
-        g_pLogWriter = NULL;
-    }
-
     if (pShareMemory != NULL)
     {
         delete pShareMemory;

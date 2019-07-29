@@ -24,4 +24,3 @@ typedef struct
 #define LOG_EVCODE_OUTPUT       (1)     /* ログ出力 */
 #define LOG_EVCODE_STOP         (2)     /* ログ停止 */
 #define LOG_EVCODE_RESTART      (3)     /* ログ再開 */
-

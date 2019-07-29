@@ -111,7 +111,7 @@ ResultEnum CameraCapture::finalize()
 
     if (m_Logger != NULL)
     {
-        delete[] m_Logger;
+        delete m_Logger;
         m_Logger = NULL;
     }
 

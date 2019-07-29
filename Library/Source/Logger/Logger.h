@@ -4,6 +4,9 @@
 #define LOG_LENGTH_MAX  (128)
 #define LOG_OUT_MAX     (80)
 
+/* ログ出力プロセス起動 */
+int StartLoggerProcess(char* const name);
+
 class Logger
 {
 public :

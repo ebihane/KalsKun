@@ -3,7 +3,26 @@
 #include <stdio.h>
 #include <time.h>
 #include <sys/time.h>
+#include <unistd.h>
 #include "Logger.h"
+
+int StartLoggerProcess(char* const name)
+{
+    int retVal = 0;
+
+    int pid = fork();
+    if (pid != 0)
+    {
+        retVal = pid;
+    }
+    else
+    {
+        execl("/home/pi/projects/release/LogWriter.out", "/home/pi/projects/release/LogWriter.out", &name[0], (char *)NULL);
+        exit(0);
+    }
+
+    return retVal;
+}
 
 Logger::Logger(char* const name, const long logLevel, const LogTypeEnum logType)
  : m_Queue(NULL)

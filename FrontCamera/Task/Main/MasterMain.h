@@ -1,3 +1,3 @@
 #pragma once
 
-ResultEnum masterMain();
+ResultEnum masterMain(const int cameraNo);

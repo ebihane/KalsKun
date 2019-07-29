@@ -32,10 +32,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <RemoteRootDir>/home/pi/projects</RemoteRootDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <RemoteRootDir>/home/pi/projects</RemoteRootDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -51,10 +53,18 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <TargetExt>.so</TargetExt>
     <IncludePath>D:\Tools\OpenCV\4.1.0\opencv\build\include;$(ProjectDir)\Source</IncludePath>
+    <RemoteProjectDir>$(RemoteRootDir)/Library</RemoteProjectDir>
+    <RemoteDeployDir>$(RemoteRootDir)/Library</RemoteDeployDir>
+    <TargetName>libLibrary</TargetName>
+    <RemoteTargetPath>$(RemoteProjectDir)/bin/$(Platform)/$(Configuration)/$(TargetName)$(TargetExt)</RemoteTargetPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <TargetExt>.so</TargetExt>
     <IncludePath>D:\Tools\OpenCV\4.1.0\opencv\build\include;$(ProjectDir)\Source</IncludePath>
+    <RemoteProjectDir>$(RemoteRootDir)/Library</RemoteProjectDir>
+    <RemoteDeployDir>$(RemoteRootDir)/Library</RemoteDeployDir>
+    <TargetName>libLibrary</TargetName>
+    <RemoteTargetPath>$(RemoteProjectDir)/bin/$(Platform)/$(Configuration)/$(TargetName)$(TargetExt)</RemoteTargetPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
@@ -75,6 +85,9 @@
       <Message>
       </Message>
     </RemotePostBuildEvent>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(RemoteProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Source\Logger\Logger.cpp" />
@@ -97,7 +110,11 @@
     <ClInclude Include="Source\Socket\UdpSender\UdpSender.h" />
     <ClInclude Include="Source\ThreadBase\ThreadBase.h" />
   </ItemGroup>
-  <ItemDefinitionGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(RemoteProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
 </Project>

@@ -11,10 +11,10 @@ static Logger* g_pLogger = NULL;
 static CameraCapture* g_pCameraCapture = NULL;
 static CameraReceiver* g_pCameraReceiver = NULL;
 
-ResultEnum masterInitialize();
+ResultEnum masterInitialize(const int cameraNo);
 void masterFinalize();
 
-ResultEnum masterInitialize()
+ResultEnum masterInitialize(const int cameraNo)
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
 
@@ -31,7 +31,7 @@ ResultEnum masterInitialize()
         goto FINISH;
     }
 
-    g_pCameraCapture = new CameraCapture(0);
+    g_pCameraCapture = new CameraCapture(cameraNo);
     if (g_pCameraCapture == NULL)
     {
         g_pLogger->LOG_ERROR("[masterInitialize] g_pCameraCapture allocation failed.\n");
@@ -69,14 +69,14 @@ void masterFinalize()
     }
 }
 
-ResultEnum masterMain()
+ResultEnum masterMain(const int cameraNo)
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
-    long captureIndex = -1;
-    long receiveIndex = -1;
+    unsigned char captureIndex = -1;
+    unsigned char receiveIndex = -1;
     int key = 0;
 
-    if (masterInitialize() != ResultEnum::NormalEnd)
+    if (masterInitialize(cameraNo) != ResultEnum::NormalEnd)
     {
         goto FINISH;
     }

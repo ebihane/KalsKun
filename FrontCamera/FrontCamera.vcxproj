@@ -32,9 +32,11 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
+    <RemoteRootDir>/home/pi/projects</RemoteRootDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
+    <RemoteRootDir>/home/pi/projects</RemoteRootDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -55,26 +57,28 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
-      <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc;opencv_imgcodecs;FrontCameraLibrary</LibraryDependencies>
+      <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc;opencv_imgcodecs;Library</LibraryDependencies>
     </Link>
     <RemotePostBuildEvent>
-      <Command>gpio export 17 out</Command>
-      <Message>export pin 17 using the gpio utility so that we can execute the blink program without sudo</Message>
+      <Command>sudo cp $(RemoteTargetPath) $(RemoteRootDir)/release</Command>
+      <Message>
+      </Message>
     </RemotePostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <Link>
-      <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc;opencv_imgcodecs;FrontCameraLibrary</LibraryDependencies>
+      <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc;opencv_imgcodecs;Library</LibraryDependencies>
       <AdditionalDependencies>$(StlAdditionalDependencies);%(Link.AdditionalDependencies)</AdditionalDependencies>
       <SharedLibrarySearchPath>%(Link.SharedLibrarySearchPath)</SharedLibrarySearchPath>
       <AdditionalLibraryDirectories>%(Link.AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <RemotePostBuildEvent>
-      <Command>gpio export 17 out</Command>
-      <Message>export pin 17 using the gpio utility so that we can execute the blink program without sudo</Message>
+      <Command>sudo cp $(RemoteTargetPath) $(RemoteRootDir)/release</Command>
+      <Message>
+      </Message>
     </RemotePostBuildEvent>
     <ClCompile>
-      <AdditionalIncludeDirectories>/usr/local/include/opencv4;$(RemoteRootDir);$(RemoteProjectDir);%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>/usr/local/include/opencv4;$(RemoteRootDir);$(RemoteRootDir)/Library;$(RemoteProjectDir);%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CAdditionalWarning>switch;no-deprecated-declarations;empty-body;return-type;parentheses;no-pointer-sign;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CAdditionalWarning)</CAdditionalWarning>
       <CppAdditionalWarning>switch;no-deprecated-declarations;empty-body;return-type;parentheses;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable</CppAdditionalWarning>
       <AdditionalOptions>`pkg-config opencv --cflags` `pkg-config opencv --libs` %(AdditionalOptions)</AdditionalOptions>
@@ -108,7 +112,7 @@
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
-      <AdditionalIncludeDirectories>/usr/local/include/opencv4;$(RemoteRootDir);$(RemoteProjectDir);%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>/usr/local/include/opencv4;$(RemoteRootDir);$(RemoteRootDir)/Library;$(RemoteProjectDir);%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CAdditionalWarning>switch;no-deprecated-declarations;empty-body;return-type;parentheses;no-pointer-sign;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CAdditionalWarning)</CAdditionalWarning>
       <CppAdditionalWarning>switch;no-deprecated-declarations;empty-body;return-type;parentheses;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable</CppAdditionalWarning>
       <AdditionalOptions>`pkg-config opencv --cflags` `pkg-config opencv --libs` %(AdditionalOptions)</AdditionalOptions>
