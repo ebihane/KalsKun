@@ -1,0 +1,22 @@
+利用している OpenCV のバージョン：4.1.0
+
+＜VisualStudio2019を利用する場合＞
+VisualC++のインクルードディレクトリに、OpenCVのソースコードへのパスを通す。
+プロジェクトを右クリック → プロパティ → VC++ ディレクトリ → インクルードディレクトリ
+FrontCameraプロジェクトは、上記に加えてfreenectへのパスを通す。
+(freenectのソースコードは、Raspberry pi内にfreenectの環境を構築した後、ソースコードをコピーしてWindows側に持ってくる)
+
+現状は絶対パス指定になっている。恒久的には環境変数(PATH)にしたい。
+
+＜環境構築＞
+OpenCV in ラズパイ
+https://qiita.com/takahiro_itazuri/items/a67dd3bb7f5f88ca9dd8
+
+freenect 環境構築
+※ FrontCamera 用 Kinect Hack
+http://blog.bitcollectors.com/adam/2016/01/kinect-support-for-raspberry-pi-using-libfreenect/
+
+＜参考サイト＞
+libfreenectを使ったKinect v1の開発
+https://qiita.com/int_main_Nick/items/e4e3949148afc352fb47
+

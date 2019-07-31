@@ -92,6 +92,12 @@ ResultEnum slaveMain()
             }
         }
 
+        if (sendIndex != pShareMemory->Communicate.Index)
+        {
+            sendIndex = pShareMemory->Communicate.Index;
+            cv::imshow("Send", pShareMemory->Communicate.Data[sendIndex]);
+        }
+
         key = cv::waitKey(1);
         if (key == 'q')
         {

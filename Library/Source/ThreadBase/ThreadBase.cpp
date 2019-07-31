@@ -86,12 +86,13 @@ ResultEnum ThreadBase::Stop(const unsigned long timeoutSec)
             goto FINISH;
         }
 
-        if (m_ThreadState == ThreadStateEnum::Executing)
+        if (m_ThreadState != ThreadStateEnum::Executing)
         {
-            delay(100);
+            break;
         }
 
         cnt++;
+        delay(100);
     }
 
     retVal = ResultEnum::NormalEnd;

@@ -19,6 +19,9 @@
     <ClCompile Include="Task\Main\SlaveMain.cpp">
       <Filter>Task\Main</Filter>
     </ClCompile>
+    <ClCompile Include="Task\Kinect\KinectCapture.cpp">
+      <Filter>Task\Kinect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Task">
@@ -45,6 +48,9 @@
     <Filter Include="Task\FrontCameraPatrol">
       <UniqueIdentifier>{df6e0a5a-28ca-4505-9e14-981ee295381b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Task\Kinect">
+      <UniqueIdentifier>{eccfb7c1-d409-41d5-b9c3-4873cf850854}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Task\CameraCapture\CameraCapture.h">
@@ -64,6 +70,9 @@
     </ClInclude>
     <ClInclude Include="Task\Main\SlaveMain.h">
       <Filter>Task\Main</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\Kinect\KinectCapture.h">
+      <Filter>Task\Kinect</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

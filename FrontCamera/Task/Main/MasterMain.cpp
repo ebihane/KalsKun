@@ -1,3 +1,5 @@
+#define KINECT_CAPTURE_USE
+
 #include <stdlib.h>
 #include "Include/Common.h"
 #include "Logger/Logger.h"
@@ -5,11 +7,13 @@
 #include "Parts/ShareMemory/ShareMemory.h"
 #include "Task/CameraCapture/CameraCapture.h"
 #include "Task/CameraReceiver/CameraReceiver.h"
+#include "Task/Kinect/KinectCapture.h"
 #include "MasterMain.h"
 
 static Logger* g_pLogger = NULL;
 static CameraCapture* g_pCameraCapture = NULL;
 static CameraReceiver* g_pCameraReceiver = NULL;
+static KinectCapture* g_pKinectCapture = NULL;
 
 ResultEnum masterInitialize(const int cameraNo);
 void masterFinalize();
@@ -31,15 +35,31 @@ ResultEnum masterInitialize(const int cameraNo)
         goto FINISH;
     }
 
+#ifndef KINECT_CAPTURE_USE
     g_pCameraCapture = new CameraCapture(cameraNo);
     if (g_pCameraCapture == NULL)
     {
         g_pLogger->LOG_ERROR("[masterInitialize] g_pCameraCapture allocation failed.\n");
         goto FINISH;
     }
+#else
+
+    g_pKinectCapture = new KinectCapture();
+    if (g_pKinectCapture == NULL)
+    {
+        g_pLogger->LOG_ERROR("[masterInitialize] g_pKinectCapture allocation failed.\n");
+        goto FINISH;
+    }
+
+#endif
 
     g_pCameraReceiver->Run();
+
+#ifndef KINECT_CAPTURE_USE
     g_pCameraCapture->Run();
+#else
+    g_pKinectCapture->Start();
+#endif
 
     retVal = ResultEnum::NormalEnd;
 
@@ -113,15 +133,18 @@ ResultEnum masterMain(const int cameraNo)
 
 #endif
 
+#ifndef KINECT_CAPTURE_USE
         if (g_pCameraCapture->IsCaptureStart() == true)
         {
+#endif
             if (captureIndex != pShareMemory->Capture.Index)
             {
                 captureIndex = pShareMemory->Capture.Index;
                 cv::imshow("Capture", pShareMemory->Capture.Data[captureIndex]);
             }
+#ifndef KINECT_CAPTURE_USE
         }
-
+#endif
         if (receiveIndex != pShareMemory->Communicate.Index)
         {
             receiveIndex = pShareMemory->Communicate.Index;
