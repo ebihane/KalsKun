@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.29102.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AroundCamera", "AroundCamera\AroundCamera.vcxproj", "{98445932-10AB-4BC0-9335-564CD39C170D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AroundCameraLibrary", "Library\AroundCameraLibrary.vcxproj", "{58E3D614-4EBD-486B-A214-DA28F0D7569A}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -35,22 +33,6 @@ Global
 		{98445932-10AB-4BC0-9335-564CD39C170D}.Release|ARM64.Deploy.0 = Release|ARM64
 		{98445932-10AB-4BC0-9335-564CD39C170D}.Release|x64.ActiveCfg = Release|ARM
 		{98445932-10AB-4BC0-9335-564CD39C170D}.Release|x86.ActiveCfg = Release|ARM
-		{58E3D614-4EBD-486B-A214-DA28F0D7569A}.Debug|ARM.ActiveCfg = Debug|ARM
-		{58E3D614-4EBD-486B-A214-DA28F0D7569A}.Debug|ARM.Build.0 = Debug|ARM
-		{58E3D614-4EBD-486B-A214-DA28F0D7569A}.Debug|ARM.Deploy.0 = Debug|ARM
-		{58E3D614-4EBD-486B-A214-DA28F0D7569A}.Debug|ARM64.ActiveCfg = Debug|ARM64
-		{58E3D614-4EBD-486B-A214-DA28F0D7569A}.Debug|ARM64.Build.0 = Debug|ARM64
-		{58E3D614-4EBD-486B-A214-DA28F0D7569A}.Debug|ARM64.Deploy.0 = Debug|ARM64
-		{58E3D614-4EBD-486B-A214-DA28F0D7569A}.Debug|x64.ActiveCfg = Debug|ARM
-		{58E3D614-4EBD-486B-A214-DA28F0D7569A}.Debug|x86.ActiveCfg = Debug|ARM
-		{58E3D614-4EBD-486B-A214-DA28F0D7569A}.Release|ARM.ActiveCfg = Release|ARM
-		{58E3D614-4EBD-486B-A214-DA28F0D7569A}.Release|ARM.Build.0 = Release|ARM
-		{58E3D614-4EBD-486B-A214-DA28F0D7569A}.Release|ARM.Deploy.0 = Release|ARM
-		{58E3D614-4EBD-486B-A214-DA28F0D7569A}.Release|ARM64.ActiveCfg = Release|ARM64
-		{58E3D614-4EBD-486B-A214-DA28F0D7569A}.Release|ARM64.Build.0 = Release|ARM64
-		{58E3D614-4EBD-486B-A214-DA28F0D7569A}.Release|ARM64.Deploy.0 = Release|ARM64
-		{58E3D614-4EBD-486B-A214-DA28F0D7569A}.Release|x64.ActiveCfg = Release|ARM
-		{58E3D614-4EBD-486B-A214-DA28F0D7569A}.Release|x86.ActiveCfg = Release|ARM
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

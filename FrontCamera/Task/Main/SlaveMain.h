@@ -1,3 +1,3 @@
 #pragma once
 
-ResultEnum slaveMain();
+ResultEnum slaveMain(const int cameraNo);

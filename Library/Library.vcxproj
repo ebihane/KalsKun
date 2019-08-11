@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7ff3ec4a-34f4-4b6a-9be4-4ff4eeee23f1}</ProjectGuid>
     <Keyword>Linux</Keyword>
-    <RootNamespace>FrontCameraLibrary</RootNamespace>
+    <RootNamespace>Library</RootNamespace>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <ApplicationType>Linux</ApplicationType>
     <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
@@ -90,25 +90,27 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Logger\Logger.cpp" />
-    <ClCompile Include="Source\Queue\Queue.cpp" />
-    <ClCompile Include="Source\Socket\SocketBase.cpp" />
-    <ClCompile Include="Source\Socket\TcpClient\TcpClient.cpp" />
-    <ClCompile Include="Source\Socket\TcpServer\TcpServer.cpp" />
-    <ClCompile Include="Source\Socket\UdpReceiver\UdpReceiver.cpp" />
-    <ClCompile Include="Source\Socket\UdpSender\UdpSender.cpp" />
-    <ClCompile Include="Source\ThreadBase\ThreadBase.cpp" />
+    <ClCompile Include="Logger\Logger.cpp" />
+    <ClCompile Include="Queue\Queue.cpp" />
+    <ClCompile Include="Queue\SendQueue.cpp" />
+    <ClCompile Include="Socket\SocketBase.cpp" />
+    <ClCompile Include="Socket\TcpClient\TcpClient.cpp" />
+    <ClCompile Include="Socket\TcpServer\TcpServer.cpp" />
+    <ClCompile Include="Socket\UdpReceiver\UdpReceiver.cpp" />
+    <ClCompile Include="Socket\UdpSender\UdpSender.cpp" />
+    <ClCompile Include="ThreadBase\ThreadBase.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Include\Common.h" />
-    <ClInclude Include="Source\Logger\Logger.h" />
-    <ClInclude Include="Source\Queue\Queue.h" />
-    <ClInclude Include="Source\Socket\SocketBase.h" />
-    <ClInclude Include="Source\Socket\TcpClient\TcpClient.h" />
-    <ClInclude Include="Source\Socket\TcpServer\TcpServer.h" />
-    <ClInclude Include="Source\Socket\UdpReceiver\UdpReceiver.h" />
-    <ClInclude Include="Source\Socket\UdpSender\UdpSender.h" />
-    <ClInclude Include="Source\ThreadBase\ThreadBase.h" />
+    <ClInclude Include="Include\Common.h" />
+    <ClInclude Include="Logger\Logger.h" />
+    <ClInclude Include="Queue\Queue.h" />
+    <ClInclude Include="Queue\SendQueue.h" />
+    <ClInclude Include="Socket\SocketBase.h" />
+    <ClInclude Include="Socket\TcpClient\TcpClient.h" />
+    <ClInclude Include="Socket\TcpServer\TcpServer.h" />
+    <ClInclude Include="Socket\UdpReceiver\UdpReceiver.h" />
+    <ClInclude Include="Socket\UdpSender\UdpSender.h" />
+    <ClInclude Include="ThreadBase\ThreadBase.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>

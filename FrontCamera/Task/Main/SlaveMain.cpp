@@ -13,11 +13,11 @@ static CameraSender* g_pCameraSender = NULL;
 ResultEnum slaveInitialize();
 void slaveFinalize();
 
-ResultEnum slaveInitialize()
+ResultEnum slaveInitialize(const int cameraNo)
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
 
-    g_pLogger = new Logger((char*)"Main", Logger::LOG_ERROR | Logger::LOG_INFO, Logger::LogTypeEnum::BOTH_OUT);
+    g_pLogger = new Logger(Logger::LOG_ERROR | Logger::LOG_INFO, Logger::LogTypeEnum::BOTH_OUT);
     if (g_pLogger == NULL)
     {
         goto FINISH;
@@ -30,7 +30,7 @@ ResultEnum slaveInitialize()
         goto FINISH;
     }
 
-    g_pCameraCapture = new CameraCapture(0);
+    g_pCameraCapture = new CameraCapture(cameraNo);
     if (g_pCameraCapture == NULL)
     {
         g_pLogger->LOG_ERROR("[slaveInitialize] g_pCameraCapture allocation failed.\n");
@@ -68,14 +68,14 @@ void slaveFinalize()
     }
 }
 
-ResultEnum slaveMain()
+ResultEnum slaveMain(const int cameraNo)
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     long captureIndex = -1;
     long sendIndex = -1;
     int key = 0;
 
-    if (slaveInitialize() != ResultEnum::NormalEnd)
+    if (slaveInitialize(cameraNo) != ResultEnum::NormalEnd)
     {
         goto FINISH;
     }

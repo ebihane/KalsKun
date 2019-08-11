@@ -16,15 +16,15 @@ public:
 
     ResultEnum Open();
     ResultEnum Close();
-    ResultEnum IsSendable(bool& sendable);
-    ResultEnum IsReceivable(bool& receivable);
     ResultEnum Send(char* const targetName, void* const bufferPtr, const unsigned long size);
-    ResultEnum Receive(void* const bufferPtr, const unsigned long size);
+    ResultEnum IsReceivable(bool& receivable);
+    ResultEnum Receive(void* const bufferPtr);
     int GetLastError();
 
 private:
 
     mqd_t m_Queue;
+    mq_attr m_Attr;
     char m_Name[NAME_MAXLEN];
     int m_LastError;
 

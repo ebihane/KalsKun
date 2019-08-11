@@ -1,11 +1,14 @@
 #pragma once
-#include "Queue/Queue.h"
+#include "Queue/SendQueue.h"
 
 #define LOG_LENGTH_MAX  (128)
 #define LOG_OUT_MAX     (80)
 
 /* ログ出力プロセス起動 */
 int StartLoggerProcess(char* const name);
+
+/* ログ出力プロセス停止 */
+void StopLoggerProcess();
 
 class Logger
 {
@@ -24,7 +27,7 @@ public :
         BOTH_OUT = 0x03,
     } LogTypeEnum;
 
-    Logger(char* const name, const long logLevel, const LogTypeEnum logType);
+    Logger(const long logLevel, const LogTypeEnum logType);
     virtual ~Logger();
 
     void ChangeLevel(const char logLevel);
@@ -36,13 +39,7 @@ protected :
 
 private :
 
-    typedef struct
-    {
-        long Code;
-        char Buffer[LOG_LENGTH_MAX];
-    } LogMessageStr;
-
-    Queue* m_Queue;
+    SendQueue m_SendQueue;
     long m_Level;
     LogTypeEnum m_Type;
 

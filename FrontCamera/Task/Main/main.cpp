@@ -15,30 +15,49 @@ wiringPi; pthread; dl; rt;  opencv_core; opencv_video; opencv_videoio; opencv_hi
 #include "Parts/ShareMemory/ShareMemory.h"
 #include "MasterMain.h"
 #include "SlaveMain.h"
+#include "KinectMain.h"
 
 ResultEnum initialize(const int controllerType);
 void finalize();
 
+/* ./FrontCamera.out (使用デバイス番号) */
 int main(int argc, char* argv[])
 {
+    char deviceNo = 0;
+    char cameraNo = 0;
+
     if (initialize(argc) != ResultEnum::NormalEnd)
     {
         goto FINISH;
     }
 
-    if (argc <= 1)
+    if (2 < argc)
     {
-        int cameraNo = 0;
-        if (2 <= argc)
-        {
-            cameraNo = atoi(argv[1]);
-        }
-        printf("[masterMain] CameraNo = %d\n", cameraNo);
-        masterMain(cameraNo);
+        deviceNo = atoi(argv[2]);
     }
-    else
+
+    if (3 < argc)
     {
-        slaveMain();
+        cameraNo = atoi(argv[3]);
+    }
+
+    switch (deviceNo)
+    {
+        case 0 :
+            kinectMain(cameraNo);
+            break;
+
+        case 1 :
+            masterMain(cameraNo);
+            break;
+
+        case 2 :
+            slaveMain(cameraNo);
+            break;
+
+        default :
+            printf("[FrontCamera::main] invalid deviceNo. [%d]\n", deviceNo);
+            break;
     }
 
 FINISH:

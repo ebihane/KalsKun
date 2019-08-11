@@ -19,23 +19,24 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{b37723db-d26f-445f-a029-0eac37f568ab}</ProjectGuid>
+    <ProjectGuid>{a2587ab4-c872-41ac-8fc7-301d8f124102}</ProjectGuid>
     <Keyword>Linux</Keyword>
-    <RootNamespace>CommanderLibrary</RootNamespace>
+    <RootNamespace>Logger</RootNamespace>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <ApplicationType>Linux</ApplicationType>
     <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
     <TargetLinuxPlatform>Raspberry</TargetLinuxPlatform>
     <LinuxProjectType>{8748239F-558C-44D1-944B-07B09C35B330}</LinuxProjectType>
+    <ProjectName>LogWriter</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <RemoteRootDir>/home/pi/projects</RemoteRootDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <RemoteRootDir>/home/pi/projects</RemoteRootDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -49,57 +50,42 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <TargetExt>.so</TargetExt>
-    <IncludePath>D:\Tools\OpenCV\4.1.0\opencv\build\include;$(ProjectDir)\Source</IncludePath>
+    <IncludePath>$(SolutionDir)\Library</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <TargetExt>.so</TargetExt>
-    <IncludePath>D:\Tools\OpenCV\4.1.0\opencv\build\include;$(ProjectDir)\Source</IncludePath>
+    <IncludePath>$(SolutionDir)\Library</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
-      <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc</LibraryDependencies>
+      <LibraryDependencies>wiringPi;dl;rt;Library</LibraryDependencies>
     </Link>
     <RemotePostBuildEvent>
-      <Command>sudo cp $(RemoteTargetPath) /usr/lib</Command>
+      <Command>cp $(RemoteTargetPath) $(RemoteRootDir)/release</Command>
       <Message>
       </Message>
     </RemotePostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <Link>
-      <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc</LibraryDependencies>
+      <LibraryDependencies>wiringPi;dl;rt;Library</LibraryDependencies>
     </Link>
     <RemotePostBuildEvent>
-      <Command>sudo cp $(RemoteTargetPath) /usr/lib</Command>
+      <Command>cp $(RemoteTargetPath) $(RemoteRootDir)/release</Command>
       <Message>
       </Message>
     </RemotePostBuildEvent>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(RemoteRootDir)/Library;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Source\Include\Common.h" />
-    <ClInclude Include="Source\Logger\Logger.h" />
-    <ClInclude Include="Source\Logger\Thread\LogWriter.h" />
-    <ClInclude Include="Source\Queue\Queue.h" />
-    <ClInclude Include="Source\Socket\SocketBase.h" />
-    <ClInclude Include="Source\Socket\TcpClient\TcpClient.h" />
-    <ClInclude Include="Source\Socket\TcpServer\TcpServer.h" />
-    <ClInclude Include="Source\Socket\UdpReceiver\UdpReceiver.h" />
-    <ClInclude Include="Source\Socket\UdpSender\UdpSender.h" />
-    <ClInclude Include="Source\ThreadBase\ThreadBase.h" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Source\Logger\Logger.cpp" />
-    <ClCompile Include="Source\Logger\Thread\LogWriter.cpp" />
-    <ClCompile Include="Source\Queue\Queue.cpp" />
-    <ClCompile Include="Source\Socket\SocketBase.cpp" />
-    <ClCompile Include="Source\Socket\TcpClient\TcpClient.cpp" />
-    <ClCompile Include="Source\Socket\TcpServer\TcpServer.cpp" />
-    <ClCompile Include="Source\Socket\UdpReceiver\UdpReceiver.cpp" />
-    <ClCompile Include="Source\Socket\UdpSender\UdpSender.cpp" />
-    <ClCompile Include="Source\ThreadBase\ThreadBase.cpp" />
-  </ItemGroup>
-  <ItemDefinitionGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(RemoteRootDir)/Library;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
 </Project>

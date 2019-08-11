@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.29102.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Commander", "Commander\Commander.vcxproj", "{677DEAF6-157B-43FF-BA99-68B675AD17BC}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CommanderLibrary", "Library\CommanderLibrary.vcxproj", "{B37723DB-D26F-445F-A029-0EAC37F568AB}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -27,18 +25,6 @@ Global
 		{677DEAF6-157B-43FF-BA99-68B675AD17BC}.Release|ARM64.ActiveCfg = Release|ARM64
 		{677DEAF6-157B-43FF-BA99-68B675AD17BC}.Release|ARM64.Build.0 = Release|ARM64
 		{677DEAF6-157B-43FF-BA99-68B675AD17BC}.Release|ARM64.Deploy.0 = Release|ARM64
-		{B37723DB-D26F-445F-A029-0EAC37F568AB}.Debug|ARM.ActiveCfg = Debug|ARM
-		{B37723DB-D26F-445F-A029-0EAC37F568AB}.Debug|ARM.Build.0 = Debug|ARM
-		{B37723DB-D26F-445F-A029-0EAC37F568AB}.Debug|ARM.Deploy.0 = Debug|ARM
-		{B37723DB-D26F-445F-A029-0EAC37F568AB}.Debug|ARM64.ActiveCfg = Debug|ARM64
-		{B37723DB-D26F-445F-A029-0EAC37F568AB}.Debug|ARM64.Build.0 = Debug|ARM64
-		{B37723DB-D26F-445F-A029-0EAC37F568AB}.Debug|ARM64.Deploy.0 = Debug|ARM64
-		{B37723DB-D26F-445F-A029-0EAC37F568AB}.Release|ARM.ActiveCfg = Release|ARM
-		{B37723DB-D26F-445F-A029-0EAC37F568AB}.Release|ARM.Build.0 = Release|ARM
-		{B37723DB-D26F-445F-A029-0EAC37F568AB}.Release|ARM.Deploy.0 = Release|ARM
-		{B37723DB-D26F-445F-A029-0EAC37F568AB}.Release|ARM64.ActiveCfg = Release|ARM64
-		{B37723DB-D26F-445F-A029-0EAC37F568AB}.Release|ARM64.Build.0 = Release|ARM64
-		{B37723DB-D26F-445F-A029-0EAC37F568AB}.Release|ARM64.Deploy.0 = Release|ARM64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

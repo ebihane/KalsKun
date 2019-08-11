@@ -2,7 +2,6 @@
 #include <string.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <mqueue.h>
 #include <errno.h>
 #include "Queue.h"
 
@@ -27,6 +26,7 @@ ResultEnum Queue::Open()
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     int errorNo = ERROR_NOTHING;
     mqd_t queue = 0;
+    mq_attr attr = {0};
 
     /* 存在確認 */
     m_LastError = ERROR_NOTHING;
@@ -50,14 +50,17 @@ ResultEnum Queue::Open()
     }
 
     /* 存在しない場合は新規作成 */
-    queue = mq_open(&m_Name[0], O_RDWR | O_CREAT, 0777, NULL);
+    queue = mq_open(&m_Name[0], O_RDONLY | O_CREAT, 0644, NULL);
     if (queue < 0)
     {
         m_LastError = errno;
         goto FINISH;
     }
 
+    mq_getattr(queue, &attr);
+
     m_Queue = queue;
+    memcpy(&m_Attr, &attr, sizeof(mq_attr));
 
     retVal = ResultEnum::NormalEnd;
 
@@ -86,48 +89,39 @@ FINISH :
     return retVal;
 }
 
-ResultEnum Queue::IsSendable(bool& sendable)
+ResultEnum Queue::Send(char* const targetName, void* const bufferPtr, const unsigned long size)
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
-    fd_set sendFds;
-    fd_set errorFds;
-    struct timeval  timeout;
+    mqd_t targetQueue = INVALID_QUEUE;
 
-    sendable = false;
 
-    if (m_Queue == INVALID_QUEUE)
+    if ((targetName == NULL) || (bufferPtr == NULL))
     {
         goto FINISH;
     }
 
-    FD_ZERO(&sendFds);
-    FD_ZERO(&errorFds);
-    FD_SET(m_Queue, &sendFds);
-    FD_SET(m_Queue, &errorFds);
-
-    timeout.tv_sec = 0;
-    timeout.tv_usec = 0;
-
     m_LastError = ERROR_NOTHING;
-    if (select(m_Queue + 1, NULL, &sendFds, &errorFds, &timeout) < 0)
+
+    /* 送信対象のキューをオープン */
+    targetQueue = mq_open(&targetName[0], O_WRONLY);
+    if (targetQueue < 0)
     {
+        printf("[Queue::Send] mq_open failed. target[%s]\n", targetName);
         m_LastError = errno;
-    }
-    else if (FD_ISSET(m_Queue, &errorFds) != 0)
-    {
-        m_LastError = errno;
-    }
-    else if (FD_ISSET(m_Queue, &sendFds) == 0)
-    {
-        retVal = ResultEnum::NormalEnd;
-    }
-    else
-    {
-        sendable = true;
-        retVal = ResultEnum::NormalEnd;
+        goto FINISH;
     }
 
-FINISH:
+    if (mq_send(targetQueue, (const char*)bufferPtr, size, 0) < 0)
+    {
+        printf("[Queue::Send] mq_send failed. target[%s]\n", targetName);
+        m_LastError = errno;
+        goto FINISH;
+    }
+
+    retVal = ResultEnum::NormalEnd;
+    
+
+FINISH :
     return retVal;
 }
 
@@ -176,41 +170,7 @@ FINISH:
     return retVal;
 }
 
-ResultEnum Queue::Send(char* const targetName, void* const bufferPtr, const unsigned long size)
-{
-    ResultEnum retVal = ResultEnum::AbnormalEnd;
-    mqd_t targetQueue = INVALID_QUEUE;
-
-
-    if ((targetName == NULL) || (bufferPtr == NULL))
-    {
-        goto FINISH;
-    }
-
-    m_LastError = ERROR_NOTHING;
-
-    /* 送信対象のキューをオープン */
-    targetQueue = mq_open(&targetName[0], O_RDWR);
-    if (targetQueue < 0)
-    {
-        m_LastError = errno;
-        goto FINISH;
-    }
-
-    if (mq_send(targetQueue, (const char*)bufferPtr, size, 0) < 0)
-    {
-        m_LastError = errno;
-        goto FINISH;
-    }
-
-    retVal = ResultEnum::NormalEnd;
-    
-
-FINISH :
-    return retVal;
-}
-
-ResultEnum Queue::Receive(void* const bufferPtr, const unsigned long size)
+ResultEnum Queue::Receive(void* const bufferPtr)
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
 
@@ -221,7 +181,7 @@ ResultEnum Queue::Receive(void* const bufferPtr, const unsigned long size)
     }
 
     m_LastError = ERROR_NOTHING;
-    if (mq_receive(m_Queue, (char *)bufferPtr, size, 0) < 0)
+    if (mq_receive(m_Queue, (char *)bufferPtr, m_Attr.mq_msgsize, 0) < 0)
     {
         m_LastError = errno;
         goto FINISH;

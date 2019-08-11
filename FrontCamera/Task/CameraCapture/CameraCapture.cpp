@@ -32,7 +32,7 @@ ResultEnum CameraCapture::initialize()
 
     m_Start = false;
 
-    m_Logger = new Logger((char*)"CameraCapture", Logger::LOG_ERROR | Logger::LOG_INFO, Logger::LogTypeEnum::BOTH_OUT);
+    m_Logger = new Logger(Logger::LOG_ERROR | Logger::LOG_INFO, Logger::LogTypeEnum::BOTH_OUT);
     if (m_Logger == NULL)
     {
         goto FINISH;

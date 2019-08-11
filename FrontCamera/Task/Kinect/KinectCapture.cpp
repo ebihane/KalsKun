@@ -54,7 +54,7 @@ ResultEnum KinectCapture::Start()
     pthread_t tid = -1;
     pthread_attr_t  attr;
 
-    m_Logger = new Logger((char*)"KinectCapture", Logger::LOG_ERROR | Logger::LOG_INFO, Logger::LogTypeEnum::BOTH_OUT);
+    m_Logger = new Logger(Logger::LOG_ERROR | Logger::LOG_INFO, Logger::LogTypeEnum::BOTH_OUT);
     if (m_Logger == NULL)
     {
         goto FINISH;

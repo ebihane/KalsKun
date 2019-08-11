@@ -20,7 +20,7 @@ ResultEnum CameraSender::initialize()
     ResultEnum retVal = ResultEnum::AbnormalEnd;
 
 
-    m_Logger = new Logger((char *)"CameraSender", Logger::LOG_ERROR | Logger::LOG_INFO, Logger::LogTypeEnum::BOTH_OUT);
+    m_Logger = new Logger(Logger::LOG_ERROR | Logger::LOG_INFO, Logger::LogTypeEnum::BOTH_OUT);
     if (m_Logger == NULL)
     {
         goto FINISH;

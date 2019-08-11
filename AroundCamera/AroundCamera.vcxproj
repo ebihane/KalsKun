@@ -47,14 +47,14 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <IncludePath>D:\Tools\OpenCV\4.1.0\opencv\build\include;$(SolutionDir)\..;$(SolutionDir)\Library\Source;$(MSBuildProjectDirectory);$(IncludePath)</IncludePath>
+    <IncludePath>D:\Tools\OpenCV\4.1.0\opencv\build\include;$(SolutionDir)\..;$(SolutionDir)\Library;$(MSBuildProjectDirectory);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <IncludePath>D:\Tools\OpenCV\4.1.0\opencv\build\include;$(SolutionDir)\..;$(SolutionDir)\Library\Source;$(MSBuildProjectDirectory);$(IncludePath)</IncludePath>
+    <IncludePath>D:\Tools\OpenCV\4.1.0\opencv\build\include;$(SolutionDir)\..;$(SolutionDir)\Library;$(MSBuildProjectDirectory);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
-      <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc;opencv_imgcodecs;AroundCameraLibrary</LibraryDependencies>
+      <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc;opencv_imgcodecs;Library</LibraryDependencies>
     </Link>
     <RemotePostBuildEvent>
       <Command>gpio export 17 out</Command>
@@ -69,7 +69,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <Link>
-      <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc;opencv_imgcodecs;AroundCameraLibrary</LibraryDependencies>
+      <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc;opencv_imgcodecs;Library</LibraryDependencies>
     </Link>
     <RemotePostBuildEvent>
       <Command>gpio export 17 out</Command>

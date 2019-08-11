@@ -6,6 +6,12 @@
 #include <unistd.h>
 #include "Logger.h"
 
+typedef struct
+{
+    long Code;
+    char Buffer[LOG_LENGTH_MAX];
+} LogMessageStr;
+
 int StartLoggerProcess(char* const name)
 {
     int retVal = 0;
@@ -24,21 +30,25 @@ int StartLoggerProcess(char* const name)
     return retVal;
 }
 
-Logger::Logger(char* const name, const long logLevel, const LogTypeEnum logType)
- : m_Queue(NULL)
- , m_Level(logLevel)
+void StopLoggerProcess()
+{
+    LogMessageStr message = { 0 };
+    message.Code = LOG_EVCODE_FINISH;
+    
+    SendQueue queue;
+    queue.Send((char*)LOG_WRITER_QUEUE_NAME, &message, sizeof(message));
+}
+
+Logger::Logger(const long logLevel, const LogTypeEnum logType)
+ : m_Level(logLevel)
  , m_Type(logType)
 {
-    m_Queue = new Queue(name);
+    /* nop. */
 }
 
 Logger::~Logger()
 {
-    if (m_Queue != NULL)
-    {
-        delete m_Queue;
-        m_Queue = NULL;
-    }
+    /* nop. */
 }
 
 void Logger::ChangeLevel(const char logLevel)
@@ -96,9 +106,9 @@ void Logger::Print(char* const buffer, const char logLevel, char* const fileName
 
     if ((m_Type == FILE_OUT) || (m_Type == BOTH_OUT))
     {
-        if (m_Queue->Send((char*)"LogWriter", pMessage, sizeof(LogMessageStr)) != ResultEnum::NormalEnd)
+        if (m_SendQueue.Send((char*)LOG_WRITER_QUEUE_NAME, pMessage, sizeof(LogMessageStr)) != ResultEnum::NormalEnd)
         {
-            printf("[Logger] Queue Send Failed. errno[%d]\n", m_Queue->GetLastError());
+            printf("[Logger] Queue Send Failed. errno[%d]\n", m_SendQueue.GetLastError());
         }
     }
 

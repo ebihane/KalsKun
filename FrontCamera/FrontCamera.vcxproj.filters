@@ -20,7 +20,10 @@
       <Filter>Task\Main</Filter>
     </ClCompile>
     <ClCompile Include="Task\Kinect\KinectCapture.cpp">
-      <Filter>Task\Kinect</Filter>
+      <Filter>Task\KinectCapture</Filter>
+    </ClCompile>
+    <ClCompile Include="Task\Main\KinectMain.cpp">
+      <Filter>Task\Main</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -45,10 +48,7 @@
     <Filter Include="Task\Main">
       <UniqueIdentifier>{68236e0f-78bc-4795-88bb-74f27fd9bafa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Task\FrontCameraPatrol">
-      <UniqueIdentifier>{df6e0a5a-28ca-4505-9e14-981ee295381b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Task\Kinect">
+    <Filter Include="Task\KinectCapture">
       <UniqueIdentifier>{eccfb7c1-d409-41d5-b9c3-4873cf850854}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -72,7 +72,10 @@
       <Filter>Task\Main</Filter>
     </ClInclude>
     <ClInclude Include="Task\Kinect\KinectCapture.h">
-      <Filter>Task\Kinect</Filter>
+      <Filter>Task\KinectCapture</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\Main\KinectMain.h">
+      <Filter>Task\Main</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
