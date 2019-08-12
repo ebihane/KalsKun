@@ -17,7 +17,7 @@ wiringPi; pthread; dl; rt;  opencv_core; opencv_video; opencv_videoio; opencv_hi
 #include "SlaveMain.h"
 #include "KinectMain.h"
 
-ResultEnum initialize(const int controllerType);
+ResultEnum initialize(const char controllerType);
 void finalize();
 
 /* ./FrontCamera.out (使用デバイス番号) */
@@ -26,19 +26,19 @@ int main(int argc, char* argv[])
     char deviceNo = 0;
     char cameraNo = 0;
 
-    if (initialize(argc) != ResultEnum::NormalEnd)
-    {
-        goto FINISH;
-    }
-
     if (2 < argc)
     {
-        deviceNo = atoi(argv[2]);
+        deviceNo = atoi(argv[1]);
     }
 
     if (3 < argc)
     {
-        cameraNo = atoi(argv[3]);
+        cameraNo = atoi(argv[2]);
+    }
+
+    if (initialize(deviceNo) != ResultEnum::NormalEnd)
+    {
+        goto FINISH;
     }
 
     switch (deviceNo)
@@ -65,7 +65,7 @@ FINISH:
     return 0;
 }
 
-ResultEnum initialize(const int controllerType)
+ResultEnum initialize(const char controllerType)
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
 
@@ -77,13 +77,21 @@ ResultEnum initialize(const int controllerType)
         goto FINISH;
     }
 
-    if (controllerType <= 1)
+    if (controllerType == 0)
+    {
+        StartLoggerProcess((char *)"KinectCamera");
+    }
+    else if (controllerType == 1)
     {
         StartLoggerProcess((char *)"FrontCameraM");
     }
-    else
+    else if (controllerType == 2)
     {
         StartLoggerProcess((char*)"FrontCameraS");
+    }
+    else
+    {
+        goto FINISH;
     }
 
     retVal = ResultEnum::NormalEnd;

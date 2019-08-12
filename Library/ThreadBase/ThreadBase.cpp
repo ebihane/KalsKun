@@ -11,7 +11,8 @@
 //
 
 ThreadBase::ThreadBase()
- : m_Handle(-1)
+ : m_Logger(NULL)
+ , m_Handle(-1)
  , m_Stop(false)
  , m_LastError(ERROR_NOTHING)
  , m_ThreadState(ThreadStateEnum::NotStart)
@@ -31,15 +32,23 @@ ResultEnum ThreadBase::Run()
     pthread_t tid = -1;
     pthread_attr_t  attr;
 
-
     m_Stop = false;
     m_ThreadState = ThreadStateEnum::NotStart;
     m_LastError = ERROR_NOTHING;
+
+    m_Logger = new Logger(Logger::LOG_ERROR | Logger::LOG_INFO, Logger::BOTH_OUT);
+    if (m_Logger == NULL)
+    {
+        m_LastError = errno;
+        m_ThreadState = ThreadStateEnum::Error;
+        goto FINISH;
+    }
 
     if (pthread_attr_init(&attr) != 0)
     {
         m_LastError = errno;
         m_ThreadState = ThreadStateEnum::Error;
+        m_Logger->LOG_ERROR("[ThreadBase] pthread_attr_init failed.\n");
         goto FINISH;
     }
 
@@ -47,12 +56,14 @@ ResultEnum ThreadBase::Run()
     {
         m_LastError = errno;
         m_ThreadState = ThreadStateEnum::Error;
+        m_Logger->LOG_ERROR("[ThreadBase] pthread_attr_setdetachstate failed.\n");
         goto FINISH;
     }
 
     if (initialize() != ResultEnum::NormalEnd)
     {
         m_ThreadState = ThreadStateEnum::Error;
+        m_Logger->LOG_ERROR("[ThreadBase] initialize failed.\n");
         goto FINISH;
     }
 
@@ -60,6 +71,7 @@ ResultEnum ThreadBase::Run()
     {
         m_LastError = errno;
         m_ThreadState = ThreadStateEnum::Error;
+        m_Logger->LOG_ERROR("[ThreadBase] pthread_create failed.\n");
         goto FINISH;
     }
 
@@ -110,6 +122,12 @@ void ThreadBase::MainProcedure()
     m_ThreadResult = doProcedure();
     finalize();
 
+    if (m_Logger != NULL)
+    {
+        delete m_Logger;
+        m_Logger = NULL;
+    }
+
     m_ThreadState = ThreadStateEnum::Finished;
 }
 
@@ -121,6 +139,15 @@ ThreadBase::ThreadStateEnum ThreadBase::GetState()
 int ThreadBase::GetLastError()
 {
     return m_LastError;
+}
+
+void ThreadBase::ChangeLogInfo(const char logLevel, const Logger::LogTypeEnum logType)
+{
+    if (m_Logger != NULL)
+    {
+        m_Logger->ChangeLevel(logLevel);
+        m_Logger->ChangeOut(logType);
+    }
 }
 
 bool ThreadBase::isStopRequest()

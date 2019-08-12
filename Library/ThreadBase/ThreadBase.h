@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Include/Common.h"
+#include "Logger/Logger.h"
 
 class ThreadBase
 {
@@ -24,8 +25,11 @@ public :
     void MainProcedure();
     ThreadStateEnum GetState();
     int GetLastError();
+    void ChangeLogInfo(const char logLevel, const Logger::LogTypeEnum logType);
 
 protected :
+
+    Logger* m_Logger;
 
     virtual ResultEnum initialize() = 0;
     virtual ResultEnum doProcedure() = 0;

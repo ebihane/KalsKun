@@ -6,6 +6,15 @@ using namespace cv;
 
 #define CAMERA_DATA_MAX (10)
 
+typedef enum
+{
+    E_PATROL_NONE = 0,
+    E_PATROL_NORMAL,
+    E_PATROL_FIRST_DETECT,
+    E_PATROL_DETECTING,
+    E_PATROL_DETECT,
+} PatrolStateEnum;
+
 typedef struct
 {
     unsigned char Index;
@@ -15,7 +24,7 @@ typedef struct
 typedef struct
 {
     bool SystemError;
-    bool IsVideoRecord;
+    PatrolStateEnum PatrolState;
     CameraDataStr Capture;
 } ShareMemoryStr;
 

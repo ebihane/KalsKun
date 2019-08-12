@@ -16,7 +16,6 @@ protected :
 
 private :
 
-    Logger* m_Logger;
     UdpSender* m_UdpSender;
     char* m_SendBuffer;
 

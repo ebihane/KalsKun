@@ -31,9 +31,11 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
+    <RemoteRootDir>/home/pi/projects</RemoteRootDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
+    <RemoteRootDir>/home/pi/projects</RemoteRootDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -54,11 +56,12 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
-      <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc;opencv_imgcodecs;CommanderLibrary</LibraryDependencies>
+      <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc;opencv_imgcodecs;Library</LibraryDependencies>
     </Link>
     <RemotePostBuildEvent>
-      <Command>gpio export 17 out</Command>
-      <Message>export pin 17 using the gpio utility so that we can execute the blink program without sudo</Message>
+      <Command>sudo cp $(RemoteTargetPath) $(RemoteRootDir)/release</Command>
+      <Message>
+      </Message>
     </RemotePostBuildEvent>
     <ClCompile>
       <CppAdditionalWarning>switch;no-deprecated-declarations;empty-body;return-type;parentheses;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CppAdditionalWarning)</CppAdditionalWarning>
@@ -66,11 +69,12 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <Link>
-      <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc;opencv_imgcodecs;CommanderLibrary</LibraryDependencies>
+      <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc;opencv_imgcodecs;Library</LibraryDependencies>
     </Link>
     <RemotePostBuildEvent>
-      <Command>gpio export 17 out</Command>
-      <Message>export pin 17 using the gpio utility so that we can execute the blink program without sudo</Message>
+      <Command>sudo cp $(RemoteTargetPath) $(RemoteRootDir)/release</Command>
+      <Message>
+      </Message>
     </RemotePostBuildEvent>
     <ClCompile>
       <CAdditionalWarning>switch;no-deprecated-declarations;empty-body;return-type;parentheses;no-pointer-sign;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CAdditionalWarning)</CAdditionalWarning>
@@ -81,9 +85,16 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Parts\Communication\ReceiverThread.cpp" />
+    <ClCompile Include="Parts\Communication\SenderThread.cpp" />
+    <ClCompile Include="Task\AroundCamera\AroundCameraComm.cpp" />
+    <ClCompile Include="Task\Main\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Parts\Communication\ReceiverThread.h" />
+    <ClInclude Include="Parts\Communication\SenderThread.h" />
+    <ClInclude Include="Parts\ShareMemory\ShareMemory.h" />
+    <ClInclude Include="Task\AroundCamera\AroundCameraComm.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>

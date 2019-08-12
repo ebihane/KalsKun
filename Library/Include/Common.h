@@ -13,8 +13,6 @@ typedef enum
 /* イベント構造体 */
 typedef struct
 {
-    long From;          /* 送信元 */
-    long To;            /* 宛先 */
     long Code;          /* イベントコード */
     ResultEnum Result;  /* 実行結果 */
     long lParam[5];     /* long 型パラメータ */

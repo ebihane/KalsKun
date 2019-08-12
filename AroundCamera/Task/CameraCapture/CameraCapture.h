@@ -18,13 +18,16 @@ protected :
 
 private :
 
-    Logger* m_Logger;
     int m_CameraIndex;
     bool m_Start;
     cv::VideoCapture* m_Capture;
+    cv::VideoWriter* m_VideoWriter;
 
     ResultEnum initialize();
     ResultEnum doProcedure();
     ResultEnum finalize();
+
+    bool startVideoWrite();
+    void stopVideoWrite();
 
 };

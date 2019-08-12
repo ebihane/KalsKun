@@ -4,7 +4,6 @@
 
 CameraReceiver::CameraReceiver()
  : ThreadBase()
- , m_Logger(NULL)
  , m_UdpReceiver(NULL)
  , m_ReceiveBuffer(NULL)
 {
@@ -19,13 +18,6 @@ CameraReceiver::~CameraReceiver()
 ResultEnum CameraReceiver::initialize()
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
-
-    m_Logger = new Logger(Logger::LOG_ERROR | Logger::LOG_INFO, Logger::LogTypeEnum::BOTH_OUT);
-    if (m_Logger == NULL)
-    {
-        pShareMemory->SystemError = true;
-        goto FINISH;
-    }
 
     m_ReceiveBuffer = new char[UDP_RECEIVE_MAX];
     if (m_ReceiveBuffer == NULL)
@@ -194,12 +186,6 @@ ResultEnum CameraReceiver::finalize()
     {
         delete[] m_ReceiveBuffer;
         m_ReceiveBuffer = NULL;
-    }
-
-    if (m_Logger != NULL)
-    {
-        delete[] m_Logger;
-        m_Logger = NULL;
     }
 
     return ResultEnum::NormalEnd;

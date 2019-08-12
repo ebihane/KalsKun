@@ -175,6 +175,12 @@ void KinectCapture::mainProcedure()
 
     finalize();
 
+    if (m_Logger != NULL)
+    {
+        delete m_Logger;
+        m_Logger = NULL;
+    }
+
     m_Running = false;
 }
 

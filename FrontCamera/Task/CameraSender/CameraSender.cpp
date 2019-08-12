@@ -20,12 +20,6 @@ ResultEnum CameraSender::initialize()
     ResultEnum retVal = ResultEnum::AbnormalEnd;
 
 
-    m_Logger = new Logger(Logger::LOG_ERROR | Logger::LOG_INFO, Logger::LogTypeEnum::BOTH_OUT);
-    if (m_Logger == NULL)
-    {
-        goto FINISH;
-    }
-
     m_SendBuffer = new char[UDP_SEND_MAX];
     if (m_SendBuffer == NULL)
     {
@@ -142,12 +136,6 @@ ResultEnum CameraSender::finalize()
     {
         delete[] m_SendBuffer;
         m_SendBuffer = NULL;
-    }
-
-    if (m_Logger != NULL)
-    {
-        delete[] m_Logger;
-        m_Logger = NULL;
     }
 
     return ResultEnum::NormalEnd;

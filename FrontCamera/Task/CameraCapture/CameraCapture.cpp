@@ -32,15 +32,8 @@ ResultEnum CameraCapture::initialize()
 
     m_Start = false;
 
-    m_Logger = new Logger(Logger::LOG_ERROR | Logger::LOG_INFO, Logger::LogTypeEnum::BOTH_OUT);
-    if (m_Logger == NULL)
-    {
-        goto FINISH;
-    }
-
     retVal = ResultEnum::NormalEnd;
 
-FINISH :
     return retVal;
 }
 
@@ -108,12 +101,6 @@ FINISH :
 ResultEnum CameraCapture::finalize()
 {
     m_Start = false;
-
-    if (m_Logger != NULL)
-    {
-        delete m_Logger;
-        m_Logger = NULL;
-    }
 
     return ResultEnum::NormalEnd;
 }

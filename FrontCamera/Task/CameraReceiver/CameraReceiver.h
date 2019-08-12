@@ -18,7 +18,6 @@ protected :
 
 private :
 
-    Logger* m_Logger;
     UdpReceiver* m_UdpReceiver;
     char* m_ReceiveBuffer;
 

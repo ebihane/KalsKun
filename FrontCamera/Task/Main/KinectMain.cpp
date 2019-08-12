@@ -40,6 +40,13 @@ ResultEnum kinectInitialize(const int cameraNo)
 
 void kinectFinalize()
 {
+    if (g_pKinectCapture != NULL)
+    {
+        g_pKinectCapture->Stop();
+        delete g_pKinectCapture;
+        g_pKinectCapture = NULL;
+    }
+
     if (g_pLogger != NULL)
     {
         delete g_pLogger;

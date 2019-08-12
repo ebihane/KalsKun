@@ -27,8 +27,7 @@ ResultEnum TcpServer::Open()
     int yes = 1;
     struct sockaddr_in addr;
 
-
-    Disconnection();
+    Close();
 
     m_LastErrorNo = ERROR_NOTHING;
     sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -65,7 +64,6 @@ ResultEnum TcpServer::Open()
         close(sock);
         goto FINISH;
     }
-
 
     m_OpenSocket = sock;
 

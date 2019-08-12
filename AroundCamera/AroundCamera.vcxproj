@@ -31,9 +31,11 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
     <UseDebugLibraries>true</UseDebugLibraries>
+    <RemoteRootDir>/home/pi/projects</RemoteRootDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
+    <RemoteRootDir>/home/pi/projects</RemoteRootDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'" Label="Configuration">
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -89,10 +91,12 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Task\CameraCapture\CameraCapture.cpp" />
+    <ClCompile Include="Task\StateSender\StateSender.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Parts\ShareMemory\ShareMemory.h" />
     <ClInclude Include="Task\CameraCapture\CameraCapture.h" />
+    <ClInclude Include="Task\StateSender\StateSender.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
