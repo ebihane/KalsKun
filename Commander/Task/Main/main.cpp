@@ -1,9 +1,12 @@
+#define MEMORY_MAIN
+
 #include <stdlib.h>
 #include "Logger/Logger.h"
-#include "Task/AroundCamera/AroundCameraComm.h"
+#include "Parts/ShareMemory/ShareMemory.h"
+#include "Task/AroundCamera/AroundCameraReceiver.h"
 
 static Logger* g_pLogger = NULL;
-static AroundCameraComm* g_pAroundCameraComm = NULL;
+static AroundCameraReceiver* g_pAroundCameraReceiver = NULL;
 
 ResultEnum initialize();
 void mainProcedure();
@@ -29,6 +32,12 @@ ResultEnum initialize()
 
     wiringPiSetupSys();
 
+    pShareMemory = new ShareMemoryStr();
+    if (pShareMemory == NULL)
+    {
+        goto FINISH;
+    }
+
     StartLoggerProcess((char*)"Commander");
 
     g_pLogger = new Logger(Logger::LOG_ERROR | Logger::LOG_INFO, Logger::LogTypeEnum::BOTH_OUT);
@@ -37,8 +46,8 @@ ResultEnum initialize()
         goto FINISH;
     }
 
-    g_pAroundCameraComm = new AroundCameraComm();
-    if (g_pAroundCameraComm != NULL)
+    g_pAroundCameraReceiver = new AroundCameraReceiver();
+    if (g_pAroundCameraReceiver != NULL)
     {
         g_pLogger->LOG_ERROR("[initialize] FrontCameraSender allocation failed.\n");
         goto FINISH;
@@ -60,11 +69,11 @@ void mainProcedure()
 
 void finalize()
 {
-    if (g_pAroundCameraComm != NULL)
+    if (g_pAroundCameraReceiver != NULL)
     {
-        g_pAroundCameraComm->Stop(10000);
-        delete g_pAroundCameraComm;
-        g_pAroundCameraComm = NULL;
+        g_pAroundCameraReceiver->Stop(10000);
+        delete g_pAroundCameraReceiver;
+        g_pAroundCameraReceiver = NULL;
     }
 
     if (g_pLogger != NULL)

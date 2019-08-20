@@ -59,14 +59,15 @@
       <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc;opencv_imgcodecs;Library</LibraryDependencies>
     </Link>
     <RemotePostBuildEvent>
-      <Command>gpio export 17 out</Command>
-      <Message>export pin 17 using the gpio utility so that we can execute the blink program without sudo</Message>
+      <Command>sudo cp $(RemoteTargetPath) $(RemoteRootDir)/release</Command>
+      <Message>
+      </Message>
     </RemotePostBuildEvent>
     <ClCompile>
       <CAdditionalWarning>switch;no-deprecated-declarations;empty-body;return-type;parentheses;no-pointer-sign;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CAdditionalWarning)</CAdditionalWarning>
     </ClCompile>
     <ClCompile>
-      <CppAdditionalWarning>switch;no-deprecated-declarations;empty-body;return-type;parentheses;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CppAdditionalWarning)</CppAdditionalWarning>
+      <CppAdditionalWarning>switch;no-deprecated-declarations;empty-body;return-type;parentheses;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable</CppAdditionalWarning>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
@@ -74,8 +75,9 @@
       <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc;opencv_imgcodecs;Library</LibraryDependencies>
     </Link>
     <RemotePostBuildEvent>
-      <Command>gpio export 17 out</Command>
-      <Message>export pin 17 using the gpio utility so that we can execute the blink program without sudo</Message>
+      <Command>sudo cp $(RemoteTargetPath) $(RemoteRootDir)/release</Command>
+      <Message>
+      </Message>
     </RemotePostBuildEvent>
     <ClCompile>
       <AdditionalIncludeDirectories>/usr/local/include/opencv4;$(RemoteRootDir);$(RemoteProjectDir);%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -84,7 +86,7 @@
       <CAdditionalWarning>switch;no-deprecated-declarations;empty-body;return-type;parentheses;no-pointer-sign;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CAdditionalWarning)</CAdditionalWarning>
     </ClCompile>
     <ClCompile>
-      <CppAdditionalWarning>switch;no-deprecated-declarations;empty-body;return-type;parentheses;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CppAdditionalWarning)</CppAdditionalWarning>
+      <CppAdditionalWarning>switch;no-deprecated-declarations;empty-body;return-type;parentheses;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable</CppAdditionalWarning>
       <AdditionalOptions>`pkg-config opencv --cflags` `pkg-config opencv --libs` %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>

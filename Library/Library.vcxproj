@@ -98,6 +98,8 @@
     <ClCompile Include="Socket\TcpServer\TcpServer.cpp" />
     <ClCompile Include="Socket\UdpReceiver\UdpReceiver.cpp" />
     <ClCompile Include="Socket\UdpSender\UdpSender.cpp" />
+    <ClCompile Include="ThreadBase\ReceiverThread.cpp" />
+    <ClCompile Include="ThreadBase\SenderThread.cpp" />
     <ClCompile Include="ThreadBase\ThreadBase.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -110,6 +112,8 @@
     <ClInclude Include="Socket\TcpServer\TcpServer.h" />
     <ClInclude Include="Socket\UdpReceiver\UdpReceiver.h" />
     <ClInclude Include="Socket\UdpSender\UdpSender.h" />
+    <ClInclude Include="ThreadBase\ReceiverThread.h" />
+    <ClInclude Include="ThreadBase\SenderThread.h" />
     <ClInclude Include="ThreadBase\ThreadBase.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">

@@ -85,16 +85,12 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Parts\Communication\ReceiverThread.cpp" />
-    <ClCompile Include="Parts\Communication\SenderThread.cpp" />
-    <ClCompile Include="Task\AroundCamera\AroundCameraComm.cpp" />
+    <ClCompile Include="Task\AroundCamera\AroundCameraReceiver.cpp" />
     <ClCompile Include="Task\Main\main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Parts\Communication\ReceiverThread.h" />
-    <ClInclude Include="Parts\Communication\SenderThread.h" />
     <ClInclude Include="Parts\ShareMemory\ShareMemory.h" />
-    <ClInclude Include="Task\AroundCamera\AroundCameraComm.h" />
+    <ClInclude Include="Task\AroundCamera\AroundCameraReceiver.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>

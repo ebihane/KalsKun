@@ -13,9 +13,6 @@
     <Filter Include="Task\Main">
       <UniqueIdentifier>{0213635d-6c71-499f-a9b5-95cbf8f58ba5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Parts\Communication">
-      <UniqueIdentifier>{8e338d69-6831-4b8e-97b9-e31ccc49268e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Task\AroundCamera">
       <UniqueIdentifier>{71e349ba-fb1b-4158-9d0a-fa6afb365234}</UniqueIdentifier>
     </Filter>
@@ -24,13 +21,7 @@
     <ClCompile Include="Task\Main\main.cpp">
       <Filter>Task\Main</Filter>
     </ClCompile>
-    <ClCompile Include="Parts\Communication\ReceiverThread.cpp">
-      <Filter>Parts\Communication</Filter>
-    </ClCompile>
-    <ClCompile Include="Parts\Communication\SenderThread.cpp">
-      <Filter>Parts\Communication</Filter>
-    </ClCompile>
-    <ClCompile Include="Task\AroundCamera\AroundCameraComm.cpp">
+    <ClCompile Include="Task\AroundCamera\AroundCameraReceiver.cpp">
       <Filter>Task\AroundCamera</Filter>
     </ClCompile>
   </ItemGroup>
@@ -38,13 +29,7 @@
     <ClInclude Include="Parts\ShareMemory\ShareMemory.h">
       <Filter>Parts\ShareMemory</Filter>
     </ClInclude>
-    <ClInclude Include="Parts\Communication\ReceiverThread.h">
-      <Filter>Parts\Communication</Filter>
-    </ClInclude>
-    <ClInclude Include="Parts\Communication\SenderThread.h">
-      <Filter>Parts\Communication</Filter>
-    </ClInclude>
-    <ClInclude Include="Task\AroundCamera\AroundCameraComm.h">
+    <ClInclude Include="Task\AroundCamera\AroundCameraReceiver.h">
       <Filter>Task\AroundCamera</Filter>
     </ClInclude>
   </ItemGroup>

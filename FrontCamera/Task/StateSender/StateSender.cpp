@@ -2,7 +2,7 @@
 #include "StateSender.h"
 
 StateSender::StateSender()
- : SenderThread((char *)COMMANDER_IP_ADDRESS, AC_TO_COMMANDER_PORT)
+ : SenderThread((char *)COMMANDER_IP_ADDRESS, FC_TO_COMMANDER_PORT)
  , m_SendCount(0)
 {
     /* nop. */
@@ -28,7 +28,6 @@ bool StateSender::createSendData(EventInfo* const ev)
     ev->Result = ResultEnum::NormalEnd;
     ev->lParam[0] = m_SendCount;
     ev->lParam[1] = pShareMemory->SystemError;
-    ev->lParam[2] = (long)pShareMemory->PatrolState;
 
     retVal = true;
 

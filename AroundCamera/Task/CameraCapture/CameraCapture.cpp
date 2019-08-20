@@ -34,7 +34,6 @@ ResultEnum CameraCapture::initialize()
 
     retVal = ResultEnum::NormalEnd;
 
-FINISH :
     return retVal;
 }
 

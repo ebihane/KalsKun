@@ -5,21 +5,48 @@
 SenderThread::SenderThread(char* const ipAddress, const unsigned short portNo)
  : ThreadBase()
  , m_TcpClient(NULL)
- , m_Queue(NULL)
 {
-    m_Queue = new Queue((char*)"SenderThread");
     m_TcpClient = new TcpClient(ipAddress, portNo);
 }
 
 SenderThread::~SenderThread()
 {
-    /* nop. */
+    finalize();
+}
+
+ResultEnum SenderThread::initializeCore()
+{
+    /* Œp³‚µ‚È‚¢ê‡‚Í‰½‚à‚¹‚¸³í‚ð•Ô‚· */
+    return ResultEnum::NormalEnd;
+}
+
+void SenderThread::doReconnectInitialize(const bool isFirst)
+{
+    /* Œp³‚µ‚È‚¢ê‡‚Í‰½‚à‚µ‚È‚¢ */
+}
+
+ResultEnum SenderThread::doConnectedProc()
+{
+    /* Œp³‚µ‚È‚¢ê‡‚Í‰½‚à‚¹‚¸³í‚ð•Ô‚· */
+    return ResultEnum::NormalEnd;
+}
+
+ResultEnum SenderThread::finalizeCore()
+{
+    /* Œp³‚µ‚È‚¢ê‡‚Í‰½‚à‚¹‚¸³í‚ð•Ô‚· */
+    return ResultEnum::NormalEnd;
 }
 
 ResultEnum SenderThread::initialize()
 {
     ResultEnum  retVal = ResultEnum::AbnormalEnd;
     
+    if (m_TcpClient == NULL)
+    {
+        m_Logger->LOG_ERROR("[initialize] m_TcpClient allocation failed.\n");
+        goto FINISH;
+    }
+
     if (m_TcpClient->Open() != ResultEnum::NormalEnd)
     {
         char logStr[80] = { 0 };
@@ -28,15 +55,7 @@ ResultEnum SenderThread::initialize()
         goto FINISH;
     }
 
-    if (m_Queue->Open() != ResultEnum::NormalEnd)
-    {
-        char logStr[80] = { 0 };
-        snprintf(&logStr[0], sizeof(logStr), "[initialize] Queue opne failed. errno[%d]\n", m_Queue->GetLastError());
-        m_Logger->LOG_ERROR(logStr);
-        goto FINISH;
-    }
-
-    retVal = ResultEnum::NormalEnd;
+    retVal = initializeCore();
 
 
 FINISH :
@@ -47,13 +66,20 @@ ResultEnum SenderThread::doProcedure()
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     ResultEnum result = ResultEnum::AbnormalEnd;
-    bool receivable = false;
+    bool isFirst = true;
+    bool sendRequest = false;
     EventInfo ev = { 0 };
 
 RECONNECT :
 
+    /* Ú‘±Žž‚Ì‰Šú‰»ˆ— */
+    doReconnectInitialize(isFirst);
+    isFirst = false;
+
+    /* ‚¢‚Á‚½‚ñØ’f‚·‚é */
     m_TcpClient->Close();
 
+    /* Ú‘± */
     result = m_TcpClient->Connection();
     if (result != ResultEnum::NormalEnd)
     {
@@ -71,19 +97,29 @@ RECONNECT :
         }
     }
 
+    /* Ú‘±Šm—§Žžˆ— */
+    result = doConnectedProc();
+    if (result != ResultEnum::NormalEnd)
+    {
+        char logStr[80] = { 0 };
+        snprintf(&logStr[0], sizeof(logStr), "[doProcedure] doConnectedProc failed.\n");
+        m_Logger->LOG_ERROR(logStr);
+
+        if (result == ResultEnum::Reconnect)
+        {
+            goto RECONNECT;
+        }
+        else
+        {
+            goto FINISH;
+        }
+    }
+
     m_Logger->LOG_INFO("[doProcedure] Main loop enter.\n");
     while (1)
     {
-        receivable = false;
-        if (m_Queue->IsReceivable(receivable) != ResultEnum::NormalEnd)
-        {
-            char logStr[80] = { 0 };
-            snprintf(&logStr[0], sizeof(logStr), "[doProcedure] Queue IsReceivable failed. errno[%d]\n", m_Queue->GetLastError());
-            m_Logger->LOG_ERROR(logStr);
-            goto FINISH;
-        }
-
-        if (receivable == false)
+        sendRequest = createSendData(&ev);
+        if (sendRequest == false)
         {
             if (isStopRequest() == true)
             {
@@ -93,14 +129,6 @@ RECONNECT :
 
             delay(100);
             continue;
-        }
-
-        if (m_Queue->Receive(&ev) != ResultEnum::NormalEnd)
-        {
-            char logStr[80] = { 0 };
-            snprintf(&logStr[0], sizeof(logStr), "[doProcedure] Queue Receive failed. errno[%d]\n", m_Queue->GetLastError());
-            m_Logger->LOG_ERROR(logStr);
-            goto FINISH;
         }
 
         result = m_TcpClient->Send(&ev, sizeof(EventInfo));
@@ -130,6 +158,8 @@ FINISH :
 
 ResultEnum SenderThread::finalize()
 {
+    ResultEnum retVal = ResultEnum::AbnormalEnd;
+
     if (m_TcpClient != NULL)
     {
         m_TcpClient->Close();
@@ -137,5 +167,7 @@ ResultEnum SenderThread::finalize()
         m_TcpClient = NULL;
     }
 
-    return ResultEnum::NormalEnd;
+    retVal = finalizeCore();
+
+    return retVal;
 }

@@ -57,6 +57,12 @@
     <ClCompile Include="ThreadBase\ThreadBase.cpp">
       <Filter>ThreadBase</Filter>
     </ClCompile>
+    <ClCompile Include="ThreadBase\ReceiverThread.cpp">
+      <Filter>ThreadBase</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadBase\SenderThread.cpp">
+      <Filter>ThreadBase</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Logger\Logger.h">
@@ -87,6 +93,12 @@
       <Filter>Socket</Filter>
     </ClInclude>
     <ClInclude Include="ThreadBase\ThreadBase.h">
+      <Filter>ThreadBase</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadBase\ReceiverThread.h">
+      <Filter>ThreadBase</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadBase\SenderThread.h">
       <Filter>ThreadBase</Filter>
     </ClInclude>
   </ItemGroup>

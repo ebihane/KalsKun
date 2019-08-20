@@ -21,6 +21,11 @@ ResultEnum initialize(const char controllerType);
 void finalize();
 
 /* ./FrontCamera.out (使用デバイス番号) */
+/* Kinect を用いて深度データから距離がわかるか要検証 */
+/* Kinect が屋外で使用できない場合、2台のカメラによるステレオマッチングを行う必要あり */
+/* 使用デバイス番号に 0 を指定すると Kinect 用の処理を実行する前方カメラマイコンとして起動する */
+/* 使用デバイス番号に 1 を指定するとステレオマッチングを実施する側の前方カメラマイコンとして起動する (Master) */
+/* 使用デバイス番号に 2 を指定するとカメラ画像を取得しマスターに送信する前方カメラマイコンとして起動する (Slave) */
 int main(int argc, char* argv[])
 {
     char deviceNo = 0;

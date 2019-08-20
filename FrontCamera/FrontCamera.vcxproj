@@ -98,6 +98,7 @@
     <ClCompile Include="Task\Main\main.cpp" />
     <ClCompile Include="Task\Main\MasterMain.cpp" />
     <ClCompile Include="Task\Main\SlaveMain.cpp" />
+    <ClCompile Include="Task\StateSender\StateSender.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Parts\ShareMemory\ShareMemory.h" />
@@ -113,6 +114,7 @@
     <ClInclude Include="Task\Main\KinectMain.h" />
     <ClInclude Include="Task\Main\MasterMain.h" />
     <ClInclude Include="Task\Main\SlaveMain.h" />
+    <ClInclude Include="Task\StateSender\StateSender.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>

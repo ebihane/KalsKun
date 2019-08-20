@@ -25,6 +25,9 @@
     <ClCompile Include="Task\Main\KinectMain.cpp">
       <Filter>Task\Main</Filter>
     </ClCompile>
+    <ClCompile Include="Task\StateSender\StateSender.cpp">
+      <Filter>Task\StateSender</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Task">
@@ -51,6 +54,9 @@
     <Filter Include="Parts\ShareMemory">
       <UniqueIdentifier>{a00ff18c-3a66-41fe-8c96-11ced04e531b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Task\StateSender">
+      <UniqueIdentifier>{0b070aeb-bd38-4ff7-a893-441624aa322f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Task\CameraCapture\CameraCapture.h">
@@ -76,6 +82,9 @@
     </ClInclude>
     <ClInclude Include="Task\Main\KinectMain.h">
       <Filter>Task\Main</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\StateSender\StateSender.h">
+      <Filter>Task\StateSender</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

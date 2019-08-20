@@ -79,7 +79,7 @@ ResultEnum initialize(const char cameraNo)
         goto FINISH;
     }
 
-    g_pCommanderSocket = new TcpServer(10001);
+    g_pCommanderSocket = new TcpServer(COMMANDER_TO_AC_PORT);
     if (g_pCommanderSocket == NULL)
     {
         goto FINISH;
@@ -115,6 +115,8 @@ void finalize()
         delete pShareMemory;
         pShareMemory = NULL;
     }
+
+    system("sudo shutdown -h now &");
 }
 
 void procMain()

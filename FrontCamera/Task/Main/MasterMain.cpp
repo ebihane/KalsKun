@@ -24,6 +24,7 @@ ResultEnum masterInitialize(const int cameraNo)
         goto FINISH;
     }
 
+    /* Slave からのカメラ画像を受信するスレッドの生成*/
     g_pCameraReceiver = new CameraReceiver();
     if (g_pCameraReceiver == NULL)
     {
@@ -31,6 +32,7 @@ ResultEnum masterInitialize(const int cameraNo)
         goto FINISH;
     }
 
+    /* 自身のカメラをキャプチャするスレッドの生成 */
     g_pCameraCapture = new CameraCapture(cameraNo);
     if (g_pCameraCapture == NULL)
     {
@@ -89,12 +91,10 @@ ResultEnum masterMain(const int cameraNo)
         {
             receiveIndex = pShareMemory->Communicate.Index;
             Mat receiveCapture = pShareMemory->Communicate.Data[receiveIndex];
-            cv::imshow("Receive", receiveCapture);
 
             // 受信データの更新がある場合のみ、Master の持つ Camera 画像を取り込む
             captureIndex = pShareMemory->Capture.Index;
             Mat masterCapture = pShareMemory->Capture.Data[captureIndex];
-            cv::imshow("Capture", masterCapture);
 
             // 2つの画像からステレオマッチングを行い、物体との距離を測定する
 
@@ -110,18 +110,12 @@ ResultEnum masterMain(const int cameraNo)
         // 終了指示
 
 
-        key = cv::waitKey(1);
-        if (key == 'q')
-        {
-            break;
-        }
     }
 
     retVal = ResultEnum::NormalEnd;
 
 FINISH :
 
-    cv::destroyAllWindows();
     masterFinalize();
     return retVal;
 }

@@ -13,7 +13,7 @@ typedef struct
 } ShareMemoryStr;
 
 #ifdef MEMORY_MAIN
-ShareMemoryStr* pShareMemory;
+    ShareMemoryStr* pShareMemory;
 #else
-extern ShareMemoryStr* pShareMemory;
+    extern ShareMemoryStr* pShareMemory;
 #endif

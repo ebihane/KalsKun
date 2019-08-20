@@ -10,7 +10,7 @@ static Logger* g_pLogger = NULL;
 static CameraCapture* g_pCameraCapture = NULL;
 static CameraSender* g_pCameraSender = NULL;
 
-ResultEnum slaveInitialize();
+ResultEnum slaveInitialize(const int cameraNo);
 void slaveFinalize();
 
 ResultEnum slaveInitialize(const int cameraNo)
@@ -83,26 +83,11 @@ ResultEnum slaveMain(const int cameraNo)
     g_pLogger->LOG_INFO("[slaveMain] Main loop start.\n");
     while (1)
     {
-        if (g_pCameraCapture->IsCaptureStart() == true)
-        {
-            if (captureIndex != pShareMemory->Capture.Index)
-            {
-                captureIndex = pShareMemory->Capture.Index;
-                cv::imshow("Capture", pShareMemory->Capture.Data[captureIndex]);
-            }
-        }
+        // 画像更新無し時間の計測
 
-        if (sendIndex != pShareMemory->Communicate.Index)
-        {
-            sendIndex = pShareMemory->Communicate.Index;
-            cv::imshow("Send", pShareMemory->Communicate.Data[sendIndex]);
-        }
+        // ハートビート出力
 
-        key = cv::waitKey(1);
-        if (key == 'q')
-        {
-            break;
-        }
+        // 終了指示
     }
 
     retVal = ResultEnum::NormalEnd;

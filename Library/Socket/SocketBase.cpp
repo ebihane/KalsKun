@@ -151,7 +151,7 @@ ResultEnum SocketBase::receiveCore(const int sock, void* const bufferPtr, const 
     }
 
     m_LastErrorNo = ERROR_NOTHING;
-    while (rest <= 0)
+    while (0 < rest)
     {
         onceReceive = recv(sock, ptr, rest, 0);
         if (onceReceive < 0)
