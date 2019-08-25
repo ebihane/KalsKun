@@ -65,8 +65,8 @@ ResultEnum CameraCapture::doProcedure()
     m_Capture->read(pShareMemory->Capture.Data[0]);
     m_Start = true;
 
-    pShareMemory->Capture.Index = 0;
-    nextIndex = 1;
+    pShareMemory->Capture.Index = -1;
+    nextIndex = 0;
     while (1)
     {
         if (isStopRequest() == true)

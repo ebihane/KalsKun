@@ -38,6 +38,7 @@ KinectCapture::KinectCapture()
  , m_RgbMutex(PTHREAD_MUTEX_INITIALIZER)
  , m_Context(NULL)
  , m_Device(NULL)
+ , m_StopRequest(false)
 {
     /* nop. */
 }
@@ -82,6 +83,7 @@ ResultEnum KinectCapture::Start()
         goto FINISH;
     }
 
+    m_StopRequest = false;
     if (pthread_create(&tid, &attr, this->threadMain, this) != 0)
     {
         goto FINISH;
