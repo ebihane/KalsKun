@@ -93,6 +93,7 @@
     <ClCompile Include="Logger\Logger.cpp" />
     <ClCompile Include="Queue\Queue.cpp" />
     <ClCompile Include="Queue\SendQueue.cpp" />
+    <ClCompile Include="Serial\Serial.cpp" />
     <ClCompile Include="Socket\SocketBase.cpp" />
     <ClCompile Include="Socket\TcpClient\TcpClient.cpp" />
     <ClCompile Include="Socket\TcpServer\TcpServer.cpp" />
@@ -103,10 +104,12 @@
     <ClCompile Include="ThreadBase\ThreadBase.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Adapter\AdapterBase.h" />
     <ClInclude Include="Include\Common.h" />
     <ClInclude Include="Logger\Logger.h" />
     <ClInclude Include="Queue\Queue.h" />
     <ClInclude Include="Queue\SendQueue.h" />
+    <ClInclude Include="Serial\Serial.h" />
     <ClInclude Include="Socket\SocketBase.h" />
     <ClInclude Include="Socket\TcpClient\TcpClient.h" />
     <ClInclude Include="Socket\TcpServer\TcpServer.h" />

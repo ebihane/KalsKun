@@ -2,11 +2,10 @@
 #include <stdlib.h>
 #include "SenderThread.h"
 
-SenderThread::SenderThread(char* const ipAddress, const unsigned short portNo)
+SenderThread::SenderThread(AdapterBase* const adapter)
  : ThreadBase()
- , m_TcpClient(NULL)
+ , m_Adapter(adapter)
 {
-    m_TcpClient = new TcpClient(ipAddress, portNo);
 }
 
 SenderThread::~SenderThread()
@@ -41,16 +40,16 @@ ResultEnum SenderThread::initialize()
 {
     ResultEnum  retVal = ResultEnum::AbnormalEnd;
     
-    if (m_TcpClient == NULL)
+    if (m_Adapter == NULL)
     {
-        m_Logger->LOG_ERROR("[initialize] m_TcpClient allocation failed.\n");
+        m_Logger->LOG_ERROR("[initialize] m_Adapter allocation failed.\n");
         goto FINISH;
     }
 
-    if (m_TcpClient->Open() != ResultEnum::NormalEnd)
+    if (m_Adapter->Open() != ResultEnum::NormalEnd)
     {
         char logStr[80] = { 0 };
-        snprintf(&logStr[0], sizeof(logStr), "[initialize] TcpClient Open failed. errno[%d]\n", m_TcpClient->GetLastError());
+        snprintf(&logStr[0], sizeof(logStr), "[initialize] Adapter Open failed. errno[%d]\n", m_Adapter->GetLastError());
         m_Logger->LOG_ERROR(logStr);
         goto FINISH;
     }
@@ -77,14 +76,14 @@ RECONNECT :
     isFirst = false;
 
     /* ‚¢‚Á‚½‚ñØ’f‚·‚é */
-    m_TcpClient->Close();
+    m_Adapter->Close();
 
     /* Ú‘± */
-    result = m_TcpClient->Connection();
+    result = m_Adapter->Connection();
     if (result != ResultEnum::NormalEnd)
     {
         char logStr[80] = { 0 };
-        snprintf(&logStr[0], sizeof(logStr), "[doProcedure] Connection failed. errno[%d]\n", m_TcpClient->GetLastError());
+        snprintf(&logStr[0], sizeof(logStr), "[doProcedure] Connection failed. errno[%d]\n", m_Adapter->GetLastError());
         m_Logger->LOG_ERROR(logStr);
 
         if (result == ResultEnum::Reconnect)
@@ -131,11 +130,11 @@ RECONNECT :
             continue;
         }
 
-        result = m_TcpClient->Send(&ev, sizeof(EventInfo));
+        result = m_Adapter->Send(&ev, sizeof(EventInfo));
         if (result != ResultEnum::NormalEnd)
         {
             char logStr[80] = { 0 };
-            snprintf(&logStr[0], sizeof(logStr), "[doProcedure] Send failed. errno[%d]\n", m_TcpClient->GetLastError());
+            snprintf(&logStr[0], sizeof(logStr), "[doProcedure] Send failed. errno[%d]\n", m_Adapter->GetLastError());
             m_Logger->LOG_ERROR(logStr);
 
             if (result == ResultEnum::Reconnect)
@@ -160,11 +159,11 @@ ResultEnum SenderThread::finalize()
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
 
-    if (m_TcpClient != NULL)
+    if (m_Adapter != NULL)
     {
-        m_TcpClient->Close();
-        delete m_TcpClient;
-        m_TcpClient = NULL;
+        m_Adapter->Close();
+        delete m_Adapter;
+        m_Adapter = NULL;
     }
 
     retVal = finalizeCore();

@@ -16,6 +16,9 @@
     <Filter Include="Task\AroundCamera">
       <UniqueIdentifier>{71e349ba-fb1b-4158-9d0a-fa6afb365234}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Task\MotorCommunicator">
+      <UniqueIdentifier>{881f455c-e840-4085-bc87-f54e79ecd0f5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Task\Main\main.cpp">
@@ -24,6 +27,9 @@
     <ClCompile Include="Task\AroundCamera\AroundCameraReceiver.cpp">
       <Filter>Task\AroundCamera</Filter>
     </ClCompile>
+    <ClCompile Include="Task\MotorCommunicator\MotorCommunicator.cpp">
+      <Filter>Task\MotorCommunicator</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Parts\ShareMemory\ShareMemory.h">
@@ -31,6 +37,9 @@
     </ClInclude>
     <ClInclude Include="Task\AroundCamera\AroundCameraReceiver.h">
       <Filter>Task\AroundCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\MotorCommunicator\MotorCommunicator.h">
+      <Filter>Task\MotorCommunicator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

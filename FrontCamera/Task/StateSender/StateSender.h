@@ -1,12 +1,13 @@
 #pragma once
 
+#include "Adapter/AdapterBase.h"
 #include "ThreadBase/SenderThread.h"
 
 class StateSender : public SenderThread
 {
 public :
 
-    StateSender();
+    StateSender(AdapterBase* const adapter);
     virtual ~StateSender();
 
 protected :

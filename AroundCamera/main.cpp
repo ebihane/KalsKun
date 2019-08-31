@@ -13,6 +13,7 @@ wiringPi; pthread; dl; rt;  opencv_core; opencv_video; opencv_videoio; opencv_hi
 #include "Include/Common.h"
 #include "Logger/Logger.h"
 #include "Socket/TcpServer/TcpServer.h"
+#include "Socket/TcpClient/TcpClient.h"
 #include "Parts/ShareMemory/ShareMemory.h"
 #include "Task/CameraCapture/CameraCapture.h"
 #include "Task/StateSender/StateSender.h"
@@ -50,6 +51,7 @@ FINISH :
 ResultEnum initialize(const char cameraNo)
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
+    TcpClient* client = NULL;
 
     wiringPiSetupSys();
 
@@ -73,7 +75,8 @@ ResultEnum initialize(const char cameraNo)
         goto FINISH;
     }
 
-    g_pStateSender = new StateSender();
+    client = new TcpClient((char*)COMMANDER_IP_ADDRESS, AC_TO_COMMANDER_PORT);
+    g_pStateSender = new StateSender(client);
     if (g_pStateSender == NULL)
     {
         goto FINISH;

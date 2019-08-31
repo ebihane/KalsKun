@@ -1,8 +1,8 @@
 #include "Parts/ShareMemory/ShareMemory.h"
 #include "StateSender.h"
 
-StateSender::StateSender()
- : SenderThread((char *)COMMANDER_IP_ADDRESS, FC_TO_COMMANDER_PORT)
+StateSender::StateSender(AdapterBase* const adapter)
+ : SenderThread(adapter)
  , m_SendCount(0)
 {
     /* nop. */

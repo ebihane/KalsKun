@@ -7,8 +7,8 @@
 #include "SocketBase.h"
 
 SocketBase::SocketBase(const unsigned short portNo)
- : PORT_NO(portNo)
- , m_LastErrorNo(0)
+ : AdapterBase()
+ , PORT_NO(portNo)
 {
     /* nop. */
 }

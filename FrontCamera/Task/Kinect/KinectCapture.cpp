@@ -34,11 +34,12 @@ void depthCallback(freenect_device* dev, void* depth, uint32_t timestamp)
 
 KinectCapture::KinectCapture()
  : m_Handle(-1)
+ , m_StopRequest(false)
+ , m_Running(false)
  , m_DepthMutex(PTHREAD_MUTEX_INITIALIZER)
  , m_RgbMutex(PTHREAD_MUTEX_INITIALIZER)
  , m_Context(NULL)
  , m_Device(NULL)
- , m_StopRequest(false)
 {
     /* nop. */
 }

@@ -87,10 +87,12 @@
   <ItemGroup>
     <ClCompile Include="Task\AroundCamera\AroundCameraReceiver.cpp" />
     <ClCompile Include="Task\Main\main.cpp" />
+    <ClCompile Include="Task\MotorCommunicator\MotorCommunicator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Parts\ShareMemory\ShareMemory.h" />
     <ClInclude Include="Task\AroundCamera\AroundCameraReceiver.h" />
+    <ClInclude Include="Task\MotorCommunicator\MotorCommunicator.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>

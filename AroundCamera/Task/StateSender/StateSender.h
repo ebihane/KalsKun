@@ -6,7 +6,7 @@ class StateSender : public SenderThread
 {
 public :
 
-    StateSender();
+    StateSender(AdapterBase* const adapter);
     virtual ~StateSender();
 
 protected :

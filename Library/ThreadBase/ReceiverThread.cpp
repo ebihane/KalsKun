@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include "ReceiverThread.h"
 
-ReceiverThread::ReceiverThread(const unsigned short portNo)
+ReceiverThread::ReceiverThread(AdapterBase* const adapter)
  : ThreadBase()
- , m_TcpServer(NULL)
+ , m_Adapter(adapter)
 {
-    m_TcpServer = new TcpServer(portNo);
+    /* nop. */
 }
 
 ReceiverThread::~ReceiverThread()
@@ -41,16 +41,16 @@ ResultEnum ReceiverThread::initialize()
 {
     ResultEnum  retVal = ResultEnum::AbnormalEnd;
     
-    if (m_TcpServer == NULL)
+    if (m_Adapter == NULL)
     {
-        m_Logger->LOG_ERROR("[initialize] m_TcpClient allocation failed.\n");
+        m_Logger->LOG_ERROR("[initialize] m_Adapter allocation failed.\n");
         goto FINISH;
     }
 
-    if (m_TcpServer->Open() != ResultEnum::NormalEnd)
+    if (m_Adapter->Open() != ResultEnum::NormalEnd)
     {
         char logStr[80] = { 0 };
-        snprintf(&logStr[0], sizeof(logStr), "[initialize] TcpClient Open failed. errno[%d]\n", m_TcpServer->GetLastError());
+        snprintf(&logStr[0], sizeof(logStr), "[initialize] m_Adapter Open failed. errno[%d]\n", m_Adapter->GetLastError());
         m_Logger->LOG_ERROR(logStr);
         goto FINISH;
     }
@@ -78,14 +78,14 @@ RECONNECT :
     isFirst = false;
 
     /* ‚¢‚Á‚½‚ñØ’f‚·‚é */
-    m_TcpServer->Disconnection();
+    m_Adapter->Disconnection();
 
     /* Ú‘± */
-    result = m_TcpServer->Connection();
+    result = m_Adapter->Connection();
     if (result != ResultEnum::NormalEnd)
     {
         char logStr[80] = { 0 };
-        snprintf(&logStr[0], sizeof(logStr), "[doProcedure] Connection failed. errno[%d]\n", m_TcpServer->GetLastError());
+        snprintf(&logStr[0], sizeof(logStr), "[doProcedure] Connection failed. errno[%d]\n", m_Adapter->GetLastError());
         m_Logger->LOG_ERROR(logStr);
 
         if (result == ResultEnum::Reconnect)
@@ -119,11 +119,11 @@ RECONNECT :
     m_Logger->LOG_INFO("[doProcedure] Main loop enter.\n");
     while (1)
     {
-        result = m_TcpServer->IsReceivable(receivable);
+        result = m_Adapter->IsReceivable(receivable);
         if (result != ResultEnum::NormalEnd)
         {
             char logStr[80] = { 0 };
-            snprintf(&logStr[0], sizeof(logStr), "[doProcedure] IsReceivable failed. errno[%d]\n", m_TcpServer->GetLastError());
+            snprintf(&logStr[0], sizeof(logStr), "[doProcedure] IsReceivable failed. errno[%d]\n", m_Adapter->GetLastError());
             m_Logger->LOG_ERROR(logStr);
 
             if (result == ResultEnum::Reconnect)
@@ -148,11 +148,11 @@ RECONNECT :
             continue;
         }
 
-        result = m_TcpServer->Receive(&ev, sizeof(EventInfo));
+        result = m_Adapter->Receive(&ev, sizeof(EventInfo));
         if (result != ResultEnum::NormalEnd)
         {
             char logStr[80] = { 0 };
-            snprintf(&logStr[0], sizeof(logStr), "[doProcedure] Receive failed. errno[%d]\n", m_TcpServer->GetLastError());
+            snprintf(&logStr[0], sizeof(logStr), "[doProcedure] Receive failed. errno[%d]\n", m_Adapter->GetLastError());
             m_Logger->LOG_ERROR(logStr);
 
             if (result == ResultEnum::Reconnect)
@@ -195,11 +195,11 @@ ResultEnum ReceiverThread::finalize()
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
 
-    if (m_TcpServer != NULL)
+    if (m_Adapter != NULL)
     {
-        m_TcpServer->Close();
-        delete m_TcpServer;
-        m_TcpServer = NULL;
+        m_Adapter->Close();
+        delete m_Adapter;
+        m_Adapter = NULL;
     }
 
     retVal = finalizeCore();

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Socket/TcpServer/TcpServer.h"
+#include "Adapter/AdapterBase.h"
 #include "Queue/Queue.h"
 #include "ThreadBase/ThreadBase.h"
 
@@ -13,7 +13,7 @@ class ReceiverThread : public ThreadBase
 {
 public :
 
-    ReceiverThread(const unsigned short portNo);
+    ReceiverThread(AdapterBase* const adapter);
     virtual ~ReceiverThread();
 
 protected :
@@ -26,7 +26,7 @@ protected :
 
 private :
 
-    TcpServer* m_TcpServer;
+    AdapterBase* m_Adapter;
 
     ResultEnum initialize();
     ResultEnum doProcedure();

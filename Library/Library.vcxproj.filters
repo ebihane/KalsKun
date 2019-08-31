@@ -4,9 +4,6 @@
     <Filter Include="ThreadBase">
       <UniqueIdentifier>{5a5da09c-589a-43d6-8b53-e3651df6aab8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Socket">
-      <UniqueIdentifier>{18df26cb-6330-428b-ac4a-c3fa2dc61508}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Queue">
       <UniqueIdentifier>{821eb792-95fd-42d4-8f64-6d14180086e0}</UniqueIdentifier>
     </Filter>
@@ -16,17 +13,26 @@
     <Filter Include="Include">
       <UniqueIdentifier>{e1699579-04fe-47e5-9286-1e21f01ffc5c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Socket\UdpSender">
+    <Filter Include="Adapter">
+      <UniqueIdentifier>{e87679b3-efa3-47f7-889f-a203d7814c69}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Adapter\Socket">
+      <UniqueIdentifier>{18df26cb-6330-428b-ac4a-c3fa2dc61508}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Adapter\Socket\UdpSender">
       <UniqueIdentifier>{86028717-1553-4de6-958e-2c31a857846d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Socket\UdpReceiver">
+    <Filter Include="Adapter\Socket\UdpReceiver">
       <UniqueIdentifier>{f35a5ec4-99bd-409e-b7d1-3124d72bf4be}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Socket\TcpServer">
+    <Filter Include="Adapter\Socket\TcpServer">
       <UniqueIdentifier>{9ed77dc5-09d5-4182-94f8-9e5dfdeda6ba}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Socket\TcpClient">
+    <Filter Include="Adapter\Socket\TcpClient">
       <UniqueIdentifier>{e256272f-c546-48bd-9597-1f2b5a42b741}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Adapter\Serial">
+      <UniqueIdentifier>{6f0d0031-0008-40a0-a88a-ce4288398082}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -40,19 +46,19 @@
       <Filter>Queue</Filter>
     </ClCompile>
     <ClCompile Include="Socket\TcpClient\TcpClient.cpp">
-      <Filter>Socket\TcpClient</Filter>
+      <Filter>Adapter\Socket\TcpClient</Filter>
     </ClCompile>
     <ClCompile Include="Socket\TcpServer\TcpServer.cpp">
-      <Filter>Socket\TcpServer</Filter>
+      <Filter>Adapter\Socket\TcpServer</Filter>
     </ClCompile>
     <ClCompile Include="Socket\UdpReceiver\UdpReceiver.cpp">
-      <Filter>Socket\UdpReceiver</Filter>
+      <Filter>Adapter\Socket\UdpReceiver</Filter>
     </ClCompile>
     <ClCompile Include="Socket\UdpSender\UdpSender.cpp">
-      <Filter>Socket\UdpSender</Filter>
+      <Filter>Adapter\Socket\UdpSender</Filter>
     </ClCompile>
     <ClCompile Include="Socket\SocketBase.cpp">
-      <Filter>Socket</Filter>
+      <Filter>Adapter\Socket</Filter>
     </ClCompile>
     <ClCompile Include="ThreadBase\ThreadBase.cpp">
       <Filter>ThreadBase</Filter>
@@ -62,6 +68,9 @@
     </ClCompile>
     <ClCompile Include="ThreadBase\SenderThread.cpp">
       <Filter>ThreadBase</Filter>
+    </ClCompile>
+    <ClCompile Include="Serial\Serial.cpp">
+      <Filter>Adapter\Serial</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -78,19 +87,19 @@
       <Filter>Queue</Filter>
     </ClInclude>
     <ClInclude Include="Socket\TcpClient\TcpClient.h">
-      <Filter>Socket\TcpClient</Filter>
+      <Filter>Adapter\Socket\TcpClient</Filter>
     </ClInclude>
     <ClInclude Include="Socket\TcpServer\TcpServer.h">
-      <Filter>Socket\TcpServer</Filter>
+      <Filter>Adapter\Socket\TcpServer</Filter>
     </ClInclude>
     <ClInclude Include="Socket\UdpReceiver\UdpReceiver.h">
-      <Filter>Socket\UdpReceiver</Filter>
+      <Filter>Adapter\Socket\UdpReceiver</Filter>
     </ClInclude>
     <ClInclude Include="Socket\UdpSender\UdpSender.h">
-      <Filter>Socket\UdpSender</Filter>
+      <Filter>Adapter\Socket\UdpSender</Filter>
     </ClInclude>
     <ClInclude Include="Socket\SocketBase.h">
-      <Filter>Socket</Filter>
+      <Filter>Adapter\Socket</Filter>
     </ClInclude>
     <ClInclude Include="ThreadBase\ThreadBase.h">
       <Filter>ThreadBase</Filter>
@@ -100,6 +109,12 @@
     </ClInclude>
     <ClInclude Include="ThreadBase\SenderThread.h">
       <Filter>ThreadBase</Filter>
+    </ClInclude>
+    <ClInclude Include="Serial\Serial.h">
+      <Filter>Adapter\Serial</Filter>
+    </ClInclude>
+    <ClInclude Include="Adapter\AdapterBase.h">
+      <Filter>Adapter</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

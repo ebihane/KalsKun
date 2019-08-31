@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Socket/TcpClient/TcpClient.h"
+#include "Adapter/AdapterBase.h"
 #include "Queue/Queue.h"
 #include "ThreadBase/ThreadBase.h"
 
@@ -11,7 +11,7 @@ class SenderThread : public ThreadBase
 {
 public :
 
-    SenderThread(char* const ipAddress, const unsigned short portNo);
+    SenderThread(AdapterBase* const adapter);
     virtual ~SenderThread();
 
 protected :
@@ -24,7 +24,7 @@ protected :
 
 private :
 
-    TcpClient* m_TcpClient;
+    AdapterBase* m_Adapter;
 
     ResultEnum initialize();
     ResultEnum doProcedure();
