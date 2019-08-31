@@ -4,6 +4,7 @@
 
 ReceiverThread::ReceiverThread(AdapterBase* const adapter)
  : ThreadBase()
+ , m_RecvData(NULL)
  , m_Adapter(adapter)
 {
     /* nop. */
@@ -12,12 +13,6 @@ ReceiverThread::ReceiverThread(AdapterBase* const adapter)
 ReceiverThread::~ReceiverThread()
 {
     finalize();
-}
-
-ResultEnum ReceiverThread::initializeCore()
-{
-    /* 継承しない場合は何もせず正常を返す */
-    return ResultEnum::NormalEnd;
 }
 
 void ReceiverThread::doReconnectInitialize(const bool isFirst)
@@ -40,6 +35,7 @@ ResultEnum ReceiverThread::finalizeCore()
 ResultEnum ReceiverThread::initialize()
 {
     ResultEnum  retVal = ResultEnum::AbnormalEnd;
+    ResultEnum  result = ResultEnum::AbnormalEnd;
     
     if (m_Adapter == NULL)
     {
@@ -55,8 +51,22 @@ ResultEnum ReceiverThread::initialize()
         goto FINISH;
     }
 
-    retVal = initializeCore();
+    result = initializeCore();
+    if (result != ResultEnum::NormalEnd)
+    {
+        char logStr[80] = { 0 };
+        snprintf(&logStr[0], sizeof(logStr), "[initialize] initializeCore failed. result[%d]\n", result);
+        m_Logger->LOG_ERROR(logStr);
+        goto FINISH;
+    }
 
+    if (m_RecvData == NULL)
+    {
+        m_Logger->LOG_ERROR("[initialize] m_SendData is NULL.\n");
+        goto FINISH;
+    }
+
+    retVal = ResultEnum::NormalEnd;
 
 FINISH :
     return retVal;
@@ -68,8 +78,6 @@ ResultEnum ReceiverThread::doProcedure()
     ResultEnum result = ResultEnum::AbnormalEnd;
     bool isFirst = true;
     bool receivable = false;
-    EventInfo ev = { 0 };
-
 
 RECONNECT :
 
@@ -148,7 +156,7 @@ RECONNECT :
             continue;
         }
 
-        result = m_Adapter->Receive(&ev, sizeof(EventInfo));
+        result = receive();
         if (result != ResultEnum::NormalEnd)
         {
             char logStr[80] = { 0 };
@@ -166,7 +174,7 @@ RECONNECT :
         }
 
         /* 受信データの解析 */
-        result = analyze(&ev);
+        result = analyze(&m_RecvData[0]);
         if (result != ResultEnum::NormalEnd)
         {
             char logStr[80] = { 0 };
@@ -204,5 +212,36 @@ ResultEnum ReceiverThread::finalize()
 
     retVal = finalizeCore();
 
+    return retVal;
+}
+
+ResultEnum ReceiverThread::receive()
+{
+    ResultEnum retVal = ResultEnum::AbnormalEnd;
+    ResultEnum result = ResultEnum::AbnormalEnd;
+    unsigned long   size = 0;
+
+
+    while (1)
+    {
+        result = m_Adapter->Receive(&m_RecvData[size], 1);
+        if (result != ResultEnum::NormalEnd)
+        {
+            retVal = result;
+            goto FINISH;
+        }
+
+        size++;
+        if (isReceiveComplete(&m_RecvData[0], size) == true)
+        {
+            break;
+        }
+
+        delay(10);
+    }
+
+    retVal = ResultEnum::NormalEnd;
+
+FINISH :
     return retVal;
 }

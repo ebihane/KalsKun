@@ -20,3 +20,13 @@ http://blog.bitcollectors.com/adam/2016/01/kinect-support-for-raspberry-pi-using
 libfreenectを使ったKinect v1の開発
 https://qiita.com/int_main_Nick/items/e4e3949148afc352fb47
 
+
+これらのLibraryは、/usr/local/lib 下に展開する
+opencv_core
+opencv_video
+opencv_videoio
+opencv_highgui
+opencv_imgproc
+
+opencvのヘッダ類は、/usr/local/include/opevcv4下に「opencv2」というフォルダで展開する
+コンパイルとinstallを行うと自動的に展開される？

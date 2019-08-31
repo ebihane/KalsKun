@@ -13,9 +13,17 @@ StateSender::~StateSender()
     /* nop. */
 }
 
-bool StateSender::createSendData(EventInfo* const ev)
+ResultEnum StateSender::initializeCore()
+{
+    EventInfo* p = new EventInfo();
+    m_SendData = (char *)p;
+    return ResultEnum::NormalEnd;
+}
+
+bool StateSender::createSendData(char* const data, unsigned long* const size)
 {
     bool retVal = false;
+    EventInfo* p = (EventInfo*)data;
 
     if (isStopRequest() == true)
     {
@@ -24,10 +32,12 @@ bool StateSender::createSendData(EventInfo* const ev)
 
     m_SendCount++;
 
-    ev->Code = 1;
-    ev->Result = ResultEnum::NormalEnd;
-    ev->lParam[0] = m_SendCount;
-    ev->lParam[1] = pShareMemory->SystemError;
+    p->Code = 1;
+    p->Result = ResultEnum::NormalEnd;
+    p->lParam[0] = m_SendCount;
+    p->lParam[1] = pShareMemory->SystemError;
+
+    *size = sizeof(EventInfo);
 
     retVal = true;
 

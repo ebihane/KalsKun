@@ -4,6 +4,7 @@
 
 SenderThread::SenderThread(AdapterBase* const adapter)
  : ThreadBase()
+ , m_SendData(NULL)
  , m_Adapter(adapter)
 {
 }
@@ -11,12 +12,6 @@ SenderThread::SenderThread(AdapterBase* const adapter)
 SenderThread::~SenderThread()
 {
     finalize();
-}
-
-ResultEnum SenderThread::initializeCore()
-{
-    /* Œp³‚µ‚È‚¢ê‡‚Í‰½‚à‚¹‚¸³í‚ð•Ô‚· */
-    return ResultEnum::NormalEnd;
 }
 
 void SenderThread::doReconnectInitialize(const bool isFirst)
@@ -39,6 +34,7 @@ ResultEnum SenderThread::finalizeCore()
 ResultEnum SenderThread::initialize()
 {
     ResultEnum  retVal = ResultEnum::AbnormalEnd;
+    ResultEnum  result = ResultEnum::AbnormalEnd;
     
     if (m_Adapter == NULL)
     {
@@ -54,8 +50,22 @@ ResultEnum SenderThread::initialize()
         goto FINISH;
     }
 
-    retVal = initializeCore();
+    result = initializeCore();
+    if (result != ResultEnum::NormalEnd)
+    {
+        char logStr[80] = { 0 };
+        snprintf(&logStr[0], sizeof(logStr), "[initialize] initializeCore failed. result[%d]\n", result);
+        m_Logger->LOG_ERROR(logStr);
+        goto FINISH;
+    }
 
+    if (m_SendData == NULL)
+    {
+        m_Logger->LOG_ERROR("[initialize] m_SendData is NULL.\n");
+        goto FINISH;
+    }
+
+    retVal = ResultEnum::NormalEnd;
 
 FINISH :
     return retVal;
@@ -67,7 +77,7 @@ ResultEnum SenderThread::doProcedure()
     ResultEnum result = ResultEnum::AbnormalEnd;
     bool isFirst = true;
     bool sendRequest = false;
-    EventInfo ev = { 0 };
+    unsigned long size = 0;
 
 RECONNECT :
 
@@ -76,7 +86,7 @@ RECONNECT :
     isFirst = false;
 
     /* ‚¢‚Á‚½‚ñØ’f‚·‚é */
-    m_Adapter->Close();
+    m_Adapter->Disconnection();
 
     /* Ú‘± */
     result = m_Adapter->Connection();
@@ -117,7 +127,7 @@ RECONNECT :
     m_Logger->LOG_INFO("[doProcedure] Main loop enter.\n");
     while (1)
     {
-        sendRequest = createSendData(&ev);
+        sendRequest = createSendData(m_SendData, &size);
         if (sendRequest == false)
         {
             if (isStopRequest() == true)
@@ -130,7 +140,7 @@ RECONNECT :
             continue;
         }
 
-        result = m_Adapter->Send(&ev, sizeof(EventInfo));
+        result = m_Adapter->Send(m_SendData, size);
         if (result != ResultEnum::NormalEnd)
         {
             char logStr[80] = { 0 };

@@ -56,7 +56,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
-      <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc;opencv_imgcodecs;Library</LibraryDependencies>
+      <LibraryDependencies>wiringPi;pthread;dl;rt;Library</LibraryDependencies>
     </Link>
     <RemotePostBuildEvent>
       <Command>sudo cp $(RemoteTargetPath) $(RemoteRootDir)/release</Command>
@@ -69,7 +69,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <Link>
-      <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc;opencv_imgcodecs;Library</LibraryDependencies>
+      <LibraryDependencies>wiringPi;pthread;dl;rt;Library</LibraryDependencies>
     </Link>
     <RemotePostBuildEvent>
       <Command>sudo cp $(RemoteTargetPath) $(RemoteRootDir)/release</Command>
@@ -81,23 +81,34 @@
     </ClCompile>
     <ClCompile>
       <CppAdditionalWarning>switch;no-deprecated-declarations;empty-body;return-type;parentheses;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CppAdditionalWarning)</CppAdditionalWarning>
-      <AdditionalOptions>`pkg-config opencv --cflags` `pkg-config opencv --libs` %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(RemoteRootDir);$(RemoteProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Task\AroundCamera\AroundCameraReceiver.cpp" />
     <ClCompile Include="Task\Main\main.cpp" />
+    <ClCompile Include="Task\Main\Sequencer\Error\ErrorKun.cpp" />
+    <ClCompile Include="Task\Main\Sequencer\Idle\HimajinKun.cpp" />
+    <ClCompile Include="Task\Main\Sequencer\Kusakari\KusakariKun.cpp" />
+    <ClCompile Include="Task\Main\Sequencer\Setting\SetteiKun.cpp" />
+    <ClCompile Include="Task\Main\Sequencer\Yakei\YakeiKun.cpp" />
     <ClCompile Include="Task\MotorCommunicator\MotorCommunicator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Parts\ShareMemory\ShareMemory.h" />
     <ClInclude Include="Task\AroundCamera\AroundCameraReceiver.h" />
+    <ClInclude Include="Task\Main\Sequencer\Error\ErrorKun.h" />
+    <ClInclude Include="Task\Main\Sequencer\Idle\HimajinKun.h" />
+    <ClInclude Include="Task\Main\Sequencer\Kusakari\KusakariKun.h" />
+    <ClInclude Include="Task\Main\Sequencer\SequencerBase.h" />
+    <ClInclude Include="Task\Main\Sequencer\Setting\SetteiKun.h" />
+    <ClInclude Include="Task\Main\Sequencer\Yakei\YakeiKun.h" />
     <ClInclude Include="Task\MotorCommunicator\MotorCommunicator.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
       <CAdditionalWarning>switch;no-deprecated-declarations;empty-body;return-type;parentheses;no-pointer-sign;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CAdditionalWarning)</CAdditionalWarning>
-      <AdditionalOptions>`pkg-config opencv --cflags` `pkg-config opencv --libs` %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>$(RemoteRootDir);$(RemoteProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -16,6 +16,7 @@ private :
 
     long m_SendCount;
 
-    bool createSendData(EventInfo* const ev);
+    ResultEnum initializeCore();
+    bool createSendData(char* const data, unsigned long* const size);
 
 };

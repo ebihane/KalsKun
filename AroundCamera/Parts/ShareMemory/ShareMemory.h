@@ -1,7 +1,6 @@
 #pragma once
 
 #include <opencv2/opencv.hpp>
-
 using namespace cv;
 
 #define CAMERA_DATA_MAX (10)

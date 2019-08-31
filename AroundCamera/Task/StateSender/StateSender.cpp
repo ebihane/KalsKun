@@ -3,6 +3,7 @@
 
 StateSender::StateSender(AdapterBase* const adapter)
  : SenderThread(adapter)
+ , m_SendTiming(false)
  , m_SendCount(0)
 {
     /* nop. */
@@ -13,23 +14,35 @@ StateSender::~StateSender()
     /* nop. */
 }
 
-bool StateSender::createSendData(EventInfo* const ev)
+ResultEnum StateSender::initializeCore()
+{
+    EventInfo* p = new EventInfo();
+    m_SendData = (char*)p;
+    return ResultEnum::NormalEnd;
+}
+
+bool StateSender::createSendData(char* const data, unsigned long* const size)
 {
     bool retVal = false;
+    EventInfo* p = (EventInfo*)data;
 
-    if (isStopRequest() == true)
+    if (m_SendTiming == false)
     {
+        m_SendTiming = true;
         goto FINISH;
     }
 
     m_SendCount++;
 
-    ev->Code = 1;
-    ev->Result = ResultEnum::NormalEnd;
-    ev->lParam[0] = m_SendCount;
-    ev->lParam[1] = pShareMemory->SystemError;
-    ev->lParam[2] = (long)pShareMemory->PatrolState;
+    p->Code = 1;
+    p->Result = ResultEnum::NormalEnd;
+    p->lParam[0] = m_SendCount;
+    p->lParam[1] = pShareMemory->SystemError;
+    p->lParam[2] = (long)pShareMemory->PatrolState;
 
+    *size = sizeof(EventInfo);
+
+    m_SendTiming = false;
     retVal = true;
 
 FINISH :

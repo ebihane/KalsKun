@@ -6,13 +6,15 @@ class AroundCameraReceiver : public ReceiverThread
 {
 public :
 
-    AroundCameraReceiver();
+    AroundCameraReceiver(AdapterBase* const adapter);
     virtual ~AroundCameraReceiver();
 
 protected :
 
 private :
 
-    ResultEnum analyze(EventInfo* const ev);
+    ResultEnum initializeCore();
+    bool isReceiveComplete(char* const buffer, const unsigned long size);
+    ResultEnum analyze(char* const buffer);
 
 };

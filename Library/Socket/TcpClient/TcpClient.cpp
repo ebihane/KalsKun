@@ -21,25 +21,7 @@ TcpClient::~TcpClient()
 
 ResultEnum TcpClient::Open()
 {
-    ResultEnum retVal = ResultEnum::AbnormalEnd;
-    int sock = SOCKET_INVALID;
-
-    Disconnection();
-
-    m_LastErrorNo = ERROR_NOTHING;
-    sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock < 0)
-    {
-        m_LastErrorNo = errno;
-        goto FINISH;
-    }
-
-    m_Socket = sock;
-
-    retVal = ResultEnum::NormalEnd;
-
-FINISH :
-    return retVal;
+    return ResultEnum::NormalEnd;
 }
 
 ResultEnum TcpClient::Close()
@@ -51,20 +33,36 @@ ResultEnum TcpClient::Close()
 ResultEnum TcpClient::Connection()
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
+    int sock = SOCKET_INVALID;
     struct sockaddr_in addr;
 
+    if (m_Socket != SOCKET_INVALID)
+    {
+        retVal = ResultEnum::NormalEnd;
+        goto FINISH;
+    }
+
+    m_LastErrorNo = ERROR_NOTHING;
+    sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock < 0)
+    {
+        m_LastErrorNo = errno;
+        goto FINISH;
+    }
 
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = inet_addr(&m_IpAddress[0]);
     addr.sin_port = htons(PORT_NO);
 
     m_LastErrorNo = ERROR_NOTHING;
-    if (connect(m_Socket, (struct sockaddr*)&addr, sizeof(addr)) < 0)
+    if (connect(sock, (struct sockaddr*)&addr, sizeof(addr)) < 0)
     {
         m_LastErrorNo = errno;
         retVal = ResultEnum::Reconnect;
         goto FINISH;
     }
+
+    m_Socket = sock;
 
     delay(5000);
 

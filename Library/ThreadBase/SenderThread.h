@@ -16,10 +16,12 @@ public :
 
 protected :
 
-    virtual ResultEnum initializeCore();
+    char* m_SendData;
+
+    virtual ResultEnum initializeCore() = 0;
     virtual void doReconnectInitialize(const bool isFirst);
     virtual ResultEnum doConnectedProc();
-    virtual bool createSendData(EventInfo* const ev) = 0;
+    virtual bool createSendData(char* const data, unsigned long* const size) = 0;
     virtual ResultEnum finalizeCore();
 
 private :

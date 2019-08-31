@@ -19,6 +19,27 @@
     <Filter Include="Task\MotorCommunicator">
       <UniqueIdentifier>{881f455c-e840-4085-bc87-f54e79ecd0f5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Task\Main\Sequencer">
+      <UniqueIdentifier>{2c0b79ff-efb7-444d-b4f9-a632302fa318}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Task\Main\Sequencer\Idle">
+      <UniqueIdentifier>{2af8fe0f-7f92-4bcd-8e97-1055d13ad2e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Task\Main\Sequencer\Kusakari">
+      <UniqueIdentifier>{741e17b0-6180-44ce-96d5-cb2589691ccf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Task\Main\Sequencer\Yakei">
+      <UniqueIdentifier>{471f5ca1-6d36-468c-b141-cd6b7d343d77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Task\Main\Sequencer\Error">
+      <UniqueIdentifier>{a460dfb6-98cb-4c78-975e-ba94effeec03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Task\Main\Sequencer\Setting">
+      <UniqueIdentifier>{bc9f47aa-d5f9-41d5-8292-3066011b6cd3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Task\FrontCamera">
+      <UniqueIdentifier>{91d29160-ae5e-46a4-a0bd-12c7cd39e50c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Task\Main\main.cpp">
@@ -30,16 +51,49 @@
     <ClCompile Include="Task\MotorCommunicator\MotorCommunicator.cpp">
       <Filter>Task\MotorCommunicator</Filter>
     </ClCompile>
+    <ClCompile Include="Task\Main\Sequencer\Idle\HimajinKun.cpp">
+      <Filter>Task\Main\Sequencer\Idle</Filter>
+    </ClCompile>
+    <ClCompile Include="Task\Main\Sequencer\Kusakari\KusakariKun.cpp">
+      <Filter>Task\Main\Sequencer\Kusakari</Filter>
+    </ClCompile>
+    <ClCompile Include="Task\Main\Sequencer\Error\ErrorKun.cpp">
+      <Filter>Task\Main\Sequencer\Error</Filter>
+    </ClCompile>
+    <ClCompile Include="Task\Main\Sequencer\Setting\SetteiKun.cpp">
+      <Filter>Task\Main\Sequencer\Setting</Filter>
+    </ClCompile>
+    <ClCompile Include="Task\Main\Sequencer\Yakei\YakeiKun.cpp">
+      <Filter>Task\Main\Sequencer\Yakei</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Parts\ShareMemory\ShareMemory.h">
-      <Filter>Parts\ShareMemory</Filter>
-    </ClInclude>
     <ClInclude Include="Task\AroundCamera\AroundCameraReceiver.h">
       <Filter>Task\AroundCamera</Filter>
     </ClInclude>
     <ClInclude Include="Task\MotorCommunicator\MotorCommunicator.h">
       <Filter>Task\MotorCommunicator</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\Main\Sequencer\Idle\HimajinKun.h">
+      <Filter>Task\Main\Sequencer\Idle</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\Main\Sequencer\Kusakari\KusakariKun.h">
+      <Filter>Task\Main\Sequencer\Kusakari</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\Main\Sequencer\Error\ErrorKun.h">
+      <Filter>Task\Main\Sequencer\Error</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\Main\Sequencer\Setting\SetteiKun.h">
+      <Filter>Task\Main\Sequencer\Setting</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\Main\Sequencer\Yakei\YakeiKun.h">
+      <Filter>Task\Main\Sequencer\Yakei</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\Main\Sequencer\SequencerBase.h">
+      <Filter>Task\Main\Sequencer</Filter>
+    </ClInclude>
+    <ClInclude Include="Parts\ShareMemory\ShareMemory.h">
+      <Filter>Parts\ShareMemory</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

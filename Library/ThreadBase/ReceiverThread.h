@@ -18,10 +18,13 @@ public :
 
 protected :
 
-    virtual ResultEnum initializeCore();
+    char* m_RecvData;
+
+    virtual ResultEnum initializeCore() = 0;
     virtual void doReconnectInitialize(const bool isFirst);
     virtual ResultEnum doConnectedProc();
-    virtual ResultEnum analyze(EventInfo* const ev) = 0;
+    virtual bool isReceiveComplete(char* const buffer, const unsigned long size) = 0;
+    virtual ResultEnum analyze(char* const buffer) = 0;
     virtual ResultEnum finalizeCore();
 
 private :
@@ -31,5 +34,7 @@ private :
     ResultEnum initialize();
     ResultEnum doProcedure();
     ResultEnum finalize();
+
+    ResultEnum receive();
 
 };

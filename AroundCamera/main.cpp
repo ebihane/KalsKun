@@ -10,6 +10,8 @@ wiringPi; pthread; dl; rt;  opencv_core; opencv_video; opencv_videoio; opencv_hi
 
 #define MEMORY_MAIN
 
+#include <stdio.h>
+#include <stdlib.h>
 #include "Include/Common.h"
 #include "Logger/Logger.h"
 #include "Socket/TcpServer/TcpServer.h"
@@ -64,6 +66,7 @@ ResultEnum initialize(const char cameraNo)
     pShareMemory = new ShareMemoryStr;
     if (pShareMemory == NULL)
     {
+        g_pLogger->LOG_ERROR("[initialize] pShareMemory allocation failed.\n");
         goto FINISH;
     }
 
@@ -72,6 +75,7 @@ ResultEnum initialize(const char cameraNo)
     g_pCameraCapture = new CameraCapture(cameraNo);
     if (g_pCameraCapture == NULL)
     {
+        g_pLogger->LOG_ERROR("[initialize] g_pCameraCapture allocation failed.\n");
         goto FINISH;
     }
 
@@ -79,19 +83,26 @@ ResultEnum initialize(const char cameraNo)
     g_pStateSender = new StateSender(client);
     if (g_pStateSender == NULL)
     {
+        g_pLogger->LOG_ERROR("[initialize] g_pStateSender allocation failed.\n");
         goto FINISH;
     }
 
     g_pCommanderSocket = new TcpServer(COMMANDER_TO_AC_PORT);
     if (g_pCommanderSocket == NULL)
     {
+        g_pLogger->LOG_ERROR("[initialize] g_pCommanderSocket allocation failed.\n");
         goto FINISH;
     }
 
     if (g_pCommanderSocket->Open() != ResultEnum::NormalEnd)
     {
+        char logStr[80] = { 0 };
+        snprintf(&logStr[0], sizeof(logStr), "[initialize] g_pCommanderSocket Open failed. errno[%d]\n", g_pCommanderSocket->GetLastError());
+        g_pLogger->LOG_ERROR(logStr);
         goto FINISH;
     }
+
+    g_pStateSender->Run();
 
     retVal = ResultEnum::NormalEnd;
 
@@ -173,7 +184,6 @@ RECONNECT :
 
             g_pStateSender->Stop(10000);
             g_pCameraCapture->Stop(10000);
-
             ev.Result = ResultEnum::NormalEnd;
             g_pCommanderSocket->Send(&ev, sizeof(EventInfo));
 
