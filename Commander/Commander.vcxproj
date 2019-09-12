@@ -85,6 +85,7 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Parts\MappingData\MappingData.cpp" />
     <ClCompile Include="Task\AroundCamera\AroundCameraReceiver.cpp" />
     <ClCompile Include="Task\Main\main.cpp" />
     <ClCompile Include="Task\Main\Sequencer\Error\ErrorKun.cpp" />
@@ -95,6 +96,7 @@
     <ClCompile Include="Task\MotorCommunicator\MotorCommunicator.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Parts\MappingData\MappingData.h" />
     <ClInclude Include="Parts\ShareMemory\ShareMemory.h" />
     <ClInclude Include="Task\AroundCamera\AroundCameraReceiver.h" />
     <ClInclude Include="Task\Main\Sequencer\Error\ErrorKun.h" />

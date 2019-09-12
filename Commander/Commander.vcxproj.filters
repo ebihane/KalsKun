@@ -40,6 +40,9 @@
     <Filter Include="Task\FrontCamera">
       <UniqueIdentifier>{91d29160-ae5e-46a4-a0bd-12c7cd39e50c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Parts\MappingData">
+      <UniqueIdentifier>{442c95d4-e623-415e-9751-740a64bc850d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Task\Main\main.cpp">
@@ -65,6 +68,9 @@
     </ClCompile>
     <ClCompile Include="Task\Main\Sequencer\Yakei\YakeiKun.cpp">
       <Filter>Task\Main\Sequencer\Yakei</Filter>
+    </ClCompile>
+    <ClCompile Include="Parts\MappingData\MappingData.cpp">
+      <Filter>Parts\MappingData</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -94,6 +100,9 @@
     </ClInclude>
     <ClInclude Include="Parts\ShareMemory\ShareMemory.h">
       <Filter>Parts\ShareMemory</Filter>
+    </ClInclude>
+    <ClInclude Include="Parts\MappingData\MappingData.h">
+      <Filter>Parts\MappingData</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
