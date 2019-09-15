@@ -1,12 +1,11 @@
 #pragma once
 
 #include "Adapter/AdapterBase.h"
-#include "Queue/Queue.h"
 #include "ThreadBase/ThreadBase.h"
 
-/* 他マイコンへの送信を行うスレッドの基底となるクラス */
+/* 送信を行うスレッドの基底となるクラス */
 /* 処理のトリガは継承先で自由に指定できる (createSendData メソッドで true を返すと送信される) */
-/* キューに受信した内容を他のマイコンに転送する */
+/* このクラスは内部でループする (最短の処理周期は100msec) */
 class SenderThread : public ThreadBase
 {
 public :

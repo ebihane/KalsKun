@@ -11,7 +11,6 @@
 
 Queue::Queue(char* const name)
  : m_Queue(INVALID_QUEUE)
- , m_LastError(ERROR_NOTHING)
 {
     snprintf(&m_Name[0], NAME_MAXLEN, "/%s", &name[0]);
 }
@@ -29,7 +28,7 @@ ResultEnum Queue::Open()
     mq_attr attr = {0};
 
     /* 存在確認 */
-    m_LastError = ERROR_NOTHING;
+    m_LastErrorNo = ERROR_NOTHING;
     queue = mq_open(&m_Name[0], O_RDWR);
     if (0 <= queue)
     {
@@ -45,7 +44,7 @@ ResultEnum Queue::Open()
     /* 存在しない場合の errno 以外の異常が発生した場合 */
     if (errorNo != ENOENT)
     {
-        m_LastError = errorNo;
+        m_LastErrorNo = errorNo;
         goto FINISH;
     }
 
@@ -53,7 +52,7 @@ ResultEnum Queue::Open()
     queue = mq_open(&m_Name[0], O_RDONLY | O_CREAT, 0644, NULL);
     if (queue < 0)
     {
-        m_LastError = errno;
+        m_LastErrorNo = errno;
         goto FINISH;
     }
 
@@ -77,13 +76,39 @@ ResultEnum Queue::Close()
     {
         if (mq_close(m_Queue) < 0)
         {
-            m_LastError = errno;
+            m_LastErrorNo = errno;
             goto FINISH;
         }
     }
 
     retVal = ResultEnum::NormalEnd;
 
+
+FINISH :
+    return retVal;
+}
+
+ResultEnum Queue::Connection()
+{
+    return ResultEnum::NormalEnd;
+}
+
+ResultEnum Queue::Disconnection()
+{
+    return ResultEnum::NormalEnd;
+}
+
+ResultEnum Queue::IsSendable(bool& sendable)
+{
+    ResultEnum retVal = ResultEnum::AbnormalEnd;
+
+    if (m_Queue == INVALID_QUEUE)
+    {
+        goto FINISH;
+    }
+
+    sendable = true;
+    retVal = ResultEnum::NormalEnd;
 
 FINISH :
     return retVal;
@@ -100,21 +125,21 @@ ResultEnum Queue::Send(char* const targetName, void* const bufferPtr, const unsi
         goto FINISH;
     }
 
-    m_LastError = ERROR_NOTHING;
+    m_LastErrorNo = ERROR_NOTHING;
 
     /* 送信対象のキューをオープン */
     targetQueue = mq_open(&targetName[0], O_WRONLY);
     if (targetQueue < 0)
     {
         printf("[Queue::Send] mq_open failed. target[%s]\n", targetName);
-        m_LastError = errno;
+        m_LastErrorNo = errno;
         goto FINISH;
     }
 
     if (mq_send(targetQueue, (const char*)bufferPtr, size, 0) < 0)
     {
         printf("[Queue::Send] mq_send failed. target[%s]\n", targetName);
-        m_LastError = errno;
+        m_LastErrorNo = errno;
         goto FINISH;
     }
 
@@ -147,14 +172,14 @@ ResultEnum Queue::IsReceivable(bool& receivable)
     timeout.tv_sec = 0;
     timeout.tv_usec = 0;
 
-    m_LastError = ERROR_NOTHING;
+    m_LastErrorNo = ERROR_NOTHING;
     if (select(m_Queue + 1, &recvFds, NULL, &errorFds, &timeout) < 0)
     {
-        m_LastError = errno;
+        m_LastErrorNo = errno;
     }
     else if (FD_ISSET(m_Queue, &errorFds) != 0)
     {
-        m_LastError = errno;
+        m_LastErrorNo = errno;
     }
     else if (FD_ISSET(m_Queue, &recvFds) == 0)
     {
@@ -180,10 +205,10 @@ ResultEnum Queue::Receive(void* const bufferPtr)
         goto FINISH;
     }
 
-    m_LastError = ERROR_NOTHING;
+    m_LastErrorNo = ERROR_NOTHING;
     if (mq_receive(m_Queue, (char *)bufferPtr, m_Attr.mq_msgsize, 0) < 0)
     {
-        m_LastError = errno;
+        m_LastErrorNo = errno;
         goto FINISH;
     }
 
@@ -192,9 +217,4 @@ ResultEnum Queue::Receive(void* const bufferPtr)
 
 FINISH:
     return retVal;
-}
-
-int Queue::GetLastError()
-{
-    return m_LastError;
 }

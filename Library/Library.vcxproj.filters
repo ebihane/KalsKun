@@ -4,9 +4,6 @@
     <Filter Include="ThreadBase">
       <UniqueIdentifier>{5a5da09c-589a-43d6-8b53-e3651df6aab8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Queue">
-      <UniqueIdentifier>{821eb792-95fd-42d4-8f64-6d14180086e0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Logger">
       <UniqueIdentifier>{445508bf-4e5e-4e26-a3b7-d1c8921362e6}</UniqueIdentifier>
     </Filter>
@@ -34,16 +31,22 @@
     <Filter Include="Adapter\Serial">
       <UniqueIdentifier>{6f0d0031-0008-40a0-a88a-ce4288398082}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Adapter\Queue">
+      <UniqueIdentifier>{821eb792-95fd-42d4-8f64-6d14180086e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Measure">
+      <UniqueIdentifier>{c5d0a5d0-3c8b-41ff-8a51-39870ce7cdba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logger\Logger.cpp">
       <Filter>Logger</Filter>
     </ClCompile>
     <ClCompile Include="Queue\Queue.cpp">
-      <Filter>Queue</Filter>
+      <Filter>Adapter\Queue</Filter>
     </ClCompile>
     <ClCompile Include="Queue\SendQueue.cpp">
-      <Filter>Queue</Filter>
+      <Filter>Adapter\Queue</Filter>
     </ClCompile>
     <ClCompile Include="Socket\TcpClient\TcpClient.cpp">
       <Filter>Adapter\Socket\TcpClient</Filter>
@@ -72,6 +75,12 @@
     <ClCompile Include="Serial\Serial.cpp">
       <Filter>Adapter\Serial</Filter>
     </ClCompile>
+    <ClCompile Include="ThreadBase\LoopThreadBase.cpp">
+      <Filter>ThreadBase</Filter>
+    </ClCompile>
+    <ClCompile Include="Measure\Stopwatch.cpp">
+      <Filter>Measure</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Logger\Logger.h">
@@ -81,10 +90,10 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="Queue\Queue.h">
-      <Filter>Queue</Filter>
+      <Filter>Adapter\Queue</Filter>
     </ClInclude>
     <ClInclude Include="Queue\SendQueue.h">
-      <Filter>Queue</Filter>
+      <Filter>Adapter\Queue</Filter>
     </ClInclude>
     <ClInclude Include="Socket\TcpClient\TcpClient.h">
       <Filter>Adapter\Socket\TcpClient</Filter>
@@ -115,6 +124,12 @@
     </ClInclude>
     <ClInclude Include="Adapter\AdapterBase.h">
       <Filter>Adapter</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadBase\LoopThreadBase.h">
+      <Filter>ThreadBase</Filter>
+    </ClInclude>
+    <ClInclude Include="Measure\Stopwatch.h">
+      <Filter>Measure</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

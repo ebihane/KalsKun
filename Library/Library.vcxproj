@@ -91,6 +91,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Logger\Logger.cpp" />
+    <ClCompile Include="Measure\Stopwatch.cpp" />
     <ClCompile Include="Queue\Queue.cpp" />
     <ClCompile Include="Queue\SendQueue.cpp" />
     <ClCompile Include="Serial\Serial.cpp" />
@@ -99,6 +100,7 @@
     <ClCompile Include="Socket\TcpServer\TcpServer.cpp" />
     <ClCompile Include="Socket\UdpReceiver\UdpReceiver.cpp" />
     <ClCompile Include="Socket\UdpSender\UdpSender.cpp" />
+    <ClCompile Include="ThreadBase\LoopThreadBase.cpp" />
     <ClCompile Include="ThreadBase\ReceiverThread.cpp" />
     <ClCompile Include="ThreadBase\SenderThread.cpp" />
     <ClCompile Include="ThreadBase\ThreadBase.cpp" />
@@ -107,6 +109,7 @@
     <ClInclude Include="Adapter\AdapterBase.h" />
     <ClInclude Include="Include\Common.h" />
     <ClInclude Include="Logger\Logger.h" />
+    <ClInclude Include="Measure\Stopwatch.h" />
     <ClInclude Include="Queue\Queue.h" />
     <ClInclude Include="Queue\SendQueue.h" />
     <ClInclude Include="Serial\Serial.h" />
@@ -115,6 +118,7 @@
     <ClInclude Include="Socket\TcpServer\TcpServer.h" />
     <ClInclude Include="Socket\UdpReceiver\UdpReceiver.h" />
     <ClInclude Include="Socket\UdpSender\UdpSender.h" />
+    <ClInclude Include="ThreadBase\LoopThreadBase.h" />
     <ClInclude Include="ThreadBase\ReceiverThread.h" />
     <ClInclude Include="ThreadBase\SenderThread.h" />
     <ClInclude Include="ThreadBase\ThreadBase.h" />
