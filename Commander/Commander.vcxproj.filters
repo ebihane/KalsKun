@@ -43,6 +43,15 @@
     <Filter Include="Parts\MappingData">
       <UniqueIdentifier>{442c95d4-e623-415e-9751-740a64bc850d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Parts\PositionData">
+      <UniqueIdentifier>{f3f8e846-5530-4872-8275-c66b7dd0ca57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Task\DriveManager">
+      <UniqueIdentifier>{5f630189-dcb6-4d7e-9f18-d951bec982ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Parts\Distance">
+      <UniqueIdentifier>{eadfa753-a658-4713-b9a9-fa7ef8febc53}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Task\Main\main.cpp">
@@ -71,6 +80,21 @@
     </ClCompile>
     <ClCompile Include="Parts\MappingData\MappingData.cpp">
       <Filter>Parts\MappingData</Filter>
+    </ClCompile>
+    <ClCompile Include="Parts\PositionData\PositionData.cpp">
+      <Filter>Parts\PositionData</Filter>
+    </ClCompile>
+    <ClCompile Include="Parts\MappingData\AreaMap.cpp">
+      <Filter>Parts\MappingData</Filter>
+    </ClCompile>
+    <ClCompile Include="Parts\MappingData\MoveMap.cpp">
+      <Filter>Parts\MappingData</Filter>
+    </ClCompile>
+    <ClCompile Include="Task\DriveManager\DriveManager.cpp">
+      <Filter>Task\DriveManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Parts\Distance\TudeConverter.cpp">
+      <Filter>Parts\Distance</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -103,6 +127,21 @@
     </ClInclude>
     <ClInclude Include="Parts\MappingData\MappingData.h">
       <Filter>Parts\MappingData</Filter>
+    </ClInclude>
+    <ClInclude Include="Parts\PositionData\PositionData.h">
+      <Filter>Parts\PositionData</Filter>
+    </ClInclude>
+    <ClInclude Include="Parts\MappingData\AreaMap.h">
+      <Filter>Parts\MappingData</Filter>
+    </ClInclude>
+    <ClInclude Include="Parts\MappingData\MoveMap.h">
+      <Filter>Parts\MappingData</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\DriveManager\DriveManager.h">
+      <Filter>Task\DriveManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Parts\Distance\TudeConverter.h">
+      <Filter>Parts\Distance</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

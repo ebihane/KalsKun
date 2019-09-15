@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Include/Common.h"
-#include "Parts/ShareMemory/ShareMemory.h"
 
 class MappingData
 {
@@ -40,14 +39,12 @@ public:
     /* Mapping Data の領域サイズと保存時の値をファイルから取得し、MappingData を復元する */
     ResultEnum Load();
 
-
-
 protected :
 
-private :
+    /* 指定された座標がマップデータの領域内か確認する */
+    bool isInRange(const unsigned long x, const unsigned long y);
 
-    static const unsigned char  PointXArray[3][3];
-    static const unsigned char  PointYArray[3][3];
+private :
 
     char            m_FilePath[80]; /* ファイルパス */
 
@@ -56,8 +53,5 @@ private :
     unsigned char** m_MapData;      /* マップデータ */
 
     int             m_LastErrorNo;  /* 最後に発生したシステムエラー番号 */
-
-    /* 指定された座標がマップデータの領域内か確認する */
-    bool isInRange(const unsigned long x, const unsigned long y);
 
 };

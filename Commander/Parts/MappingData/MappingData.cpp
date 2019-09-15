@@ -44,8 +44,8 @@ void MappingData::Get(const unsigned long x, const unsigned long y, unsigned cha
 {
     unsigned char   posX = 0;
     unsigned char   posY = 0;
-    unsigned long   offsetX = 0;
-    unsigned long   offsetY = 0;
+    long            offsetX = 0;
+    long            offsetY = 0;
 
     for (offsetY = 1; -1 <= offsetY; offsetY--)
     {
@@ -107,8 +107,6 @@ ResultEnum MappingData::Allocate(const unsigned long width, const unsigned long 
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     unsigned long y = 0;
-    unsigned long* matrix = NULL;
-    unsigned long* baseMatrix = NULL;
 
     if (m_MapData != NULL)
     {
