@@ -1,5 +1,8 @@
 #pragma once
 
+/*----------------*/
+/*  位置情報関連  */
+/*----------------*/
 /* ビーコン個数 */
 #define BEACON_COUNT    (3)
 
@@ -17,7 +20,7 @@ typedef enum
     E_DIR_TYPE_MAX,     /* 8: 方向種別数 */
 } DirectionEnum;
 
-/* 司令塔マイコン 電波強度関連情報 */
+/* 電波強度関連情報 */
 typedef struct
 {
     float   RssiAverage;
@@ -25,26 +28,54 @@ typedef struct
     float   Distance;
 } BeaconDataStr;
 
+/*------------------*/
+/*  モータマイコン  */
+/*------------------*/
+/* モータマイコン向け 動作指示 */
+typedef enum
+{
+    E_COMMAND_STOP = 0, /* 0: 停止 */
+    E_COMMAND_FRONT,    /* 1: 前進 */
+    E_COMMAND_U_TURN,   /* 2: Uターン */
+    E_COMMAND_AVOID,    /* 3: 回避 */
+    E_COMMAND_REMOTE,   /* 4: 遠隔動作 */
+} MotorCommandEnum;
 
-/* 遠隔操作関連 */
+/* モータマイコン向け 草刈り刃動作指示 */
+typedef enum
+{
+    E_CUTTER_STOP = 0,  /* 0: 草刈り刃停止 */
+    E_CUTTER_DRIVE,     /* 1: 草刈り刃駆動 */
+} CutterDriveEnum;
+
+/* 遠隔操作モード */
 typedef enum
 {
     E_MODE_MANUAL = 0,  /* 0: 手動 */
     E_MODE_AUTO,        /* 1: 自動 */
 } MoveTypeEnum;
 
-/* リモコン */
+/* モータマイコン 動作指示 */
 typedef struct
 {
-    MoveTypeEnum Mode;  /* 制御モード */
+    MotorCommandEnum    Command;
+    CutterDriveEnum     Cutter;
+} MotorDriveStr;
 
-} MoveControlStr;
+/* モータマイコン 状態 */
+typedef struct
+{
+    MotorCommandEnum    Command;
+    CutterDriveEnum     Cutter;
+    long                PointX;
+    long                PointY;
+    long                ErrorStatus;
+    MoveTypeEnum        RemoteMode;
+} MotorStatusStr;
 
-
-
-
-
-
+/*--------------*/
+/*  前方カメラ  */
+/*--------------*/
 /* 前方カメラ 状態 */
 typedef struct
 {
@@ -53,6 +84,9 @@ typedef struct
     long Avoidance;     /* 回避指示 */
 } FrontCameraStateStr;
 
+/*--------------*/
+/*  周辺カメラ  */
+/*--------------*/
 /* 周辺カメラ 状態 */
 typedef struct
 {
@@ -61,29 +95,17 @@ typedef struct
     long PersonDetect;  /* 人検知状態 */
 } AroundCameraStateStr;
 
-/* モータマイコン通信 指示内容 */
-typedef struct
-{
-    char LeftRight;     /* 左右 */
-    char FrontBack;     /* 前後 */
-    char CutterSpeed;   /* 草刈り刃スピード */
-} MotorCommandStr;
 
-
-
-
-/*-----------------*/
+/*=================*/
 /* 共有メモリ 本体 */
-/*-----------------*/
+/*=================*/
 typedef struct
 {
+    BeaconDataStr           BeaconData[BEACON_COUNT];
+    MotorDriveStr           MotorDrive;
+    MotorStatusStr          MotorState;
     AroundCameraStateStr    AroundCamera;
     FrontCameraStateStr     FrontCamera;
-
-    MoveControlStr          MoveControl;
-
-    MotorCommandStr         MotorCommand;
-    BeaconDataStr           BeaconData[BEACON_COUNT];
 } ShareMemoryStr;
 
 #ifdef MEMORY_MAIN

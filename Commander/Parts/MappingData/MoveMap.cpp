@@ -1,6 +1,8 @@
 #include "Parts/Setting/SettingManager.h"
 #include "MoveMap.h"
 
+MoveMap* MoveMap::m_This = new MoveMap();
+
 MoveMap::MoveMap()
  : MappingData((char *)"/home/pi/Information/MoveMap.dat")
  , m_MovedValue(MOVED_INIT_VALUE)
@@ -12,6 +14,11 @@ MoveMap::MoveMap()
 MoveMap::~MoveMap()
 {
     /* nop. */
+}
+
+MoveMap* const MoveMap::GetInstance()
+{
+    return m_This;
 }
 
 /* 初期データ生成 */
@@ -41,6 +48,11 @@ void MoveMap::SetInitialData()
 }
 
 /* 指定した座標が移動可能か判断する */
+bool MoveMap::IsMovable(RectStr* const position)
+{
+    return IsMovable(position->X, position->Y);
+}
+
 bool MoveMap::IsMovable(const unsigned long x, const unsigned long y)
 {
     bool retVal = false;
@@ -62,6 +74,11 @@ FINISH :
 }
 
 /* 指定した座標が未移動か判断する */
+bool MoveMap::IsNotMove(RectStr* const position)
+{
+    return IsNotMove(position->X, position->Y);
+}
+
 bool MoveMap::IsNotMove(const unsigned long x, const unsigned long y)
 {
     bool retVal = false;

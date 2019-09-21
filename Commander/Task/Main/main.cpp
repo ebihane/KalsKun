@@ -26,8 +26,6 @@
 
 /* Parts */
 static Logger* g_pLogger = NULL;
-static AreaMap* g_pAreaMap = NULL;
-static MoveMap* g_pMoveMap = NULL;
 
 /* Task */
 static FrontCameraReceiver* g_pFrontCameraReceiver = NULL;
@@ -43,15 +41,24 @@ void finalize();
 
 int main(void)
 {
+    bool isMainLoopExit = false;
+
     if (initialize() != ResultEnum::NormalEnd)
     {
         goto FINISH;
     }
 
     mainProcedure();
+    isMainLoopExit = true;
 
 FINISH :
     finalize();
+
+    if (isMainLoopExit == true)
+    {
+        system("sudo shutdown -h now &");
+    }
+
     return 0;
 }
 
@@ -60,7 +67,9 @@ ResultEnum initialize()
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     SettingManager* setting = NULL;
     TcpServer* server = NULL;
-    Queue* queue = NULL;
+    AreaMap* areaMap = AreaMap::GetInstance();
+    MoveMap* moveMap = MoveMap::GetInstance();
+
 
     wiringPiSetupSys();
 
@@ -91,41 +100,27 @@ ResultEnum initialize()
     }
 
     /* 範囲マップ */
-    g_pAreaMap = new AreaMap();
-    if (g_pAreaMap == NULL)
+    if (areaMap->IsFileExist() == true)
     {
-        g_pLogger->LOG_ERROR("[initialize] AreaMap allocation failed.\n");
-        goto FINISH;
-    }
-
-    if (g_pAreaMap->IsFileExist() == true)
-    {
-        g_pAreaMap->Load();
+        areaMap->Load();
     }
     else
     {
-        g_pAreaMap->Allocate();
-        g_pAreaMap->SetInitialData();
-        g_pAreaMap->Save();
+        areaMap->Allocate();
+        areaMap->SetInitialData();
+        areaMap->Save();
     }
 
     /* 動作マップ */
-    g_pMoveMap = new MoveMap();
-    if (g_pMoveMap == NULL)
+    if (moveMap->IsFileExist() == true)
     {
-        g_pLogger->LOG_ERROR("[initialize] MoveMap allocation failed.\n");
-        goto FINISH;
-    }
-
-    if (g_pMoveMap->IsFileExist() == true)
-    {
-        g_pMoveMap->Load();
+        moveMap->Load();
     }
     else
     {
-        g_pMoveMap->Allocate();
-        g_pMoveMap->SetInitialData();
-        g_pMoveMap->Save();
+        moveMap->Allocate();
+        moveMap->SetInitialData();
+        moveMap->Save();
     }
 
     /* Task 生成 */
@@ -148,8 +143,7 @@ ResultEnum initialize()
     }
 
     /* モータマイコン通信スレッド 初期化 */
-    queue = new Queue((char*)"MotorComm");
-    g_pMotorCommunicator = new MotorCommunicator(queue);
+    g_pMotorCommunicator = new MotorCommunicator();
     if (g_pMotorCommunicator == NULL)
     {
         g_pLogger->LOG_ERROR("[initialize] g_pMotorCommunicator allocation failed.\n");
@@ -234,19 +228,11 @@ void finalize()
         g_pFrontCameraReceiver = NULL;
     }
 
-    if (g_pMoveMap != NULL)
-    {
-        g_pMoveMap->Save();
-        delete g_pMoveMap;
-        g_pMoveMap = NULL;
-    }
+    MoveMap* moveMap = MoveMap::GetInstance();
+    moveMap->Save();
 
-    if (g_pAreaMap != NULL)
-    {
-        g_pAreaMap->Save();
-        delete g_pAreaMap;
-        g_pAreaMap = NULL;
-    }
+    AreaMap* areaMap = AreaMap::GetInstance();
+    areaMap->Save();
 
     if (g_pLogger != NULL)
     {

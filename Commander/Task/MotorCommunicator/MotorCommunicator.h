@@ -1,13 +1,13 @@
 #pragma once
 
 #include "Serial/Serial.h"
-#include "ThreadBase/ReceiverThread.h"
+#include "ThreadBase/LoopThreadBase.h"
 
-class MotorCommunicator : public ReceiverThread
+class MotorCommunicator : public LoopThreadBase
 {
 public :
 
-    MotorCommunicator(AdapterBase* const adapter);
+    MotorCommunicator();
     virtual ~MotorCommunicator();
 
 protected :
@@ -16,10 +16,9 @@ protected :
 private :
 
     Serial* m_Serial;
-    bool    m_SendTiming;
 
     ResultEnum initializeCore();
-    bool isReceiveComplete(char* const buffer, const unsigned long size);
-    ResultEnum analyze(char* const buffer);
+    ResultEnum doMainProc();
+    ResultEnum finalizeCore();
 
 };

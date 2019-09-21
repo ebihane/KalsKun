@@ -1,11 +1,11 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include "Parts/ShareMemory/ShareMemory.h"
 #include "MotorCommunicator.h"
 
-MotorCommunicator::MotorCommunicator(AdapterBase* const adapter)
- : ReceiverThread(adapter)
- , m_Serial(NULL)
- , m_SendTiming(false)
+MotorCommunicator::MotorCommunicator()
+    : LoopThreadBase(100, TypeEnum::TIMER_STOP)
+    , m_Serial(NULL)
 {
     /* nop. */
 }
@@ -18,70 +18,112 @@ MotorCommunicator::~MotorCommunicator()
 ResultEnum MotorCommunicator::initializeCore()
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
-
     Serial::SerialInfoStr serialSetting;
+
+    /* シリアルポート設定 */
     serialSetting.Baudrate = Serial::BaudrateEnum::E_Baudrate_115200;
     serialSetting.Parity = Serial::ParityEnum::E_Parity_Non;
     serialSetting.StopBit = Serial::StopBitEnum::E_StopBit_1Bit;
     serialSetting.DataLength = Serial::DataLengthEnum::E_Data_8bit;
 
-    Serial* serial = new Serial((char*)"ttyUSB0", &serialSetting);
-    if (serial == NULL)
+    m_Serial = new Serial((char*)"ttyUSB0", &serialSetting);
+    if (m_Serial == NULL)
     {
-        m_Logger->LOG_ERROR("[initializeCore] serial allocation failed.\n");
+        m_Logger->LOG_ERROR("[initializeCore] Serial allocation failed.\n");
         goto FINISH;
     }
 
-    m_Serial = serial;
-    m_RecvData = new char[20];
-    
+    if (m_Serial->Open() != ResultEnum::NormalEnd)
+    {
+        m_Logger->LOG_ERROR("[initializeCore] Serial Open failed.\n");
+        goto FINISH;
+    }
+
+    retVal = ResultEnum::NormalEnd;
+
+FINISH:
+    return retVal;
+}
+
+ResultEnum MotorCommunicator::doMainProc()
+{
+    ResultEnum retVal = ResultEnum::AbnormalEnd;
+    long tempCommand = 0;
+    char sendBuffer[3] = { 0 };
+    char recvBuffer[8] = { 0 };
+
+
+    tempCommand = pShareMemory->MotorDrive.Cutter;
+    tempCommand <<= 4;
+    tempCommand |= (pShareMemory->MotorDrive.Command & 0x0000000F);
+
+    sendBuffer[0] = 0xFF;
+    sendBuffer[1] = 0x02;
+    sendBuffer[2] = (char)tempCommand;
+
+    if (m_Serial->Send(&sendBuffer[0], sizeof(sendBuffer)) != ResultEnum::NormalEnd)
+    {
+        char log[40] = { 0 };
+        snprintf(&log[0], sizeof(log), "[doMainProc] Send failed. errno[%d]\n", m_Serial->GetLastError());
+        m_Logger->LOG_ERROR(log);
+        goto FINISH;
+    }
+
+    if (m_Serial->Receive(&recvBuffer[0], sizeof(recvBuffer)) != ResultEnum::NormalEnd)
+    {
+        char log[40] = { 0 };
+        snprintf(&log[0], sizeof(log), "[doMainProc] Receive failed. errno[%d]\n", m_Serial->GetLastError());
+        m_Logger->LOG_ERROR(log);
+        goto FINISH;
+    }
+
+    tempCommand = recvBuffer[2] & 0x0F;
+    pShareMemory->MotorState.Command = (MotorCommandEnum)tempCommand;
+    tempCommand = (recvBuffer[2] >> 4) & 0x0F;
+    pShareMemory->MotorState.Cutter = (CutterDriveEnum)tempCommand;
+
+    tempCommand = recvBuffer[3];
+    tempCommand <<= 8;
+    tempCommand |= recvBuffer[4];
+    pShareMemory->MotorState.PointX = tempCommand;
+
+    tempCommand = recvBuffer[5];
+    tempCommand <<= 8;
+    tempCommand |= recvBuffer[6];
+    pShareMemory->MotorState.PointY = tempCommand;
+
+    if ((recvBuffer[7] & 0x01) != 0)
+    {
+        pShareMemory->MotorState.ErrorStatus = 1;
+    }
+    else
+    {
+        pShareMemory->MotorState.ErrorStatus = 0;
+    }
+
+    if ((recvBuffer[7] & 0x02) != 0)
+    {
+        pShareMemory->MotorState.RemoteMode = E_MODE_MANUAL;
+    }
+    else
+    {
+        pShareMemory->MotorState.RemoteMode = E_MODE_AUTO;
+    }
+
     retVal = ResultEnum::NormalEnd;
 
 FINISH :
     return retVal;
 }
 
-bool MotorCommunicator::isReceiveComplete(char* const buffer, const unsigned long size)
+ResultEnum MotorCommunicator::finalizeCore()
 {
-    return true;
-}
-
-ResultEnum MotorCommunicator::analyze(char* const buffer)
-{
-    char sendBuffer[20] = { 0 };
-
-    memcpy(&sendBuffer[0], buffer, )
-
-
-}
-
-bool MotorCommunicator::createSendData(char* const data, unsigned long* size)
-{
-    bool retVal = false;
-
-    if (m_SendTiming == false)
+    if (m_Serial != NULL)
     {
-        /* 次は送信する */
-        m_SendTiming = true;
-
-        *size = 0;
-        goto FINISH;
+        m_Serial->Close();
+        delete m_Serial;
+        m_Serial = NULL;
     }
 
-    data[0] = 0xFF;
-    data[1] = 0x02;
-    data[2] = pShareMemory->MotorCommand.CutterSpeed;
-    data[3] = pShareMemory->MotorCommand.FrontBack;
-    data[4] = pShareMemory->MotorCommand.LeftRight;
-
-    *size = 5;
-
-    /* 次は送信しない */
-    m_SendTiming = false;
-
-    retVal = true;
-
-FINISH :
-
-    return retVal;
+    return ResultEnum::NormalEnd;
 }

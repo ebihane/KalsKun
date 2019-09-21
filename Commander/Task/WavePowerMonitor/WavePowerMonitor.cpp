@@ -5,7 +5,7 @@
 #include "WavePowerMonitor.h"
 
 WavePowerMonitor::WavePowerMonitor(const unsigned char apNo)
- : LoopThreadBase(200)
+ : LoopThreadBase(200, TypeEnum::TIMER_STOP)
  , AP_INDEX(apNo)
  , m_Index(0)
 {

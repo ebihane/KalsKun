@@ -107,7 +107,6 @@ ResultEnum SettingManager::Save()
     FILE* fp = NULL;
     char* buffer = NULL;
     long size = 0;
-    long index = 0;
 
     m_LastErrorNo = 0;
 
@@ -130,10 +129,10 @@ ResultEnum SettingManager::Save()
     fprintf(fp, "MapCount(Y),%ld\n", m_MapCount.Y);
     fprintf(fp, "WavePowerCoeff,%lf\n", m_WavePowerCoeff);
     fprintf(fp, "APCount,%ld\n", m_ApCount);
-    for (index = 0; index < m_ApCount; index++)
+    for (size = 0; size < m_ApCount; size++)
     {
-        fprintf(fp, "AP%ld(X),%d\n", index + 1, m_ApAddress[index].X);
-        fprintf(fp, "AP%ld(Y),%d\n", index + 1, m_ApAddress[index].Y);
+        fprintf(fp, "AP%ld(X),%d\n", size + 1, m_ApAddress[size].X);
+        fprintf(fp, "AP%ld(Y),%d\n", size + 1, m_ApAddress[size].Y);
     }
 
 #else
@@ -245,7 +244,7 @@ ResultEnum SettingManager::Load()
 
     fgets(&buffer[0], sizeof(buffer), fp);
     parseString(&buffer[0], &once[0], ',', sizeof(buffer));
-    m_WavePowerCoeff = atof(&once[0]);
+    m_WavePowerCoeff = (float)atof(&once[0]);
 
     fgets(&buffer[0], sizeof(buffer), fp);
     parseString(&buffer[0], &once[0], ',', sizeof(buffer));

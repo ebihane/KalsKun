@@ -11,8 +11,8 @@ public :
     static const unsigned long  NOT_MOVABLE_VALUE = 2;  /* 移動不可 */
     static const unsigned long  OBSTACLE_VALUE = 3;     /* 障害物 */
 
-    AreaMap();
-    virtual ~AreaMap();
+    /* インスタンス取得 */
+    static AreaMap* const GetInstance();
 
     /* 初期データ生成 */
     void SetInitialData();
@@ -24,5 +24,10 @@ protected :
 
 
 private :
+
+    static AreaMap* const m_This;
+
+    AreaMap();
+    virtual ~AreaMap();
 
 };

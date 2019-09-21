@@ -8,7 +8,13 @@ class LoopThreadBase : public ThreadBase
 {
 public :
 
-    LoopThreadBase(const unsigned long cycle);
+    typedef enum
+    {
+        CYCLIC = 0,
+        TIMER_STOP,
+    } TypeEnum;
+
+    LoopThreadBase(const unsigned long cycle, const TypeEnum type);
     virtual ~LoopThreadBase();
 
 protected :
@@ -20,6 +26,7 @@ protected :
 private :
 
     const unsigned long LOOP_CYCLE;
+    const TypeEnum PROC_TYPE;
 
     Stopwatch m_Watch;
 

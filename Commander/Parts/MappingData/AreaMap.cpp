@@ -1,6 +1,8 @@
 #include "Parts/Setting/SettingManager.h"
 #include "AreaMap.h"
 
+AreaMap* const AreaMap::m_This = new AreaMap();
+
 AreaMap::AreaMap()
  : MappingData((char*)"/home/pi/Information/AreaMap.dat")
 {
@@ -10,6 +12,11 @@ AreaMap::AreaMap()
 AreaMap::~AreaMap()
 {
     /* nop. */
+}
+
+AreaMap* const AreaMap::GetInstance()
+{
+    return m_This;
 }
 
 /* ‰Šúƒf[ƒ^¶¬ */

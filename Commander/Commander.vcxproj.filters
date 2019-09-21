@@ -46,9 +46,6 @@
     <Filter Include="Parts\PositionData">
       <UniqueIdentifier>{f3f8e846-5530-4872-8275-c66b7dd0ca57}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Task\RemoteController">
-      <UniqueIdentifier>{c0653e07-4170-45a4-a47a-dba235241445}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Parts\SettingManager">
       <UniqueIdentifier>{b7011f67-6c46-4fae-8459-e3ed79757616}</UniqueIdentifier>
     </Filter>
@@ -92,9 +89,6 @@
     </ClCompile>
     <ClCompile Include="Parts\MappingData\MoveMap.cpp">
       <Filter>Parts\MappingData</Filter>
-    </ClCompile>
-    <ClCompile Include="Task\RemoteController\RemoteController.cpp">
-      <Filter>Task\RemoteController</Filter>
     </ClCompile>
     <ClCompile Include="Task\FrontCamera\FrontCameraReceiver.cpp">
       <Filter>Task\FrontCamera</Filter>
@@ -145,9 +139,6 @@
     </ClInclude>
     <ClInclude Include="Parts\MappingData\MoveMap.h">
       <Filter>Parts\MappingData</Filter>
-    </ClInclude>
-    <ClInclude Include="Task\RemoteController\RemoteController.h">
-      <Filter>Task\RemoteController</Filter>
     </ClInclude>
     <ClInclude Include="Task\FrontCamera\FrontCameraReceiver.h">
       <Filter>Task\FrontCamera</Filter>

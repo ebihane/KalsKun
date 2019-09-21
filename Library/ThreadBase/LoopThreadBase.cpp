@@ -1,7 +1,8 @@
 #include "LoopThreadBase.h"
 
-LoopThreadBase::LoopThreadBase(const unsigned long cycle)
+LoopThreadBase::LoopThreadBase(const unsigned long cycle, const TypeEnum type)
  : LOOP_CYCLE(cycle)
+ , PROC_TYPE(type)
 {
     /* nop. */
 }
@@ -44,7 +45,11 @@ ResultEnum LoopThreadBase::doProcedure()
         elapsedTime = m_Watch.Get();
         elapsedMsec = (unsigned long)(elapsedTime * 1000.0F);
 
-        if (LOOP_CYCLE <= elapsedMsec)
+        if (PROC_TYPE == TypeEnum::TIMER_STOP)
+        {
+            waitTime = LOOP_CYCLE;
+        }
+        else if (LOOP_CYCLE <= elapsedMsec)
         {
             waitTime = 1;
         }
