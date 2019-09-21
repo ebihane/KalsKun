@@ -20,6 +20,11 @@ ResultEnum StateSender::initializeCore()
     return ResultEnum::NormalEnd;
 }
 
+void StateSender::SetState(long moveCommand)
+{
+	m_MoveCommand = moveCommand;
+}
+
 bool StateSender::createSendData(char* const data, unsigned long* const size)
 {
     bool retVal = false;
@@ -36,6 +41,7 @@ bool StateSender::createSendData(char* const data, unsigned long* const size)
     p->Result = ResultEnum::NormalEnd;
     p->lParam[0] = m_SendCount;
     p->lParam[1] = pShareMemory->SystemError;
+	p->lParam[2] = m_MoveCommand;
 
     *size = sizeof(EventInfo);
 

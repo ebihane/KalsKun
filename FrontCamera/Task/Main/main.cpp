@@ -49,14 +49,10 @@ int main(int argc, char* argv[])
     switch (deviceNo)
     {
         case 0 :
-            masterMain(cameraNo);
+			masterMain(cameraNo);
             break;
 
         case 1 :
-            masterMain(cameraNo);
-            break;
-
-        case 2 :
             slaveMain(cameraNo);
             break;
 

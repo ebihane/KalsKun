@@ -57,7 +57,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
-      <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc;opencv_imgcodecs;freenect;Library</LibraryDependencies>
+      <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc;opencv_imgcodecs;opencv_objdetect;freenect;Library</LibraryDependencies>
     </Link>
     <RemotePostBuildEvent>
       <Command>sudo cp $(RemoteTargetPath) $(RemoteRootDir)/release</Command>
