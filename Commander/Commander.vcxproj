@@ -96,12 +96,13 @@
     <ClCompile Include="Task\Main\Sequencer\Error\ErrorKun.cpp" />
     <ClCompile Include="Task\Main\Sequencer\Idle\HimajinKun.cpp" />
     <ClCompile Include="Task\Main\Sequencer\Kusakari\KusakariKun.cpp" />
-    <ClCompile Include="Task\Main\Sequencer\Setting\SetteiKun.cpp" />
+    <ClCompile Include="Task\Main\Sequencer\SequencerBase.cpp" />
     <ClCompile Include="Task\Main\Sequencer\Yakei\YakeiKun.cpp" />
     <ClCompile Include="Task\MotorCommunicator\MotorCommunicator.cpp" />
     <ClCompile Include="Task\WavePowerMonitor\WavePowerMonitor.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Parts\CommanderCommon.h" />
     <ClInclude Include="Parts\MappingData\AreaMap.h" />
     <ClInclude Include="Parts\MappingData\MappingData.h" />
     <ClInclude Include="Parts\MappingData\MoveMap.h" />
@@ -114,7 +115,6 @@
     <ClInclude Include="Task\Main\Sequencer\Idle\HimajinKun.h" />
     <ClInclude Include="Task\Main\Sequencer\Kusakari\KusakariKun.h" />
     <ClInclude Include="Task\Main\Sequencer\SequencerBase.h" />
-    <ClInclude Include="Task\Main\Sequencer\Setting\SetteiKun.h" />
     <ClInclude Include="Task\Main\Sequencer\Yakei\YakeiKun.h" />
     <ClInclude Include="Task\MotorCommunicator\MotorCommunicator.h" />
     <ClInclude Include="Task\WavePowerMonitor\WavePowerMonitor.h" />

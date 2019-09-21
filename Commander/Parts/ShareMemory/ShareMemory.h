@@ -39,6 +39,8 @@ typedef enum
     E_COMMAND_U_TURN,   /* 2: Uターン */
     E_COMMAND_AVOID,    /* 3: 回避 */
     E_COMMAND_REMOTE,   /* 4: 遠隔動作 */
+    E_COMMAND_MONITOR,  /* 5: モニタ */
+    E_COMMAND_MAX,      /* 6: コマンド数 */
 } MotorCommandEnum;
 
 /* モータマイコン向け 草刈り刃動作指示 */
@@ -46,6 +48,7 @@ typedef enum
 {
     E_CUTTER_STOP = 0,  /* 0: 草刈り刃停止 */
     E_CUTTER_DRIVE,     /* 1: 草刈り刃駆動 */
+    E_CUTTER_TYPE_MAX,  /* 2: 草刈り刃 制御数 */
 } CutterDriveEnum;
 
 /* 遠隔操作モード */
@@ -53,14 +56,7 @@ typedef enum
 {
     E_MODE_MANUAL = 0,  /* 0: 手動 */
     E_MODE_AUTO,        /* 1: 自動 */
-} MoveTypeEnum;
-
-/* モータマイコン 動作指示 */
-typedef struct
-{
-    MotorCommandEnum    Command;
-    CutterDriveEnum     Cutter;
-} MotorDriveStr;
+} ControlModeEnum;
 
 /* モータマイコン 状態 */
 typedef struct
@@ -70,7 +66,7 @@ typedef struct
     long                PointX;
     long                PointY;
     long                ErrorStatus;
-    MoveTypeEnum        RemoteMode;
+    ControlModeEnum     RemoteMode;
 } MotorStatusStr;
 
 /*--------------*/
@@ -102,7 +98,6 @@ typedef struct
 typedef struct
 {
     BeaconDataStr           BeaconData[BEACON_COUNT];
-    MotorDriveStr           MotorDrive;
     MotorStatusStr          MotorState;
     AroundCameraStateStr    AroundCamera;
     FrontCameraStateStr     FrontCamera;

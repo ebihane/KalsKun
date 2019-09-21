@@ -1,4 +1,5 @@
 #include "Parts/Setting/SettingManager.h"
+#include "AreaMap.h"
 #include "MoveMap.h"
 
 MoveMap* MoveMap::m_This = new MoveMap();
@@ -100,10 +101,72 @@ FINISH :
     return retVal;
 }
 
+/* 指定した座標を走行済みに変更する */
+void MoveMap::ChangeMoved(RectStr* const position)
+{
+    ChangeMoved(position->X, position->Y);
+}
+
+void MoveMap::ChangeMoved(const unsigned long x, const unsigned long y)
+{
+    AreaMap* areaMap = AreaMap::GetInstance();
+
+    if (areaMap->IsMovable(x, y) == false)
+    {
+        goto FINISH;
+    }
+
+    Set(x, y, m_MovedValue);
+
+FINISH :
+    return;
+}
+
+/* 畑の全区画を走行完了したか判定する */
+bool MoveMap::IsComplete()
+{
+    bool retVal = true;
+    SettingManager* setting = SettingManager::GetInstance();
+    AreaMap* areaMap = AreaMap::GetInstance();
+    RectStr mapCount = setting->GetMapCount();
+    char areaMapValue = 0;
+    char moveMapValue = 0;
+
+
+    for (long y = 0; y < mapCount.Y; y++)
+    {
+        for (long x = 0; x < mapCount.X; x++)
+        {
+            /* 走行禁止の場合は未完了にしない */
+            if (areaMap->IsMovable(x, y) == false)
+            {
+                continue;
+            }
+
+            /* 障害物は未完了にしない */
+            areaMapValue = areaMap->Get(x, y);
+            if (areaMapValue == AreaMap::OBSTACLE_VALUE)
+            {
+                continue;
+            }
+
+            moveMapValue = Get(x, y);
+            if (moveMapValue != m_MovedValue)
+            {
+                retVal = false;
+                goto FINISH;
+            }
+        }
+    }
+
+FINISH :
+    return retVal;
+}
+
 /* 走行データを更新する */
 void MoveMap::UpdateMovedValue()
 {
-    unsigned long tempValue = m_MovedValue;
+    unsigned char tempValue = m_MovedValue;
 
     tempValue++;
     if (tempValue == MOVE_FAILED_NO)

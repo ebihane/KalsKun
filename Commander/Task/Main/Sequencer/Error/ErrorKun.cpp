@@ -11,17 +11,17 @@ ErrorKun::~ErrorKun()
 
 }
 
-void ErrorKun::Initialize()
+ResultEnum ErrorKun::initializeCore()
+{
+    return ResultEnum::NormalEnd;
+}
+
+void ErrorKun::destroyCore()
 {
 
 }
 
-void ErrorKun::Destroy()
-{
-
-}
-
-SequencerBase::SequenceTypeEnum ErrorKun::Process()
+SequencerBase::SequenceTypeEnum ErrorKun::processCore()
 {
     return SequencerBase::SequenceTypeEnum::E_SEQ_ERROR;
 }

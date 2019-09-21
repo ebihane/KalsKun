@@ -51,7 +51,8 @@ typedef struct
 #define COMMANDER_TO_FC_PORT        (10001)         /* 司令塔マイコン → 前方カメラマイコン 通信ポート番号 */
 #define MOTOR_TO_COMMANDER_PORT     (10000)         /* モータマイコン → 司令塔マイコン 通信スレッド ポート番号 */
 #define AC_TO_COMMANDER_PORT        (10001)         /* 360°カメラマイコン → 司令塔マイコン 状態通信スレッド ポート番号 */
-#define FC_TO_COMMANDER_PORT        (10002)         /* 前方カメラマイコン → 司令塔マイコン 状態通信スレッド ポート番号 */
+#define FC1_TO_COMMANDER_PORT       (10002)         /* 前方カメラ(テープ検知用)マイコン → 司令塔マイコン 状態通信スレッド ポート番号 */
+#define FC2_TO_COMMANDER_PORT       (10003)         /* 前方カメラ(顔検証用)マイコン → 司令塔マイコン 状態通信スレッド ポート番号 */
 
 /* IP アドレス定義 (Wifi) */
 #define COMMANDER_WIFI_IP           "10.0.0.1"      /* 司令塔マイコン Wifi IP アドレス */

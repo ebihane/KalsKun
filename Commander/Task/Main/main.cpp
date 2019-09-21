@@ -4,7 +4,6 @@
 
 /* Parts */
 #include "Logger/Logger.h"
-#include "Queue/Queue.h"
 #include "Socket/TcpServer/TcpServer.h"
 #include "Parts/Setting/SettingManager.h"
 #include "Parts/ShareMemory/ShareMemory.h"
@@ -21,7 +20,6 @@
 #include "Task/Main/Sequencer/Idle/HimajinKun.h"
 #include "Task/Main/Sequencer/Kusakari/KusakariKun.h"
 #include "Task/Main/Sequencer/Yakei/YakeiKun.h"
-#include "Task/Main/Sequencer/Setting/SetteiKun.h"
 #include "Task/Main/Sequencer/Error/ErrorKun.h"
 
 /* Parts */
@@ -125,7 +123,7 @@ ResultEnum initialize()
 
     /* Task 生成 */
     /* 前方カメラマイコン状態取得スレッド 初期化 */
-    server = new TcpServer(FC_TO_COMMANDER_PORT);
+    server = new TcpServer(FC1_TO_COMMANDER_PORT);
     g_pFrontCameraReceiver = new FrontCameraReceiver(server);
     if (g_pFrontCameraReceiver == NULL)
     {
@@ -188,10 +186,6 @@ void mainProcedure()
             else if (next == SequencerBase::SequenceTypeEnum::E_SEQ_YAKEI)
             {
                 g_pSequencer = new YakeiKun();
-            }
-            else if (next == SequencerBase::SequenceTypeEnum::E_SEQ_SETTING)
-            {
-                g_pSequencer = new SetteiKun();
             }
             else
             {
