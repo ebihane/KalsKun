@@ -150,6 +150,12 @@ FINISH :
     return retVal;
 }
 
+ResultEnum Queue::Send(void* const bufferPtr, const unsigned long size)
+{
+    m_LastErrorNo = EINVAL;
+    return ResultEnum::AbnormalEnd;
+}
+
 ResultEnum Queue::IsReceivable(bool& receivable)
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
@@ -217,4 +223,9 @@ ResultEnum Queue::Receive(void* const bufferPtr)
 
 FINISH:
     return retVal;
+}
+
+ResultEnum Queue::Receive(void* const bufferPtr, const unsigned long size)
+{
+    return Receive(bufferPtr);
 }

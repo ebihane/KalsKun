@@ -1,8 +1,10 @@
+#include <stdlib.h>
 #include "Parts/ShareMemory/ShareMemory.h"
 #include "MotorCommunicator.h"
 
 MotorCommunicator::MotorCommunicator(AdapterBase* const adapter)
- : SenderThread(adapter)
+ : ReceiverThread(adapter)
+ , m_Serial(NULL)
  , m_SendTiming(false)
 {
     /* nop. */
@@ -15,8 +17,42 @@ MotorCommunicator::~MotorCommunicator()
 
 ResultEnum MotorCommunicator::initializeCore()
 {
-    m_SendData = new char[5];
-    return ResultEnum::NormalEnd;
+    ResultEnum retVal = ResultEnum::AbnormalEnd;
+
+    Serial::SerialInfoStr serialSetting;
+    serialSetting.Baudrate = Serial::BaudrateEnum::E_Baudrate_115200;
+    serialSetting.Parity = Serial::ParityEnum::E_Parity_Non;
+    serialSetting.StopBit = Serial::StopBitEnum::E_StopBit_1Bit;
+    serialSetting.DataLength = Serial::DataLengthEnum::E_Data_8bit;
+
+    Serial* serial = new Serial((char*)"ttyUSB0", &serialSetting);
+    if (serial == NULL)
+    {
+        m_Logger->LOG_ERROR("[initializeCore] serial allocation failed.\n");
+        goto FINISH;
+    }
+
+    m_Serial = serial;
+    m_RecvData = new char[20];
+    
+    retVal = ResultEnum::NormalEnd;
+
+FINISH :
+    return retVal;
+}
+
+bool MotorCommunicator::isReceiveComplete(char* const buffer, const unsigned long size)
+{
+    return true;
+}
+
+ResultEnum MotorCommunicator::analyze(char* const buffer)
+{
+    char sendBuffer[20] = { 0 };
+
+    memcpy(&sendBuffer[0], buffer, )
+
+
 }
 
 bool MotorCommunicator::createSendData(char* const data, unsigned long* size)

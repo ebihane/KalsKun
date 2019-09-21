@@ -46,11 +46,14 @@
     <Filter Include="Parts\PositionData">
       <UniqueIdentifier>{f3f8e846-5530-4872-8275-c66b7dd0ca57}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Task\DriveManager">
-      <UniqueIdentifier>{5f630189-dcb6-4d7e-9f18-d951bec982ab}</UniqueIdentifier>
+    <Filter Include="Task\RemoteController">
+      <UniqueIdentifier>{c0653e07-4170-45a4-a47a-dba235241445}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Parts\Distance">
-      <UniqueIdentifier>{eadfa753-a658-4713-b9a9-fa7ef8febc53}</UniqueIdentifier>
+    <Filter Include="Parts\SettingManager">
+      <UniqueIdentifier>{b7011f67-6c46-4fae-8459-e3ed79757616}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Task\WavePowerMonitor">
+      <UniqueIdentifier>{fb56696b-54ab-4f43-b04a-7b63d5b4b65c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -90,11 +93,17 @@
     <ClCompile Include="Parts\MappingData\MoveMap.cpp">
       <Filter>Parts\MappingData</Filter>
     </ClCompile>
-    <ClCompile Include="Task\DriveManager\DriveManager.cpp">
-      <Filter>Task\DriveManager</Filter>
+    <ClCompile Include="Task\RemoteController\RemoteController.cpp">
+      <Filter>Task\RemoteController</Filter>
     </ClCompile>
-    <ClCompile Include="Parts\Distance\TudeConverter.cpp">
-      <Filter>Parts\Distance</Filter>
+    <ClCompile Include="Task\FrontCamera\FrontCameraReceiver.cpp">
+      <Filter>Task\FrontCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="Parts\Setting\SettingManager.cpp">
+      <Filter>Parts\SettingManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Task\WavePowerMonitor\WavePowerMonitor.cpp">
+      <Filter>Task\WavePowerMonitor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -137,11 +146,17 @@
     <ClInclude Include="Parts\MappingData\MoveMap.h">
       <Filter>Parts\MappingData</Filter>
     </ClInclude>
-    <ClInclude Include="Task\DriveManager\DriveManager.h">
-      <Filter>Task\DriveManager</Filter>
+    <ClInclude Include="Task\RemoteController\RemoteController.h">
+      <Filter>Task\RemoteController</Filter>
     </ClInclude>
-    <ClInclude Include="Parts\Distance\TudeConverter.h">
-      <Filter>Parts\Distance</Filter>
+    <ClInclude Include="Task\FrontCamera\FrontCameraReceiver.h">
+      <Filter>Task\FrontCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="Parts\Setting\SettingManager.h">
+      <Filter>Parts\SettingManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\WavePowerMonitor\WavePowerMonitor.h">
+      <Filter>Task\WavePowerMonitor</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

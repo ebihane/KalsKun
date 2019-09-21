@@ -1,18 +1,7 @@
 #pragma once
 
-/* 方角定数 */
-typedef enum
-{
-    E_COMPASS_NORTH = 0,    /* 0: 北 */
-    E_COMPASS_NORTHEAST,    /* 1: 北東 */
-    E_COMPASS_EAST,         /* 2: 東 */
-    E_COMPASS_SOUTHEAST,    /* 3: 南東 */
-    E_COMPASS_SOUTH,        /* 4: 南 */
-    E_COMPASS_SOUTHWEST,    /* 5: 南西 */
-    E_COMPASS_WEST,         /* 6: 西 */
-    E_COMPASS_NORTHWEST,    /* 7: 北西 */
-    E_COMPASS_MAX,          /* 8: 方角数 */
-} CompassEnum;
+/* ビーコン個数 */
+#define BEACON_COUNT    (3)
 
 /* 方向定数 (値は時計回り) */
 typedef enum
@@ -27,6 +16,42 @@ typedef enum
     E_DIR_FRONT_L,      /* 7: 左斜め前 */
     E_DIR_TYPE_MAX,     /* 8: 方向種別数 */
 } DirectionEnum;
+
+/* 司令塔マイコン 電波強度関連情報 */
+typedef struct
+{
+    float   RssiAverage;
+    float   TxPowerAverage;
+    float   Distance;
+} BeaconDataStr;
+
+
+/* 遠隔操作関連 */
+typedef enum
+{
+    E_MODE_MANUAL = 0,  /* 0: 手動 */
+    E_MODE_AUTO,        /* 1: 自動 */
+} MoveTypeEnum;
+
+/* リモコン */
+typedef struct
+{
+    MoveTypeEnum Mode;  /* 制御モード */
+
+} MoveControlStr;
+
+
+
+
+
+
+/* 前方カメラ 状態 */
+typedef struct
+{
+    long ReceiveCount;  /* 受信回数 */
+    long SystemError;   /* システムエラー状態 */
+    long Avoidance;     /* 回避指示 */
+} FrontCameraStateStr;
 
 /* 周辺カメラ 状態 */
 typedef struct
@@ -44,18 +69,21 @@ typedef struct
     char CutterSpeed;   /* 草刈り刃スピード */
 } MotorCommandStr;
 
-/* 位置情報 */
-typedef struct
-{
-    unsigned long   CurrentX;   /* 現在座標 X */
-    unsigned long   CurrentY;   /* 現在座標 Y */
-} PositionStr;
 
+
+
+/*-----------------*/
+/* 共有メモリ 本体 */
+/*-----------------*/
 typedef struct
 {
     AroundCameraStateStr    AroundCamera;
+    FrontCameraStateStr     FrontCamera;
+
+    MoveControlStr          MoveControl;
+
     MotorCommandStr         MotorCommand;
-    PositionStr             Position;
+    BeaconDataStr           BeaconData[BEACON_COUNT];
 } ShareMemoryStr;
 
 #ifdef MEMORY_MAIN

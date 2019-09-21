@@ -3,7 +3,7 @@
 
 /* 向いている方向をもとに、前進した場合の座標を算出するためのテーブル */
 /* マップの [0][0] が北西方向としている */
-const PositionData::RectStr PositionData::m_ReferenceMap[CompassEnum::E_COMPASS_MAX]
+const RectStr PositionData::m_ReferenceMap[CompassEnum::E_COMPASS_MAX]
 = {
     /*   X       Y      */
     /*-------+----------*/
@@ -33,7 +33,7 @@ void PositionData::GetPosition(RectStr* const position)
     memcpy(position, &m_Position, sizeof(RectStr));
 }
 
-CompassEnum PositionData::GetCompass()
+PositionData::CompassEnum PositionData::GetCompass()
 {
     return m_Compass;
 }
@@ -67,7 +67,7 @@ void PositionData::Move()
 }
 
 /* 指定された方角に向きを加味した新たな方角を返す */
-CompassEnum PositionData::convertDirectionToCompass(const CompassEnum compass, const DirectionEnum direction)
+PositionData::CompassEnum PositionData::convertDirectionToCompass(const CompassEnum compass, const DirectionEnum direction)
 {
     CompassEnum retVal = CompassEnum::E_COMPASS_MAX;
     long tempCompass = (long)compass;

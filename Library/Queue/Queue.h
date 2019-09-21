@@ -19,9 +19,11 @@ public:
     ResultEnum Disconnection();
 
     ResultEnum IsSendable(bool& sendable);
+    ResultEnum Send(void* const bufferPtr, const unsigned long size);
     ResultEnum Send(char* const targetName, void* const bufferPtr, const unsigned long size);
     ResultEnum IsReceivable(bool& receivable);
     ResultEnum Receive(void* const bufferPtr);
+    ResultEnum Receive(void* const bufferPtr, const unsigned long size);
 
 private:
 

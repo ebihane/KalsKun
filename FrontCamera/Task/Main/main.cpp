@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
     switch (deviceNo)
     {
         case 0 :
-            kinectMain(cameraNo);
+            masterMain(cameraNo);
             break;
 
         case 1 :

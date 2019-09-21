@@ -1,7 +1,7 @@
 #include <math.h>
 #include "TudeConverter.h"
 
-TudeConverter::TudeConverter() : EARTH_R(6378.137)
+TudeConverter::TudeConverter()
 {
     /* nop. */
 }

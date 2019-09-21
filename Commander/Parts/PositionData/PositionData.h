@@ -2,6 +2,7 @@
 
 #include "Include/Common.h"
 #include "Parts/ShareMemory/ShareMemory.h"
+#include "Parts/Setting/SettingManager.h"
 #include "Parts/MappingData/AreaMap.h"
 #include "Parts/MappingData/MoveMap.h"
 
@@ -14,12 +15,19 @@ class PositionData
 {
 public :
 
-    /* ç¿ïWç\ë¢ëÃ */
-    typedef struct
+    /* ï˚äpíËêî */
+    typedef enum
     {
-        long X;    /* â° */
-        long Y;    /* èc */
-    } RectStr;
+        E_COMPASS_NORTH = 0,    /* 0: ñk */
+        E_COMPASS_NORTHEAST,    /* 1: ñkìå */
+        E_COMPASS_EAST,         /* 2: ìå */
+        E_COMPASS_SOUTHEAST,    /* 3: ìÏìå */
+        E_COMPASS_SOUTH,        /* 4: ìÏ */
+        E_COMPASS_SOUTHWEST,    /* 5: ìÏêº */
+        E_COMPASS_WEST,         /* 6: êº */
+        E_COMPASS_NORTHWEST,    /* 7: ñkêº */
+        E_COMPASS_MAX,          /* 8: ï˚äpêî */
+    } CompassEnum;
 
     PositionData(const CompassEnum compass, RectStr* const position);
     virtual ~PositionData();

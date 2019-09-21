@@ -1,7 +1,8 @@
+#include "Parts/Setting/SettingManager.h"
 #include "MoveMap.h"
 
 MoveMap::MoveMap()
- : MappingData((char *)"/home/pi/MoveMap.dat")
+ : MappingData((char *)"/home/pi/Information/MoveMap.dat")
  , m_MovedValue(MOVED_INIT_VALUE)
  , m_NotMoveValue(NOT_MOVE_INIT_VALUE)
 {
@@ -11,6 +12,32 @@ MoveMap::MoveMap()
 MoveMap::~MoveMap()
 {
     /* nop. */
+}
+
+/* 初期データ生成 */
+void MoveMap::SetInitialData()
+{
+    SettingManager* setting = SettingManager::GetInstance();
+    RectStr mapCount = setting->GetMapCount();
+    
+    for (long y = 0; y < mapCount.Y; y++)
+    {
+        for (long x = 0; x < mapCount.X; x++)
+        {
+            if ((y == 0) || (y == (mapCount.Y - 1)))
+            {
+                Set(x, y, MOVE_FAILED_NO);
+            }
+            else if ((x == 0) || (x == (mapCount.X - 1)))
+            {
+                Set(x, y, MOVE_FAILED_NO);
+            }
+            else
+            {
+                Set(x, y, NOT_MOVE_INIT_VALUE);
+            }
+        }
+    }
 }
 
 /* 指定した座標が移動可能か判断する */

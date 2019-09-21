@@ -85,13 +85,13 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Parts\Distance\TudeConverter.cpp" />
     <ClCompile Include="Parts\MappingData\AreaMap.cpp" />
     <ClCompile Include="Parts\MappingData\MappingData.cpp" />
     <ClCompile Include="Parts\MappingData\MoveMap.cpp" />
     <ClCompile Include="Parts\PositionData\PositionData.cpp" />
+    <ClCompile Include="Parts\Setting\SettingManager.cpp" />
     <ClCompile Include="Task\AroundCamera\AroundCameraReceiver.cpp" />
-    <ClCompile Include="Task\DriveManager\DriveManager.cpp" />
+    <ClCompile Include="Task\FrontCamera\FrontCameraReceiver.cpp" />
     <ClCompile Include="Task\Main\main.cpp" />
     <ClCompile Include="Task\Main\Sequencer\Error\ErrorKun.cpp" />
     <ClCompile Include="Task\Main\Sequencer\Idle\HimajinKun.cpp" />
@@ -99,16 +99,18 @@
     <ClCompile Include="Task\Main\Sequencer\Setting\SetteiKun.cpp" />
     <ClCompile Include="Task\Main\Sequencer\Yakei\YakeiKun.cpp" />
     <ClCompile Include="Task\MotorCommunicator\MotorCommunicator.cpp" />
+    <ClCompile Include="Task\RemoteController\RemoteController.cpp" />
+    <ClCompile Include="Task\WavePowerMonitor\WavePowerMonitor.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Parts\Distance\TudeConverter.h" />
     <ClInclude Include="Parts\MappingData\AreaMap.h" />
     <ClInclude Include="Parts\MappingData\MappingData.h" />
     <ClInclude Include="Parts\MappingData\MoveMap.h" />
     <ClInclude Include="Parts\PositionData\PositionData.h" />
+    <ClInclude Include="Parts\Setting\SettingManager.h" />
     <ClInclude Include="Parts\ShareMemory\ShareMemory.h" />
     <ClInclude Include="Task\AroundCamera\AroundCameraReceiver.h" />
-    <ClInclude Include="Task\DriveManager\DriveManager.h" />
+    <ClInclude Include="Task\FrontCamera\FrontCameraReceiver.h" />
     <ClInclude Include="Task\Main\Sequencer\Error\ErrorKun.h" />
     <ClInclude Include="Task\Main\Sequencer\Idle\HimajinKun.h" />
     <ClInclude Include="Task\Main\Sequencer\Kusakari\KusakariKun.h" />
@@ -116,6 +118,8 @@
     <ClInclude Include="Task\Main\Sequencer\Setting\SetteiKun.h" />
     <ClInclude Include="Task\Main\Sequencer\Yakei\YakeiKun.h" />
     <ClInclude Include="Task\MotorCommunicator\MotorCommunicator.h" />
+    <ClInclude Include="Task\RemoteController\RemoteController.h" />
+    <ClInclude Include="Task\WavePowerMonitor\WavePowerMonitor.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>

@@ -19,6 +19,20 @@ typedef struct
     long fParam[10];    /* float 型パラメータ */
 } EventInfo;
 
+/* 座標構造体 */
+typedef struct
+{
+    long X;             /* 横 */
+    long Y;             /* 縦 */
+} RectStr;
+
+/* サイズ構造体 */
+typedef struct
+{
+    double Width;       /* 幅 */
+    double Length;      /* 高さ */
+} SizeStr;
+
 /* ログ出力プロセス 関連定義 */
 #define LOG_WRITER_QUEUE_NAME   "LogWriter"
 
