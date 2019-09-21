@@ -1,5 +1,10 @@
 #pragma once
 
+#include "Include/Common.h"
+#include "Queue/SendQueue.h"
+#include "Logger/Logger.h"
+#include "Parts/ShareMemory/ShareMemory.h"
+
 class SequencerBase
 {
 public :
@@ -9,25 +14,28 @@ public :
         E_SEQ_IDLE = 0,
         E_SEQ_KUSAKARI,
         E_SEQ_YAKEI,
-        E_SEQ_SETTING,
         E_SEQ_ERROR,
     } SequenceTypeEnum;
 
-    SequencerBase(const SequenceTypeEnum type) : MY_SEQUENCE_TYPE(type) {};
-    virtual ~SequencerBase() {};
+    SequencerBase(const SequenceTypeEnum type);
+    virtual ~SequencerBase();
 
-    virtual void Initialize() = 0;
-    virtual void Destroy() = 0;
-    virtual SequenceTypeEnum Process() = 0;
+    void Initialize();
+    void Destroy();
+    SequenceTypeEnum Process();
+    SequenceTypeEnum GetSequence();
 
-    inline SequenceTypeEnum GetSequence()
-    {
-        return MY_SEQUENCE_TYPE;
-    }
 
 protected :
 
     const SequenceTypeEnum MY_SEQUENCE_TYPE;
+
+    Logger m_Logger;
+    SendQueue m_SendQueue;
+
+    virtual ResultEnum initializeCore() = 0;
+    virtual void destroyCore() = 0;
+    virtual SequenceTypeEnum processCore() = 0;
 
 private :
 

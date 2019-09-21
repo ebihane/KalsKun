@@ -24,6 +24,13 @@ public:
     bool IsNotMove(RectStr* const position);
     bool IsNotMove(const unsigned long x, const unsigned long y);
 
+    /* 指定した座標を走行済みに変更する */
+    void ChangeMoved(RectStr* const position);
+    void ChangeMoved(const unsigned long x, const unsigned long y);
+
+    /* 畑の全区画を走行完了したか判定する */
+    bool IsComplete();
+
     /* 走行済みデータを更新する */
     void UpdateMovedValue();
 
@@ -33,8 +40,8 @@ private:
 
     static MoveMap* m_This;
 
-    unsigned long   m_MovedValue;                       /* 走行済時にマップに記録する値 */
-    unsigned long   m_NotMoveValue;                     /* 未走行時にマップに記録する値 */
+    unsigned char   m_MovedValue;       /* 走行済時にマップに記録する値 */
+    unsigned char   m_NotMoveValue;     /* 未走行時にマップに記録する値 */
 
     MoveMap();
     virtual ~MoveMap();

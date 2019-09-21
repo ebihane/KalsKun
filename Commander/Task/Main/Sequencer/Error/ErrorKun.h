@@ -9,14 +9,13 @@ public:
     ErrorKun();
     virtual ~ErrorKun();
 
-    void Initialize();
-    void Destroy();
-    SequenceTypeEnum Process();
-
 protected:
 
 
 private:
 
+    ResultEnum initializeCore();
+    void destroyCore();
+    SequenceTypeEnum processCore();
 
 };

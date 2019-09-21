@@ -9,14 +9,17 @@ public:
     KusakariKun();
     virtual ~KusakariKun();
 
-    void Initialize();
-    void Destroy();
-    SequenceTypeEnum Process();
-
 protected:
 
 
 private:
 
+    long m_TapeDetect;
+    long m_PrevAvoidance;
+    RectStr m_PrevRect;
+
+    ResultEnum initializeCore();
+    void destroyCore();
+    SequenceTypeEnum processCore();
 
 };

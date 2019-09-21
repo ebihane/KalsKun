@@ -9,14 +9,13 @@ public:
     SetteiKun();
     virtual ~SetteiKun();
 
-    void Initialize();
-    void Destroy();
-    SequenceTypeEnum Process();
-
 protected:
 
 
 private:
 
+    void initializeCore();
+    void destroyCore();
+    SequenceTypeEnum processCore();
 
 };

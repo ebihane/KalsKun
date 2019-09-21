@@ -11,17 +11,17 @@ SetteiKun::~SetteiKun()
 
 }
 
-void SetteiKun::Initialize()
+void SetteiKun::initializeCore()
 {
 
 }
 
-void SetteiKun::Destroy()
+void SetteiKun::destroyCore()
 {
 
 }
 
-SequencerBase::SequenceTypeEnum SetteiKun::Process()
+SequencerBase::SequenceTypeEnum SetteiKun::processCore()
 {
     return SequencerBase::SequenceTypeEnum::E_SEQ_SETTING;
 }

@@ -34,9 +34,6 @@
     <Filter Include="Task\Main\Sequencer\Error">
       <UniqueIdentifier>{a460dfb6-98cb-4c78-975e-ba94effeec03}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Task\Main\Sequencer\Setting">
-      <UniqueIdentifier>{bc9f47aa-d5f9-41d5-8292-3066011b6cd3}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Task\FrontCamera">
       <UniqueIdentifier>{91d29160-ae5e-46a4-a0bd-12c7cd39e50c}</UniqueIdentifier>
     </Filter>
@@ -72,9 +69,6 @@
     <ClCompile Include="Task\Main\Sequencer\Error\ErrorKun.cpp">
       <Filter>Task\Main\Sequencer\Error</Filter>
     </ClCompile>
-    <ClCompile Include="Task\Main\Sequencer\Setting\SetteiKun.cpp">
-      <Filter>Task\Main\Sequencer\Setting</Filter>
-    </ClCompile>
     <ClCompile Include="Task\Main\Sequencer\Yakei\YakeiKun.cpp">
       <Filter>Task\Main\Sequencer\Yakei</Filter>
     </ClCompile>
@@ -99,6 +93,9 @@
     <ClCompile Include="Task\WavePowerMonitor\WavePowerMonitor.cpp">
       <Filter>Task\WavePowerMonitor</Filter>
     </ClCompile>
+    <ClCompile Include="Task\Main\Sequencer\SequencerBase.cpp">
+      <Filter>Task\Main\Sequencer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Task\AroundCamera\AroundCameraReceiver.h">
@@ -115,9 +112,6 @@
     </ClInclude>
     <ClInclude Include="Task\Main\Sequencer\Error\ErrorKun.h">
       <Filter>Task\Main\Sequencer\Error</Filter>
-    </ClInclude>
-    <ClInclude Include="Task\Main\Sequencer\Setting\SetteiKun.h">
-      <Filter>Task\Main\Sequencer\Setting</Filter>
     </ClInclude>
     <ClInclude Include="Task\Main\Sequencer\Yakei\YakeiKun.h">
       <Filter>Task\Main\Sequencer\Yakei</Filter>
@@ -148,6 +142,9 @@
     </ClInclude>
     <ClInclude Include="Task\WavePowerMonitor\WavePowerMonitor.h">
       <Filter>Task\WavePowerMonitor</Filter>
+    </ClInclude>
+    <ClInclude Include="Parts\CommanderCommon.h">
+      <Filter>Parts</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

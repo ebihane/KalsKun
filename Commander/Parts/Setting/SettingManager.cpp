@@ -42,8 +42,8 @@ void SettingManager::CreateDefaultData()
     m_RobotSize.Width = 463.0;
 
     /* 畑の大きさ */
-    m_FarmSize.Length = 3000.0;
-    m_FarmSize.Width = 3000.0;
+    m_FarmSize.Length = 1000.0;
+    m_FarmSize.Width = 1000.0;
 
     /* マップの個数 (= 自動計算) */
     long xCount = (long)(m_FarmSize.Width / m_RobotSize.Width);

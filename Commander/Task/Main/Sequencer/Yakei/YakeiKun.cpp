@@ -11,17 +11,17 @@ YakeiKun::~YakeiKun()
 
 }
 
-void YakeiKun::Initialize()
+ResultEnum YakeiKun::initializeCore()
+{
+    return ResultEnum::NormalEnd;
+}
+
+void YakeiKun::destroyCore()
 {
 
 }
 
-void YakeiKun::Destroy()
-{
-
-}
-
-SequencerBase::SequenceTypeEnum YakeiKun::Process()
+SequencerBase::SequenceTypeEnum YakeiKun::processCore()
 {
     return SequencerBase::SequenceTypeEnum::E_SEQ_YAKEI;
 }

@@ -9,14 +9,14 @@ public :
     HimajinKun();
     virtual ~HimajinKun();
 
-    void Initialize();
-    void Destroy();
-    SequenceTypeEnum Process();
-
 protected :
 
 
 private :
 
+    ControlModeEnum m_LastRemoteType;
 
+    ResultEnum initializeCore();
+    void destroyCore();
+    SequenceTypeEnum processCore();
 };
