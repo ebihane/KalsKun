@@ -20,11 +20,10 @@ public :
     SequencerBase(const SequenceTypeEnum type);
     virtual ~SequencerBase();
 
-    void Initialize();
+    void Initialize(const SequenceTypeEnum before);
     void Destroy();
     SequenceTypeEnum Process();
     SequenceTypeEnum GetSequence();
-
 
 protected :
 
@@ -32,6 +31,7 @@ protected :
 
     Logger m_Logger;
     SendQueue m_SendQueue;
+    SequenceTypeEnum m_BeforeSequence;
 
     virtual ResultEnum initializeCore() = 0;
     virtual void destroyCore() = 0;

@@ -14,6 +14,7 @@ public:
     virtual ~SendQueue();
 
     ResultEnum Send(char* const targetName, void* const bufferPtr, const unsigned long size);
+    ResultEnum TimedSend(char* const targetName, void* const bufferPtr, const unsigned long size, const long timeout);
     int GetLastError();
 
 private:

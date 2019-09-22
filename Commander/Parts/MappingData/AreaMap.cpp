@@ -23,7 +23,8 @@ AreaMap* const AreaMap::GetInstance()
 void AreaMap::SetInitialData()
 {
     SettingManager* setting = SettingManager::GetInstance();
-    RectStr mapCount = setting->GetMapCount();
+    RectStr mapCount = { 0 };
+    setting->GetMapCount(&mapCount);
 
     for (long y = 0; y < mapCount.Y; y++)
     {

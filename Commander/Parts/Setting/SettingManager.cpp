@@ -333,9 +333,10 @@ int SettingManager::GetLastErrorNo()
 /* 設定値の取得・変更 */
 /*--------------------*/
 /* ロボットサイズ */
-SizeStr SettingManager::GetRobotSize()
+void SettingManager::GetRobotSize(SizeStr* const size)
 {
-    return m_RobotSize;
+    size->Length = m_RobotSize.Length;
+    size->Width = m_RobotSize.Width;
 }
 
 void SettingManager::SetRobotSize(SizeStr* const size)
@@ -345,9 +346,10 @@ void SettingManager::SetRobotSize(SizeStr* const size)
 }
 
 /* 畑のサイズ */
-SizeStr SettingManager::GetFarmSize()
+void SettingManager::GetFarmSize(SizeStr* const size)
 {
-    return m_FarmSize;
+    size->Length = m_FarmSize.Length;
+    size->Width = m_FarmSize.Width;
 }
 
 void SettingManager::SetFarmSize(SizeStr* const size)
@@ -357,9 +359,10 @@ void SettingManager::SetFarmSize(SizeStr* const size)
 }
 
 /* マップの個数 */
-RectStr SettingManager::GetMapCount()
+void SettingManager::GetMapCount(RectStr* const count)
 {
-    return m_MapCount;
+    count->X = m_MapCount.X;
+    count->Y = m_MapCount.Y;
 }
 
 /* 電波の伝搬係数 */

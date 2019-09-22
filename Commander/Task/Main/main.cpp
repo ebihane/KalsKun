@@ -1,6 +1,9 @@
 #define MEMORY_MAIN
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
+#include "Parts/CommanderCommon.h"
 
 /* Parts */
 #include "Logger/Logger.h"
@@ -14,6 +17,7 @@
 #include "Task/AroundCamera/AroundCameraReceiver.h"
 #include "Task/FrontCamera/FrontCameraReceiver.h"
 #include "Task/MotorCommunicator/MotorCommunicator.h"
+#include "Task/HeartBeat/HeartBeatManager.h"
 
 /* Sequencer */
 #include "Task/Main/Sequencer/SequencerBase.h"
@@ -29,6 +33,7 @@ static Logger* g_pLogger = NULL;
 static FrontCameraReceiver* g_pFrontCameraReceiver = NULL;
 static AroundCameraReceiver* g_pAroundCameraReceiver = NULL;
 static MotorCommunicator* g_pMotorCommunicator = NULL;
+static HeartBeatManager* g_pHeartBeatManager = NULL;
 
 /* Sequencer */
 static SequencerBase* g_pSequencer = NULL;
@@ -36,10 +41,17 @@ static SequencerBase* g_pSequencer = NULL;
 ResultEnum initialize();
 void mainProcedure();
 void finalize();
+void signalHandler(int signum);
+
 
 int main(void)
 {
     bool isMainLoopExit = false;
+
+    signal(SIGKILL, signalHandler);
+    signal(SIGSEGV, signalHandler);
+    signal(SIGTERM, signalHandler);
+    signal(SIGABRT, signalHandler);
 
     if (initialize() != ResultEnum::NormalEnd)
     {
@@ -67,9 +79,20 @@ ResultEnum initialize()
     TcpServer* server = NULL;
     AreaMap* areaMap = AreaMap::GetInstance();
     MoveMap* moveMap = MoveMap::GetInstance();
+    long lCnt = 0;
+    char command[32] = { 0 };
 
+    /* I/O 初期化 */
+    int result = wiringPiSetupSys();
 
-    wiringPiSetupSys();
+    for (lCnt = 0; lCnt < GPIO_USE_PIN_COUNT; lCnt++)
+    {
+        /* 入出力方向指定 */
+        /* /sys/class/gpio への export は、Shell を作成して対応 */
+        /* → /usr/local/bin 下に gpio_init.sh を作成 */
+        /*    /etc/rc.local に上記のスクリプト起動命令を記述 */
+        pinMode(GPIO_INFO_TABLE[lCnt].PinNo, GPIO_INFO_TABLE[lCnt].Mode);
+    }
 
     /* 共有メモリ インスタンス生成 */
     pShareMemory = new ShareMemoryStr();
@@ -79,12 +102,13 @@ ResultEnum initialize()
     }
 
     /* ログ関連 初期化 */
-    StartLoggerProcess((char*)"Commander");
     g_pLogger = new Logger(Logger::LOG_ERROR | Logger::LOG_INFO, Logger::LogTypeEnum::BOTH_OUT);
     if (g_pLogger == NULL)
     {
         goto FINISH;
     }
+
+    StartLoggerProcess((char*)"Commander");
 
     /* 設定 */
     setting = SettingManager::GetInstance();
@@ -121,7 +145,18 @@ ResultEnum initialize()
         moveMap->Save();
     }
 
+    snprintf(&command[0], sizeof(command), "wiringSetupSys Ret[%d]\n", result);
+    g_pLogger->LOG_INFO(command);
+
     /* Task 生成 */
+    /* ハートビート制御スレッド 初期化 */
+    g_pHeartBeatManager = new HeartBeatManager();
+    if (g_pHeartBeatManager == NULL)
+    {
+        g_pLogger->LOG_ERROR("[initialize] HeartBeatManager allocation failed.\n");
+        goto FINISH;
+    }
+
     /* 前方カメラマイコン状態取得スレッド 初期化 */
     server = new TcpServer(FC1_TO_COMMANDER_PORT);
     g_pFrontCameraReceiver = new FrontCameraReceiver(server);
@@ -149,6 +184,7 @@ ResultEnum initialize()
     }
 
     /* Task 起動 */
+    g_pHeartBeatManager->Run();
     g_pFrontCameraReceiver->Run();
     g_pAroundCameraReceiver->Run();
     g_pMotorCommunicator->Run();
@@ -165,12 +201,16 @@ FINISH :
 
 void mainProcedure()
 {
+    SequencerBase::SequenceTypeEnum current = g_pSequencer->GetSequence();
     SequencerBase::SequenceTypeEnum next = SequencerBase::SequenceTypeEnum::E_SEQ_ERROR;
+    Stopwatch watch;
 
+    watch.Start();
     while (1)
     {
+        current = g_pSequencer->GetSequence();
         next = g_pSequencer->Process();
-        if (next != g_pSequencer->GetSequence())
+        if (next != current)
         {
             g_pSequencer->Destroy();
             delete g_pSequencer;
@@ -192,7 +232,18 @@ void mainProcedure()
                 g_pSequencer = new ErrorKun();
             }
 
-            g_pSequencer->Initialize();
+            g_pSequencer->Initialize(current);
+        }
+
+        if (60.0f <= watch.GetSplit())
+        {
+            int shutdown1 = digitalRead(IO_SHUTDOWN_1);
+            int shutdown2 = digitalRead(IO_SHUTDOWN_2);
+            if ((shutdown1 == LOW) && (shutdown2 == LOW))
+            {
+                g_pLogger->LOG_INFO("[mainProcedure] Shutdown!!!\n");
+                break;
+            }
         }
 
         delay(10);
@@ -203,21 +254,21 @@ void finalize()
 {
     if (g_pMotorCommunicator != NULL)
     {
-        g_pMotorCommunicator->Stop(10000);
+        g_pMotorCommunicator->Stop(5);
         delete g_pMotorCommunicator;
         g_pMotorCommunicator = NULL;
     }
 
     if (g_pAroundCameraReceiver != NULL)
     {
-        g_pAroundCameraReceiver->Stop(10000);
+        g_pAroundCameraReceiver->Stop(5);
         delete g_pAroundCameraReceiver;
         g_pAroundCameraReceiver = NULL;
     }
 
     if (g_pFrontCameraReceiver != NULL)
     {
-        g_pFrontCameraReceiver->Stop(10000);
+        g_pFrontCameraReceiver->Stop(5);
         delete g_pFrontCameraReceiver;
         g_pFrontCameraReceiver = NULL;
     }
@@ -228,9 +279,29 @@ void finalize()
     AreaMap* areaMap = AreaMap::GetInstance();
     areaMap->Save();
 
+    /* ハートビート制御スレッドは最後に落とす */
+    if (g_pHeartBeatManager != NULL)
+    {
+        g_pHeartBeatManager->Stop(5);
+        delete g_pHeartBeatManager;
+        g_pHeartBeatManager = NULL;
+    }
+
+    StopLoggerProcess();
+
     if (g_pLogger != NULL)
     {
         delete g_pLogger;
         g_pLogger = NULL;
     }
+}
+
+void signalHandler(int signum)
+{
+    printf("ERR! [LogWriter] Signal Catched. signum[%d]\n", signum);
+
+    finalize();
+    StopLoggerProcess();
+
+    exit(0);
 }

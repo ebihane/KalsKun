@@ -1,3 +1,4 @@
+#include "Parts/CommanderCommon.h"
 #include "Parts/ShareMemory/ShareMemory.h"
 #include "SequencerBase.h"
 
@@ -13,8 +14,9 @@ SequencerBase::~SequencerBase()
     /* nop. */
 }
 
-void SequencerBase::Initialize()
+void SequencerBase::Initialize(const SequenceTypeEnum before)
 {
+    m_BeforeSequence = before;
     initializeCore();
 }
 

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "Logger/Logger.h"
+#include "Parts/CommanderCommon.h"
 #include "Parts/MappingData/AreaMap.h"
 #include "Parts/MappingData/MoveMap.h"
 #include "KusakariKun.h"
@@ -54,8 +55,10 @@ SequencerBase::SequenceTypeEnum KusakariKun::processCore()
     long avoidance = pShareMemory->FrontCamera.Avoidance;
     EventInfo ev = { 0 };
     MoveMap* moveMap = MoveMap::GetInstance();
-    AreaMap* areaMap = AreaMap::GetInstance();
 
+    /* 草刈り中であることを示す出力 */
+    digitalWrite(IO_KUSATORI_MODE, HIGH);
+    digitalWrite(IO_YAKEI_MODE, LOW);
 
     /* 動作マップ更新 */
     long pointX = pShareMemory->MotorState.PointX;

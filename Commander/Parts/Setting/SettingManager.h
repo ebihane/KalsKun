@@ -22,15 +22,15 @@ public :
     /* 設定値の取得・変更 */
     /*--------------------*/
     /* ロボットサイズ */
-    SizeStr GetRobotSize();                     /* 取得 */
+    void GetRobotSize(SizeStr* const size);     /* 取得 */
     void SetRobotSize(SizeStr* const size);     /* 設定 */
 
     /* 畑のサイズ */
-    SizeStr GetFarmSize();                      /* 取得 */
+    void GetFarmSize(SizeStr* const size);      /* 取得 */
     void SetFarmSize(SizeStr* const size);      /* 設定 */
 
     /* マップの個数 */
-    RectStr GetMapCount();                      /* 取得 */
+    void GetMapCount(RectStr* const count);     /* 取得 */
 
     /* 電波の伝搬係数 */
     float GetWavePowerCoeff();                  /* 取得 */

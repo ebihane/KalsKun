@@ -98,7 +98,14 @@ RECONNECT :
 
         if (result == ResultEnum::Reconnect)
         {
-            goto RECONNECT;
+            if (isStopRequest() == true)
+            {
+                goto FINISH;
+            }
+            else
+            {
+                goto RECONNECT;
+            }
         }
         else
         {

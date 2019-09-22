@@ -10,7 +10,6 @@ MappingData::MappingData(char* const path)
  , m_LastErrorNo(ERROR_NOTHING)
 {
     strncpy(&m_FilePath[0], &path[0], sizeof(m_FilePath));
-    m_MapCount = SettingManager::GetInstance()->GetMapCount();
 }
 
 MappingData::~MappingData()
@@ -142,6 +141,9 @@ ResultEnum MappingData::Allocate()
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     long y = 0;
+    SettingManager* setting = SettingManager::GetInstance();
+    RectStr mapCount = { 0 };
+    setting->GetMapCount(&mapCount);
 
     if (m_MapData != NULL)
     {
@@ -149,21 +151,21 @@ ResultEnum MappingData::Allocate()
         goto FINISH;
     }
 
-    m_MapData = (unsigned char **)malloc(sizeof(unsigned char*) * m_MapCount.Y);
+    m_MapData = (unsigned char **)malloc(sizeof(unsigned char*) * mapCount.Y);
     if (m_MapData == NULL)
     {
         goto FINISH;
     }
 
-    for (y = 0; y < m_MapCount.Y; y++)
+    for (y = 0; y < mapCount.Y; y++)
     {
-        m_MapData[y] = (unsigned char*)malloc(sizeof(unsigned char) * m_MapCount.X);
+        m_MapData[y] = (unsigned char*)malloc(sizeof(unsigned char) * mapCount.X);
         if (m_MapData[y] == NULL)
         {
             goto FINISH;
         }
 
-        memset(&m_MapData[y][0], 0x00, sizeof(unsigned char) * m_MapCount.X);
+        memset(&m_MapData[y][0], 0x00, sizeof(unsigned char) * mapCount.X);
     }
 
     retVal = ResultEnum::NormalEnd;
@@ -176,13 +178,16 @@ FINISH :
 void MappingData::Free()
 {
     long y = 0;
+    SettingManager* setting = SettingManager::GetInstance();
+    RectStr mapCount = { 0 };
+    setting->GetMapCount(&mapCount);
 
     if (m_MapData == NULL)
     {
         goto FINISH;
     }
 
-    for (y = 0; y < m_MapCount.Y; y++)
+    for (y = 0; y < mapCount.Y; y++)
     {
         free(m_MapData[y]);
     }
@@ -200,6 +205,9 @@ ResultEnum MappingData::Save()
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     FILE* fp = NULL;
+    SettingManager* setting = SettingManager::GetInstance();
+    RectStr mapCount = { 0 };
+    setting->GetMapCount(&mapCount);
 
     /* MapData が存在しない */
     if (m_MapData == NULL)
@@ -217,9 +225,9 @@ ResultEnum MappingData::Save()
         goto FINISH;
     }
 
-    for (long y = 0; y < m_MapCount.Y; y++)
+    for (long y = 0; y < mapCount.Y; y++)
     {
-        for (long x = 0; x < m_MapCount.X; x++)
+        for (long x = 0; x < mapCount.X; x++)
         {
             /* マップデータ 書き込み */
             if (fwrite(&m_MapData[y][x], 1, 1, fp) < 0)
@@ -252,6 +260,9 @@ ResultEnum MappingData::Load()
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     FILE* fp = NULL;
+    SettingManager* setting = SettingManager::GetInstance();
+    RectStr mapCount = { 0 };
+    setting->GetMapCount(&mapCount);
 
     if (m_MapData != NULL)
     {
@@ -274,9 +285,9 @@ ResultEnum MappingData::Load()
         goto FINISH;
     }
 
-    for (long y = 0; y < m_MapCount.Y; y++)
+    for (long y = 0; y < mapCount.Y; y++)
     {
-        for (long x = 0; x < m_MapCount.X; x++)
+        for (long x = 0; x < mapCount.X; x++)
         {
             /* マップデータ 読み込み */
             if (fread(&m_MapData[y][x], 1, 1, fp) < 0)
@@ -307,13 +318,16 @@ FINISH :
 bool MappingData::isInRange(const long x, const long y)
 {
     bool retVal = false;
+    SettingManager* setting = SettingManager::GetInstance();
+    RectStr mapCount = { 0 };
+    setting->GetMapCount(&mapCount);
 
-    if ((x < 0) || (m_MapCount.X <= x))
+    if ((x < 0) || (mapCount.X <= x))
     {
         goto FINISH;
     }
 
-    if ((y < 0) || (m_MapCount.Y <= y))
+    if ((y < 0) || (mapCount.Y <= y))
     {
         goto FINISH;
     }

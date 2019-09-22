@@ -12,18 +12,26 @@ wiringPi; pthread; dl; rt;  opencv_core; opencv_video; opencv_videoio; opencv_hi
 
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "Include/Common.h"
+#include "Parts/AroundCameraCommon.h"
+
+/* Parts */
 #include "Logger/Logger.h"
-#include "Socket/TcpServer/TcpServer.h"
 #include "Socket/TcpClient/TcpClient.h"
 #include "Parts/ShareMemory/ShareMemory.h"
+
+/* Task */
 #include "Task/CameraCapture/CameraCapture.h"
 #include "Task/StateSender/StateSender.h"
+#include "Task/RedwavePatrol/RedwavePatrol.h"
+#include "Task/HeartBeat/HeartBeatManager.h"
 
 static Logger* g_pLogger = NULL;
 static CameraCapture* g_pCameraCapture = NULL;
 static StateSender* g_pStateSender = NULL;
-static TcpServer* g_pCommanderSocket = NULL;
+static RedwavePatrol* g_pRedwavePatrol = NULL;
+static HeartBeatManager* g_pHeartBeat = NULL;
 
 ResultEnum initialize(const char cameraNo);
 void procMain();
@@ -54,8 +62,15 @@ ResultEnum initialize(const char cameraNo)
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     TcpClient* client = NULL;
+    long lCnt = 0;
 
+    /* I/O 初期化 */
     wiringPiSetupSys();
+    for (lCnt = 0; lCnt < GPIO_USE_PIN_COUNT; lCnt++)
+    {
+        /* 入出力方向指定 */
+        pinMode(GPIO_INFO_TABLE[lCnt].PinNo, GPIO_INFO_TABLE[lCnt].Mode);
+    }
 
     g_pLogger = new Logger(Logger::LOG_ERROR | Logger::LOG_INFO, Logger::BOTH_OUT);
     if (g_pLogger == NULL)
@@ -70,8 +85,21 @@ ResultEnum initialize(const char cameraNo)
         goto FINISH;
     }
 
+    pShareMemory->PatrolState = E_PATROL_NORMAL;
+
+
+    /* Task 起動 */
+    /* LogWriter 起動 */
     StartLoggerProcess((char*)"AroundCamera");
 
+    g_pHeartBeat = new HeartBeatManager();
+    if (g_pHeartBeat == NULL)
+    {
+        g_pLogger->LOG_ERROR("[initialize] g_pHeartBeat allocation failed.\n");
+        goto FINISH;
+    }
+
+    /* 360°カメラ取り込みスレッド 起動 */
     g_pCameraCapture = new CameraCapture(cameraNo);
     if (g_pCameraCapture == NULL)
     {
@@ -79,6 +107,7 @@ ResultEnum initialize(const char cameraNo)
         goto FINISH;
     }
 
+    /* 司令塔マイコンへの情報送信スレッド 起動 */
     client = new TcpClient((char*)COMMANDER_IP_ADDRESS, AC_TO_COMMANDER_PORT);
     g_pStateSender = new StateSender(client);
     if (g_pStateSender == NULL)
@@ -87,41 +116,44 @@ ResultEnum initialize(const char cameraNo)
         goto FINISH;
     }
 
-    g_pCommanderSocket = new TcpServer(COMMANDER_TO_AC_PORT);
-    if (g_pCommanderSocket == NULL)
-    {
-        g_pLogger->LOG_ERROR("[initialize] g_pCommanderSocket allocation failed.\n");
-        goto FINISH;
-    }
-
-    if (g_pCommanderSocket->Open() != ResultEnum::NormalEnd)
-    {
-        char logStr[80] = { 0 };
-        snprintf(&logStr[0], sizeof(logStr), "[initialize] g_pCommanderSocket Open failed. errno[%d]\n", g_pCommanderSocket->GetLastError());
-        g_pLogger->LOG_ERROR(logStr);
-        goto FINISH;
-    }
-
+    g_pHeartBeat->Run();
     g_pStateSender->Run();
+    g_pCameraCapture->Run();
 
     retVal = ResultEnum::NormalEnd;
 
-FINISH :
+FINISH:
     return retVal;
 }
 
 void finalize()
 {
+    if (g_pRedwavePatrol != NULL)
+    {
+        g_pRedwavePatrol->Stop(10);
+        delete g_pRedwavePatrol;
+        g_pRedwavePatrol = NULL;
+    }
+
     if (g_pStateSender != NULL)
     {
+        g_pStateSender->Stop(10);
         delete g_pStateSender;
         g_pStateSender = NULL;
     }
 
     if (g_pCameraCapture != NULL)
     {
+        g_pCameraCapture->Stop(10);
         delete g_pCameraCapture;
         g_pCameraCapture = NULL;
+    }
+
+    if (g_pHeartBeat != NULL)
+    {
+        g_pHeartBeat->Stop(10);
+        delete g_pHeartBeat;
+        g_pHeartBeat = NULL;
     }
 
     if (pShareMemory != NULL)
@@ -135,62 +167,87 @@ void finalize()
 
 void procMain()
 {
-    ResultEnum result = ResultEnum::AbnormalEnd;
-    EventInfo ev = { 0 };
+    Stopwatch watch;
+    Stopwatch yakeiWatch;
+    Stopwatch returnWatch;
+    int kusakari = 0;
+    int yakei = 0;
+    bool isYakei = false;
 
-RECONNECT :
-
-    g_pCommanderSocket->Disconnection();
-
-    result = g_pCommanderSocket->Connection();
-    if (result != ResultEnum::NormalEnd)
+    watch.Start();
+    while (1)
     {
-        char logStr[80] = { 0 };
-        snprintf(&logStr[0], sizeof(logStr), "[procMain] Socket connect failed. errno[%d]\n", g_pCommanderSocket->GetLastError());
-        g_pLogger->LOG_ERROR(logStr);
-
-        if (result == ResultEnum::Reconnect)
+        if (10.0f <= watch.GetSplit())
         {
-            goto RECONNECT;
+            int shutdown1 = digitalRead(IO_SHUTDOWN_1);
+            int shutdown2 = digitalRead(IO_SHUTDOWN_2);
+            if ((shutdown1 == LOW) && (shutdown2 == LOW))
+            {
+                g_pLogger->LOG_INFO("[procMain] Shutdown!!!!\n");
+                break;
+            }
+        }
+
+        kusakari = digitalRead(IO_KUSAKARI_MODE);
+        yakei = digitalRead(IO_YAKEI_MODE);
+
+        if ((kusakari == LOW) && (yakei == HIGH))
+        {
+            returnWatch.Stop();
+
+            if (isYakei == false)
+            {
+                if (yakeiWatch.IsRunninng() == false)
+                {
+                    yakeiWatch.Start();
+                }
+
+                if (1.0 <= yakeiWatch.GetSplit())
+                {
+                    isYakei = true;
+                    yakeiWatch.Stop();
+                    g_pLogger->LOG_INFO("[procMain] Yakei Start.\n");
+                }
+            }
         }
         else
         {
-            goto FINISH;
-        }
-    }
+            yakeiWatch.Stop();
 
-    while (1)
-    {
-        g_pCommanderSocket->Receive(&ev, sizeof(EventInfo));
-        if (result != ResultEnum::NormalEnd)
-        {
-            char logStr[80] = { 0 };
-            snprintf(&logStr[0], sizeof(logStr), "[procMain] Socket receive failed. errno[%d]\n", g_pCommanderSocket->GetLastError());
-            g_pLogger->LOG_ERROR(logStr);
+            if (isYakei == true)
+            {
+                if (returnWatch.IsRunninng() == false)
+                {
+                    returnWatch.Start();
+                }
 
-            if (result == ResultEnum::Reconnect)
-            {
-                goto RECONNECT;
-            }
-            else
-            {
-                goto FINISH;
+                if (1.0f <= returnWatch.GetSplit())
+                {
+                    isYakei = false;
+                    returnWatch.Stop();
+                    g_pLogger->LOG_INFO("[procMain] Yakei Finish.\n");
+                }
             }
         }
 
-        if (ev.Code == 666)
+        if (isYakei == true)
         {
-            g_pLogger->LOG_INFO("[procMain] Finish Request receive.\n");
-
-            g_pStateSender->Stop(10000);
-            g_pCameraCapture->Stop(10000);
-            ev.Result = ResultEnum::NormalEnd;
-            g_pCommanderSocket->Send(&ev, sizeof(EventInfo));
-
-            break;
+            /* 夜警開始により赤外線モニタスレッドを起動 */
+            if (g_pRedwavePatrol == NULL)
+            {
+                g_pRedwavePatrol = new RedwavePatrol();
+                g_pRedwavePatrol->Run();
+            }
+        }
+        else
+        {
+            /* 夜警終了により赤外線モニタスレッドを停止・破棄 */
+            if (g_pRedwavePatrol != NULL)
+            {
+                g_pRedwavePatrol->Stop(1);
+                delete g_pRedwavePatrol;
+                g_pRedwavePatrol = NULL;
+            }
         }
     }
-
-FINISH :
-    return;
 }

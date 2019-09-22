@@ -92,16 +92,23 @@ RECONNECT :
     result = m_Adapter->Connection();
     if (result != ResultEnum::NormalEnd)
     {
-        char logStr[80] = { 0 };
-        snprintf(&logStr[0], sizeof(logStr), "[doProcedure] Connection failed. errno[%d]\n", m_Adapter->GetLastError());
-        m_Logger->LOG_ERROR(logStr);
-
         if (result == ResultEnum::Reconnect)
         {
-            goto RECONNECT;
+            if (isStopRequest() == true)
+            {
+                goto FINISH;
+            }
+            else
+            {
+                goto RECONNECT;
+            }
         }
         else
         {
+            char logStr[80] = { 0 };
+            snprintf(&logStr[0], sizeof(logStr), "[doProcedure] Connection failed. errno[%d]\n", m_Adapter->GetLastError());
+            m_Logger->LOG_ERROR(logStr);
+
             goto FINISH;
         }
     }
