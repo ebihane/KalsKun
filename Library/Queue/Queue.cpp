@@ -49,7 +49,7 @@ ResultEnum Queue::Open()
     }
 
     /* ‘¶İ‚µ‚È‚¢ê‡‚ÍV‹Kì¬ */
-    queue = mq_open(&m_Name[0], O_RDONLY | O_CREAT, 0644, NULL);
+    queue = mq_open(&m_Name[0], O_RDWR | O_CREAT, 0666, NULL);
     if (queue < 0)
     {
         m_LastErrorNo = errno;

@@ -130,6 +130,10 @@ ResultEnum MotorCommunicator::doMainProc()
         {
             case 0 :    /* 0: 動作変更 */
                 m_MotorCommand = (MotorCommandEnum)ev.lParam[0];
+                if (m_MotorCommand != MotorCommandEnum::E_COMMAND_STOP)
+                {
+                    delay(2000);
+                }
                 break;
                 
             case 1 :    /* 1: 草刈り刃動作変更 */
@@ -178,6 +182,13 @@ FINISH :
 
 ResultEnum MotorCommunicator::finalizeCore()
 {
+    /* モータマイコンに必ず停止を投げておく */
+    char sendBuffer[3] = { 0 };
+    char recvBuffer[8] = { 0 };
+    createSendData(MotorCommandEnum::E_COMMAND_STOP, CutterDriveEnum::E_CUTTER_STOP, &sendBuffer[0]);
+    m_Serial->Send(&sendBuffer[0], sizeof(sendBuffer));
+    m_Serial->Receive(&recvBuffer[0], sizeof(recvBuffer));
+
     if (m_Serial != NULL)
     {
         m_Serial->Close();

@@ -93,11 +93,16 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Task\CameraCapture\CameraCapture.cpp" />
+    <ClCompile Include="Task\HeartBeat\HeartBeatManager.cpp" />
+    <ClCompile Include="Task\RedwavePatrol\RedwavePatrol.cpp" />
     <ClCompile Include="Task\StateSender\StateSender.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Parts\AroundCameraCommon.h" />
     <ClInclude Include="Parts\ShareMemory\ShareMemory.h" />
     <ClInclude Include="Task\CameraCapture\CameraCapture.h" />
+    <ClInclude Include="Task\HeartBeat\HeartBeatManager.h" />
+    <ClInclude Include="Task\RedwavePatrol\RedwavePatrol.h" />
     <ClInclude Include="Task\StateSender\StateSender.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">

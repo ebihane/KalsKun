@@ -26,7 +26,8 @@ MoveMap* const MoveMap::GetInstance()
 void MoveMap::SetInitialData()
 {
     SettingManager* setting = SettingManager::GetInstance();
-    RectStr mapCount = setting->GetMapCount();
+    RectStr mapCount = { 0 };
+    setting->GetMapCount(&mapCount);
     
     for (long y = 0; y < mapCount.Y; y++)
     {
@@ -128,10 +129,11 @@ bool MoveMap::IsComplete()
     bool retVal = true;
     SettingManager* setting = SettingManager::GetInstance();
     AreaMap* areaMap = AreaMap::GetInstance();
-    RectStr mapCount = setting->GetMapCount();
+    RectStr mapCount = { 0 };
     char areaMapValue = 0;
     char moveMapValue = 0;
 
+    setting->GetMapCount(&mapCount);
 
     for (long y = 0; y < mapCount.Y; y++)
     {

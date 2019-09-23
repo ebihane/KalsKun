@@ -92,6 +92,7 @@
     <ClCompile Include="Parts\Setting\SettingManager.cpp" />
     <ClCompile Include="Task\AroundCamera\AroundCameraReceiver.cpp" />
     <ClCompile Include="Task\FrontCamera\FrontCameraReceiver.cpp" />
+    <ClCompile Include="Task\HeartBeat\HeartBeatManager.cpp" />
     <ClCompile Include="Task\Main\main.cpp" />
     <ClCompile Include="Task\Main\Sequencer\Error\ErrorKun.cpp" />
     <ClCompile Include="Task\Main\Sequencer\Idle\HimajinKun.cpp" />
@@ -111,6 +112,7 @@
     <ClInclude Include="Parts\ShareMemory\ShareMemory.h" />
     <ClInclude Include="Task\AroundCamera\AroundCameraReceiver.h" />
     <ClInclude Include="Task\FrontCamera\FrontCameraReceiver.h" />
+    <ClInclude Include="Task\HeartBeat\HeartBeatManager.h" />
     <ClInclude Include="Task\Main\Sequencer\Error\ErrorKun.h" />
     <ClInclude Include="Task\Main\Sequencer\Idle\HimajinKun.h" />
     <ClInclude Include="Task\Main\Sequencer\Kusakari\KusakariKun.h" />

@@ -58,6 +58,5 @@ private :
     char            m_FilePath[80]; /* ファイルパス */
     unsigned char** m_MapData;      /* マップデータ */
     int             m_LastErrorNo;  /* 最後に発生したシステムエラー番号 */
-    RectStr         m_MapCount;     /* マップの個数 */
 
 };

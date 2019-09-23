@@ -91,6 +91,19 @@ ResultEnum TcpServer::Connection()
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     int sock = SOCKET_INVALID;
+    bool receivable = false;
+    
+    if (isReceivableCore(m_OpenSocket, receivable) != ResultEnum::NormalEnd)
+    {
+        retVal = ResultEnum::Reconnect;
+        goto FINISH;
+    }
+
+    if (receivable == false)
+    {
+        retVal = ResultEnum::Reconnect;
+        goto FINISH;
+    }
 
     while (1)
     {

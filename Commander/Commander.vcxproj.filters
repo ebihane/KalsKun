@@ -49,6 +49,9 @@
     <Filter Include="Task\WavePowerMonitor">
       <UniqueIdentifier>{fb56696b-54ab-4f43-b04a-7b63d5b4b65c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Task\HeartBeat">
+      <UniqueIdentifier>{b5684407-9618-48ff-ad60-6654c6569522}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Task\Main\main.cpp">
@@ -95,6 +98,9 @@
     </ClCompile>
     <ClCompile Include="Task\Main\Sequencer\SequencerBase.cpp">
       <Filter>Task\Main\Sequencer</Filter>
+    </ClCompile>
+    <ClCompile Include="Task\HeartBeat\HeartBeatManager.cpp">
+      <Filter>Task\HeartBeat</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -145,6 +151,9 @@
     </ClInclude>
     <ClInclude Include="Parts\CommanderCommon.h">
       <Filter>Parts</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\HeartBeat\HeartBeatManager.h">
+      <Filter>Task\HeartBeat</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

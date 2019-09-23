@@ -24,8 +24,8 @@ ResultEnum HimajinKun::initializeCore()
     m_LastRemoteType = pShareMemory->MotorState.RemoteMode;
 
     ev.Code = 2;
-    ev.lParam[0] = MotorCommandEnum::E_COMMAND_FRONT;
-    ev.lParam[1] = CutterDriveEnum::E_CUTTER_DRIVE;
+    ev.lParam[0] = MotorCommandEnum::E_COMMAND_STOP;
+    ev.lParam[1] = CutterDriveEnum::E_CUTTER_STOP;
 
     if (m_SendQueue.Send((char*)"MotorComm", &ev, sizeof(EventInfo)) != ResultEnum::NormalEnd)
     {
@@ -43,12 +43,16 @@ FINISH:
 
 void HimajinKun::destroyCore()
 {
-
+    /* nop. */
 }
 
 SequencerBase::SequenceTypeEnum HimajinKun::processCore()
 {
     SequenceTypeEnum retVal = E_SEQ_IDLE;
+
+    /* Idle íÜÇ≈Ç†ÇÈÇ±Ç∆Çé¶Ç∑èoóÕ */
+    digitalWrite(IO_KUSATORI_MODE, HIGH);
+    digitalWrite(IO_YAKEI_MODE, HIGH);
 
 #ifdef LAST_TEST_PROC
 

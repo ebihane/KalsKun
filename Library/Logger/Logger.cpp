@@ -36,7 +36,7 @@ void StopLoggerProcess()
     message.Code = LOG_EVCODE_FINISH;
     
     SendQueue queue;
-    queue.Send((char*)LOG_WRITER_QUEUE_NAME, &message, sizeof(message));
+    queue.TimedSend((char*)LOG_WRITER_QUEUE_NAME, &message, sizeof(message), 3);
 }
 
 Logger::Logger(const long logLevel, const LogTypeEnum logType)
@@ -106,7 +106,7 @@ void Logger::Print(char* const buffer, const char logLevel, char* const fileName
 
     if ((m_Type == FILE_OUT) || (m_Type == BOTH_OUT))
     {
-        if (m_SendQueue.Send((char*)LOG_WRITER_QUEUE_NAME, pMessage, sizeof(LogMessageStr)) != ResultEnum::NormalEnd)
+        if (m_SendQueue.TimedSend((char*)LOG_WRITER_QUEUE_NAME, pMessage, sizeof(LogMessageStr), 1) != ResultEnum::NormalEnd)
         {
             printf("[Logger] Queue Send Failed. errno[%d]\n", m_SendQueue.GetLastError());
         }

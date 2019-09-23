@@ -9,6 +9,7 @@ CameraCapture::CameraCapture(const int index)
  , m_CameraIndex(index)
  , m_Start(false)
  , m_Capture(NULL)
+ , m_VideoWriter(NULL)
 {
     /* nop. */
 }
@@ -68,7 +69,6 @@ ResultEnum CameraCapture::doProcedure()
     m_Start = true;
 
     pShareMemory->Capture.Index = 0;
-    pShareMemory->PatrolState = E_PATROL_NONE;
 
     nextIndex = 1;
     while (1)
@@ -84,9 +84,6 @@ ResultEnum CameraCapture::doProcedure()
             pShareMemory->SystemError = true;
             goto FINISH;
         }
-
-        // ‰æ‘œ•â³•K—vH
-
 
         /* ˜^‰æŽÀŽ{”»’è */
         detectState = pShareMemory->PatrolState;

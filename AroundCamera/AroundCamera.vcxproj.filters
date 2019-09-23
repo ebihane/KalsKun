@@ -8,6 +8,12 @@
     <ClCompile Include="Task\StateSender\StateSender.cpp">
       <Filter>Task\StateSender</Filter>
     </ClCompile>
+    <ClCompile Include="Task\RedwavePatrol\RedwavePatrol.cpp">
+      <Filter>Task\RedwavePatrol</Filter>
+    </ClCompile>
+    <ClCompile Include="Task\HeartBeat\HeartBeatManager.cpp">
+      <Filter>Task\HeartBeat</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="AroundCameraParts">
@@ -25,6 +31,12 @@
     <Filter Include="Task\StateSender">
       <UniqueIdentifier>{1447b721-0505-41e0-a20d-3c226c9dbb9c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Task\RedwavePatrol">
+      <UniqueIdentifier>{fe418c50-86c1-492e-8ddd-077e263eb336}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Task\HeartBeat">
+      <UniqueIdentifier>{712a8ed1-fc2d-4293-8001-7d4e7874b6bb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Parts\ShareMemory\ShareMemory.h">
@@ -35,6 +47,15 @@
     </ClInclude>
     <ClInclude Include="Task\StateSender\StateSender.h">
       <Filter>Task\StateSender</Filter>
+    </ClInclude>
+    <ClInclude Include="Parts\AroundCameraCommon.h">
+      <Filter>AroundCameraParts</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\RedwavePatrol\RedwavePatrol.h">
+      <Filter>Task\RedwavePatrol</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\HeartBeat\HeartBeatManager.h">
+      <Filter>Task\HeartBeat</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

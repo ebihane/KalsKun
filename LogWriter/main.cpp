@@ -141,11 +141,13 @@ bool initialize()
         pQueue = new Queue((char*)LOG_WRITER_QUEUE_NAME);
         if (pQueue == NULL)
         {
+            printf("[initialize] Queue allocation failed.\n");
             goto FINISH;
         }
 
         if (pQueue->Open() != ResultEnum::NormalEnd)
         {
+            printf("[initialize] Queue Open failed. errno[%d]\n", pQueue->GetLastError());
             goto FINISH;
         }
 
@@ -285,6 +287,10 @@ void signalHandler(int signum)
         snprintf(&logStr[0], sizeof(logStr), "[LogWriter] Signal Catched. signum[%d]\n", signum);
         doLogWrite(&logStr[0]);
     }
+
+    g_pQueue->Close();
+    delete g_pQueue;
+    g_pQueue = NULL;
 
     terminate();
 

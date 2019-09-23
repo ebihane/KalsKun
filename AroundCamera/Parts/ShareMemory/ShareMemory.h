@@ -7,10 +7,7 @@ using namespace cv;
 
 typedef enum
 {
-    E_PATROL_NONE = 0,
-    E_PATROL_NORMAL,
-    E_PATROL_FIRST_DETECT,
-    E_PATROL_DETECTING,
+    E_PATROL_NORMAL = 0,
     E_PATROL_DETECT,
 } PatrolStateEnum;
 

@@ -1,3 +1,4 @@
+#include "Parts/CommanderCommon.h"
 #include "YakeiKun.h"
 
 YakeiKun::YakeiKun()
@@ -23,5 +24,9 @@ void YakeiKun::destroyCore()
 
 SequencerBase::SequenceTypeEnum YakeiKun::processCore()
 {
+    /* –éŒx’†‚Å‚ ‚é‚±‚Æ‚ğ¦‚·o—Í */
+    digitalWrite(IO_KUSATORI_MODE, LOW);
+    digitalWrite(IO_YAKEI_MODE, HIGH);
+
     return SequencerBase::SequenceTypeEnum::E_SEQ_YAKEI;
 }
