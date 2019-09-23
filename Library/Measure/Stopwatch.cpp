@@ -111,7 +111,6 @@ double Stopwatch::calcDiffMicroTime(struct timespec* target)
     double retVal = 0.0;
     unsigned long secondDiff = 0;
     unsigned long nanosecDiff = 0;
-    double tempDiff = 0;
 
     if (m_Running != true)
     {

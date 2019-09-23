@@ -89,7 +89,7 @@ ResultEnum CameraCapture::doProcedure()
         detectState = pShareMemory->PatrolState;
         if (detectState == E_PATROL_DETECT)
         {
-            if (beforeDetectState == E_PATROL_DETECT)
+            if (beforeDetectState != E_PATROL_DETECT)
             {
                 if (startVideoWrite() != true)
                 {
@@ -134,6 +134,7 @@ ResultEnum CameraCapture::finalize()
     {
         m_Capture->release();
         delete m_Capture;
+        m_Capture = NULL;
     }
 
     return ResultEnum::NormalEnd;
@@ -176,5 +177,6 @@ void CameraCapture::stopVideoWrite()
     {
         m_VideoWriter->release();
         delete m_VideoWriter;
+        m_VideoWriter = NULL;
     }
 }

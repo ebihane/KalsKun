@@ -177,7 +177,7 @@ void procMain()
     watch.Start();
     while (1)
     {
-        if (10.0f <= watch.GetSplit())
+        if (60.0f <= watch.GetSplit())
         {
             int shutdown1 = digitalRead(IO_SHUTDOWN_1);
             int shutdown2 = digitalRead(IO_SHUTDOWN_2);

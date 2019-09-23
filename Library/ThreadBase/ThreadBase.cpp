@@ -4,6 +4,7 @@
 #include <string.h>
 #include <pthread.h>
 #include <wiringPi.h>
+#include <exception>
 #include "ThreadBase.h"
 
 //
@@ -119,9 +120,16 @@ void ThreadBase::MainProcedure()
     m_ThreadState = ThreadStateEnum::Executing;
     m_ThreadResult = ResultEnum::AbnormalEnd;
 
-    m_ThreadResult = doProcedure();
-    finalize();
+    try
+    {
+        m_ThreadResult = doProcedure();
+    }
+    catch (std::exception& e)
+    {
+        m_Logger->LOG_ERROR(e.what());
+    }
 
+    finalize();
     if (m_Logger != NULL)
     {
         delete m_Logger;
