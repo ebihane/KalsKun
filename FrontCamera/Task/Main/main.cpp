@@ -11,6 +11,7 @@ wiringPi; pthread; dl; rt;  opencv_core; opencv_video; opencv_videoio; opencv_hi
 #define MEMORY_MAIN
 
 #include "Include/Common.h"
+#include "Parts/FrontCameraCommon.h"
 #include "Logger/Logger.h"
 #include "Parts/ShareMemory/ShareMemory.h"
 #include "MasterMain.h"
@@ -28,6 +29,8 @@ void finalize();
 /* 使用デバイス番号に 2 を指定するとカメラ画像を取得しマスターに送信する前方カメラマイコンとして起動する (Slave) */
 int main(int argc, char* argv[])
 {
+    bool isMainLoopExit = false;
+        
     char deviceNo = 0;
     char cameraNo = 0;
 
@@ -61,8 +64,17 @@ int main(int argc, char* argv[])
             break;
     }
 
+    isMainLoopExit = true;
+
 FINISH:
     finalize();
+
+    if (isMainLoopExit == true)
+    {
+        printf("shutdown execute.");
+        // system("sudo shutdown -h now &");
+    }
+
     return 0;
 }
 
@@ -70,7 +82,15 @@ ResultEnum initialize(const char controllerType)
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
 
+    /* I/O 初期化 */
     wiringPiSetupSys();
+    {
+        for (long lCnt = 0; lCnt < GPIO_USE_PIN_COUNT; lCnt++)
+        {
+            /* 入出力方向指定 */
+            pinMode(GPIO_INFO_TABLE[lCnt].PinNo, GPIO_INFO_TABLE[lCnt].Mode);
+        }
+    }
 
     pShareMemory = new ShareMemoryStr();
     if (pShareMemory == NULL)
@@ -80,13 +100,9 @@ ResultEnum initialize(const char controllerType)
 
     if (controllerType == 0)
     {
-        StartLoggerProcess((char *)"KinectCamera");
+        StartLoggerProcess((char*)"FrontCameraM");
     }
     else if (controllerType == 1)
-    {
-        StartLoggerProcess((char *)"FrontCameraM");
-    }
-    else if (controllerType == 2)
     {
         StartLoggerProcess((char*)"FrontCameraS");
     }

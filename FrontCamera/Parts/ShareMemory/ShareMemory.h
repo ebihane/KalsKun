@@ -17,6 +17,8 @@ typedef struct
     bool SystemError;
     CameraDataStr Capture;
     CameraDataStr Communicate;
+    float UltrasoundData[2];
+    long StateData;
 } ShareMemoryStr;
 
 #ifdef MEMORY_MAIN

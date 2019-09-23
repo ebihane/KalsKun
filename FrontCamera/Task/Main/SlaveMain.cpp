@@ -8,6 +8,7 @@
 #include "Task/CameraCapture/CameraCapture.h"
 #include "Task/CameraSender/CameraSender.h"
 #include "Task/StateSender/StateSender.h"
+#include "Task/HeartBeat/HeartBeatManager.h"
 #include "SlaveMain.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/highgui.hpp>
@@ -16,6 +17,7 @@ static Logger* g_pLogger = NULL;
 static CameraCapture* g_pCameraCapture = NULL;
 static CameraSender* g_pCameraSender = NULL;
 static StateSender* g_pStateSender = NULL;
+static HeartBeatManager* g_pHeartBeatManager = NULL;
 
 ResultEnum slaveInitialize(const int cameraNo);
 void slaveFinalize();
@@ -32,13 +34,13 @@ ResultEnum slaveInitialize(const int cameraNo)
         goto FINISH;
     }
 
-    //g_pCameraSender = new CameraSender();
-    //if (g_pCameraSender == NULL)
-    //{
-    //    g_pLogger->LOG_ERROR("[slaveInitialize] g_pCameraSender allocation failed.\n");
-    //    goto FINISH;
-    //}
-
+    /* ハートビート制御スレッド 初期化 */
+    g_pHeartBeatManager = new HeartBeatManager();
+    if (g_pHeartBeatManager == NULL)
+    {
+        g_pLogger->LOG_ERROR("[initialize] HeartBeatManager allocation failed.\n");
+        goto FINISH;
+    }
     g_pCameraCapture = new CameraCapture(cameraNo);
     if (g_pCameraCapture == NULL)
     {
@@ -54,7 +56,7 @@ ResultEnum slaveInitialize(const int cameraNo)
         goto FINISH;
     }
 
-    //g_pCameraSender->Run();
+    g_pHeartBeatManager->Run();
     g_pCameraCapture->Run();
     g_pStateSender->Run();
 
@@ -85,6 +87,15 @@ void slaveFinalize()
         delete g_pCameraSender;
         g_pCameraSender = NULL;
     }
+
+    if (g_pHeartBeatManager != NULL)
+    {
+        g_pHeartBeatManager->Stop(5);
+        delete g_pHeartBeatManager;
+        g_pHeartBeatManager = NULL;
+    }
+
+    StopLoggerProcess();
 
     if (g_pLogger != NULL)
     {
@@ -128,12 +139,12 @@ ResultEnum slaveMain(const int cameraNo)
                 putText(slaveCapture, "face detected.", cvPointStart, FONT_HERSHEY_SIMPLEX, 1.2, cvColor, 2, cv::FONT_HERSHEY_DUPLEX);
 
                 // 不審者検知
-                g_pStateSender->SetState(1);
+                pShareMemory->StateData = 1;
             }
             else
             {
                 // 不審者非検知
-                g_pStateSender->SetState(0);
+                pShareMemory->StateData = 0;
             }
 
             cv::imshow("camera", slaveCapture);

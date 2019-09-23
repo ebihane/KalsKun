@@ -14,6 +14,7 @@ public :
     void Stop();
     bool IsRunninng();
     float Get();
+    double GetMicro();
     float GetSplit();
 
 protected :
@@ -28,5 +29,6 @@ private :
     struct timespec m_StopTime;
 
     float calcDiffTime(struct timespec* target);
+    double calcDiffMicroTime(struct timespec* target);
 
 };

@@ -50,7 +50,8 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <IncludePath>D:\Tools\OpenCV\4.1.0\opencv\build\include;D:\Tools\freenect;$(SolutionDir)\..;$(SolutionDir)\Library;$(MSBuildProjectDirectory);$(IncludePath)</IncludePath>
+    <IncludePath>C:\opencv\build\include;$(SolutionDir)\..;$(SolutionDir)\Library;$(MSBuildProjectDirectory);$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <IncludePath>D:\Tools\OpenCV\4.1.0\opencv\build\include;D:\Tools\freenect;$(SolutionDir)\..;$(SolutionDir)\Library;$(MSBuildProjectDirectory);$(IncludePath)</IncludePath>
@@ -93,14 +94,17 @@
     </ClCompile>
     <ClCompile Include="Task\CameraReceiver\CameraReceiver.cpp" />
     <ClCompile Include="Task\CameraSender\CameraSender.cpp" />
+    <ClCompile Include="Task\HeartBeat\HeartBeatManager.cpp" />
     <ClCompile Include="Task\Kinect\KinectCapture.cpp" />
     <ClCompile Include="Task\Main\KinectMain.cpp" />
     <ClCompile Include="Task\Main\main.cpp" />
     <ClCompile Include="Task\Main\MasterMain.cpp" />
     <ClCompile Include="Task\Main\SlaveMain.cpp" />
     <ClCompile Include="Task\StateSender\StateSender.cpp" />
+    <ClCompile Include="Task\Ultrasound\UltrasoundManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Parts\FrontCameraCommon.h" />
     <ClInclude Include="Parts\ShareMemory\ShareMemory.h" />
     <ClInclude Include="Task\CameraCapture\CameraCapture.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
@@ -110,11 +114,13 @@
     </ClInclude>
     <ClInclude Include="Task\CameraReceiver\CameraReceiver.h" />
     <ClInclude Include="Task\CameraSender\CameraSender.h" />
+    <ClInclude Include="Task\HeartBeat\HeartBeatManager.h" />
     <ClInclude Include="Task\Kinect\KinectCapture.h" />
     <ClInclude Include="Task\Main\KinectMain.h" />
     <ClInclude Include="Task\Main\MasterMain.h" />
     <ClInclude Include="Task\Main\SlaveMain.h" />
     <ClInclude Include="Task\StateSender\StateSender.h" />
+    <ClInclude Include="Task\Ultrasound\UltrasoundManager.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>

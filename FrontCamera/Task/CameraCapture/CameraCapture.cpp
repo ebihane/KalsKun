@@ -42,7 +42,7 @@ ResultEnum CameraCapture::doProcedure()
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     long       nextIndex = 0;
 
-
+RETRY:
     if (m_Capture == NULL)
     {
         m_Capture = new cv::VideoCapture(m_CameraIndex);
@@ -58,8 +58,16 @@ ResultEnum CameraCapture::doProcedure()
 
     if (m_Capture->isOpened() == false)
     {
+        if (m_Capture != NULL)
+        {
+            delete m_Capture;
+            m_Capture = NULL;
+        }
+
+        delay(100);
+
         m_Logger->LOG_ERROR("[CameraCapture] isOpened is false.\n");
-        goto FINISH;
+        goto RETRY;
     }
 
     m_Capture->read(pShareMemory->Capture.Data[0]);
