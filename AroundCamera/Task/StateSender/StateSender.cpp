@@ -16,6 +16,10 @@ StateSender::~StateSender()
 
 ResultEnum StateSender::initializeCore()
 {
+    /* 司令塔マイコンより早く起動すると接続できない？？？ */
+    /* とりあえず待ち処理 (5秒) を入れる */
+    delay(5000);
+
     EventInfo* p = new EventInfo();
     m_SendData = (char*)p;
     return ResultEnum::NormalEnd;
