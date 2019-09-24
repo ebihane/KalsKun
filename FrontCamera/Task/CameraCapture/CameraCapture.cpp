@@ -4,7 +4,7 @@
 #include "CameraCapture.h"
 
 CameraCapture::CameraCapture(const int index)
- : ThreadBase()
+ : ThreadBase((char*)"CameraCapture")
  , m_CameraIndex(index)
  , m_Start(false)
  , m_Capture(NULL)

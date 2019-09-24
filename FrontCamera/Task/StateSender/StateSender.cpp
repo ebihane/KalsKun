@@ -2,7 +2,7 @@
 #include "StateSender.h"
 
 StateSender::StateSender(AdapterBase* const adapter)
- : SenderThread(adapter)
+ : SenderThread((char*)"StateSender", adapter)
  , m_SendCount(0)
 {
     /* nop. */

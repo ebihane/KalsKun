@@ -74,7 +74,7 @@ ResultEnum masterInitialize(const int cameraNo)
         goto FINISH;
     }
 
-    client = new TcpClient("192.168.3.1", 10002);
+    client = new TcpClient((char*)"192.168.3.1", 10002);
     g_pStateSender = new StateSender(client);
     if (g_pStateSender == NULL)
     {
@@ -150,7 +150,6 @@ ResultEnum masterMain(const int cameraNo)
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     unsigned char captureIndex = -1;
-    unsigned char receiveIndex = -1;
     int key = 0;
     long cameraParameters[10] = { 100, 115, 100, 10, 3, 8, 168, 100, 10, 3 };
     Stopwatch watch;
@@ -195,7 +194,7 @@ ResultEnum masterMain(const int cameraNo)
         g_pLogger->LOG_ERROR(logBuffer);
     }
 
-    // g_pLogger->LOG_INFO("[masterMain] Main loop start.\n");
+    g_pLogger->LOG_INFO("[masterMain] Main loop start.\n");
     watch.Start();
     while (1)
     {
@@ -233,11 +232,17 @@ ResultEnum masterMain(const int cameraNo)
                 isDetected = true;
             }
 
-            float distance = pShareMemory->UltrasoundData[1];
-               
+            float distance = pShareMemory->UltrasoundData[0];
+
             cvPointStart = Point(30, 130);
             char logBuffer[50] = { 0 };
-            snprintf(logBuffer, sizeof(logBuffer), "distance=%f", distance);
+            snprintf(logBuffer, sizeof(logBuffer), "distance1=%f", distance);
+            putText(masterCapture, logBuffer, cvPointStart, FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(256, 256, 256), 2, cv::FONT_HERSHEY_DUPLEX);
+
+            distance = pShareMemory->UltrasoundData[1];
+               
+            cvPointStart = Point(30, 180);
+            snprintf(logBuffer, sizeof(logBuffer), "distance2=%f", distance);
             putText(masterCapture, logBuffer, cvPointStart, FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(256, 256, 256), 2, cv::FONT_HERSHEY_DUPLEX);
 
             cv::imshow("camera", masterCapture);
@@ -295,7 +300,7 @@ bool isColorLineDetected(cv::Mat masterCapture, cv::Scalar cvColor, long* parame
     cvPointEnd = cv::Point(640, 480);
 
     cv::cvtColor(masterCapture, hsb, cv::COLOR_BGR2HSV);
-    uchar hue, sat, val;
+    uchar hue, sat;
 
     Mat convertMat = Mat(Size(width, height), CV_8UC1);
 
@@ -319,9 +324,6 @@ bool isColorLineDetected(cv::Mat masterCapture, cv::Scalar cvColor, long* parame
 
             /* sat=彩度を取得 */
             sat = hsb.at<Vec3b>(y, x)[1];
-
-            /* val=明度を取得 */
-            val = hsb.at<Vec3b>(y, x)[2];
 
             /* 160度以上が指定された場合、判定条件を変更する */
             if (hueMax > 160)
