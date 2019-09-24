@@ -10,7 +10,7 @@ class SenderThread : public ThreadBase
 {
 public :
 
-    SenderThread(AdapterBase* const adapter);
+    SenderThread(char* const taskName, AdapterBase* const adapter);
     virtual ~SenderThread();
 
 protected :

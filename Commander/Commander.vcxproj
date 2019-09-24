@@ -91,8 +91,10 @@
     <ClCompile Include="Parts\PositionData\PositionData.cpp" />
     <ClCompile Include="Parts\Setting\SettingManager.cpp" />
     <ClCompile Include="Task\AroundCamera\AroundCameraReceiver.cpp" />
+    <ClCompile Include="Task\BuzzerController\BuzzerController.cpp" />
     <ClCompile Include="Task\FrontCamera\FrontCameraReceiver.cpp" />
     <ClCompile Include="Task\HeartBeat\HeartBeatManager.cpp" />
+    <ClCompile Include="Task\LightController\LightController.cpp" />
     <ClCompile Include="Task\Main\main.cpp" />
     <ClCompile Include="Task\Main\Sequencer\Error\ErrorKun.cpp" />
     <ClCompile Include="Task\Main\Sequencer\Idle\HimajinKun.cpp" />
@@ -111,8 +113,10 @@
     <ClInclude Include="Parts\Setting\SettingManager.h" />
     <ClInclude Include="Parts\ShareMemory\ShareMemory.h" />
     <ClInclude Include="Task\AroundCamera\AroundCameraReceiver.h" />
+    <ClInclude Include="Task\BuzzerController\BuzzerController.h" />
     <ClInclude Include="Task\FrontCamera\FrontCameraReceiver.h" />
     <ClInclude Include="Task\HeartBeat\HeartBeatManager.h" />
+    <ClInclude Include="Task\LightController\LightController.h" />
     <ClInclude Include="Task\Main\Sequencer\Error\ErrorKun.h" />
     <ClInclude Include="Task\Main\Sequencer\Idle\HimajinKun.h" />
     <ClInclude Include="Task\Main\Sequencer\Kusakari\KusakariKun.h" />

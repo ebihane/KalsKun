@@ -91,7 +91,15 @@ ResultEnum initialize()
         /* /sys/class/gpio への export は、Shell を作成して対応 */
         /* → /usr/local/bin 下に gpio_init.sh を作成 */
         /*    /etc/rc.local に上記のスクリプト起動命令を記述 */
-        pinMode(GPIO_INFO_TABLE[lCnt].PinNo, GPIO_INFO_TABLE[lCnt].Mode);
+        if (GPIO_INFO_TABLE[lCnt].Mode == SOFT_TONE_OUTPUT)
+        {
+            /* nop. */
+            /* スレッド起動時に Create する */
+        }
+        else
+        {
+            pinMode(GPIO_INFO_TABLE[lCnt].PinNo, GPIO_INFO_TABLE[lCnt].Mode);
+        }
     }
 
     /* 共有メモリ インスタンス生成 */
@@ -192,6 +200,13 @@ ResultEnum initialize()
     /* Sequencer 生成 */
     /* 最初は Idle 状態 */
     g_pSequencer = new HimajinKun();
+    if (g_pSequencer == NULL)
+    {
+        g_pLogger->LOG_ERROR("[initialize] Sequencer allocation failed.\n");
+        goto FINISH;
+    }
+
+    g_pSequencer->Initialize(SequencerBase::SequenceTypeEnum::E_SEQ_IDLE);
 
     retVal = ResultEnum::NormalEnd;
 

@@ -2,7 +2,7 @@
 #include "HeartBeatManager.h"
 
 HeartBeatManager::HeartBeatManager()
- : LoopThreadBase(300, TypeEnum::CYCLIC)
+ : LoopThreadBase((char*)"HeartBeat", 300, TypeEnum::CYCLIC)
  , m_CurrentLevel(LOW)
 {
     /* nop. */

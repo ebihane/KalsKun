@@ -17,7 +17,7 @@ public :
         Error,
     } ThreadStateEnum;
 
-    ThreadBase();
+    ThreadBase(char* const taskName);
     virtual ~ThreadBase();
 
     ResultEnum Run();
@@ -30,6 +30,7 @@ public :
 protected :
 
     Logger* m_Logger;
+    char m_TaskName[16];
 
     virtual ResultEnum initialize() = 0;
     virtual ResultEnum doProcedure() = 0;

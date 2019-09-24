@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include "SenderThread.h"
 
-SenderThread::SenderThread(AdapterBase* const adapter)
- : ThreadBase()
+SenderThread::SenderThread(char* const taskName, AdapterBase* const adapter)
+ : ThreadBase(taskName)
  , m_SendData(NULL)
  , m_Adapter(adapter)
 {

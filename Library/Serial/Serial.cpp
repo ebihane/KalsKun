@@ -90,7 +90,7 @@ ResultEnum Serial::Open()
     }
 
     /* ボーレート */
-    cfsetispeed(&setting, baudrate);
+    cfsetspeed(&setting, baudrate);
 
     /* パリティ */
     if (m_Setting.Parity != E_Parity_Non)
@@ -107,21 +107,26 @@ ResultEnum Serial::Open()
         }
     }
 
+    cfmakeraw(&setting);
+
     /*----------------*/
     /* c_iflag 設定群 */
     /*----------------*/
 
     /* カノニカルモード 無効 */
-    setting.c_iflag &= ~ICANON;
-
+/*    setting.c_iflag &= ~ICANON;
+*/
 
     /* 設定反映 */
+    tcflush(fd, TCIFLUSH);
     if (tcsetattr(fd, TCSANOW, &setting) < 0)
     {
         m_LastErrorNo = errno;
         close(fd);
         goto FINISH;
     }
+
+    ioctl(fd, TCSETS, &setting);
 
     m_Device = fd;
 

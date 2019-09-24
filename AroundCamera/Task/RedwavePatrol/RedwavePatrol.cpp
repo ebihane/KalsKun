@@ -3,7 +3,7 @@
 #include "RedwavePatrol.h"
 
 RedwavePatrol::RedwavePatrol()
- : LoopThreadBase(300, TypeEnum::TIMER_STOP)
+ : LoopThreadBase((char*)"RedWavePatrol", 300, TypeEnum::TIMER_STOP)
  , m_BeforeDetected(false)
 {
     /* nop. */

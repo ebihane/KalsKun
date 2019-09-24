@@ -5,7 +5,7 @@
 #include "WavePowerMonitor.h"
 
 WavePowerMonitor::WavePowerMonitor(const unsigned char apNo)
- : LoopThreadBase(200, TypeEnum::TIMER_STOP)
+ : LoopThreadBase((char*)"WavePowerMon", 200, TypeEnum::TIMER_STOP)
  , AP_INDEX(apNo)
  , m_Index(0)
 {
@@ -45,11 +45,11 @@ ResultEnum WavePowerMonitor::initializeCore()
     }
 
     /* 平均値算出 */
-    pShareMemory->BeaconData[AP_INDEX].RssiAverage = (float)rssiSum / AVERAGE_COUNT;
-    pShareMemory->BeaconData[AP_INDEX].TxPowerAverage = (float)txPowerSum / AVERAGE_COUNT;
+    pShareMemory->Commander.Beacon[AP_INDEX].RssiAverage = (float)rssiSum / AVERAGE_COUNT;
+    pShareMemory->Commander.Beacon[AP_INDEX].TxPowerAverage = (float)txPowerSum / AVERAGE_COUNT;
 
     /* 位置推定 */
-    pShareMemory->BeaconData[AP_INDEX].Distance = calcurateDistance();
+    pShareMemory->Commander.Beacon[AP_INDEX].Distance = calcurateDistance();
 
     retVal = ResultEnum::NormalEnd;
 
@@ -82,11 +82,11 @@ ResultEnum WavePowerMonitor::doMainProc()
     }
 
     /* 平均化 */
-    pShareMemory->BeaconData[AP_INDEX].RssiAverage = (float)rssiSum / AVERAGE_COUNT;
-    pShareMemory->BeaconData[AP_INDEX].TxPowerAverage = (float)txPowerSum / AVERAGE_COUNT;
+    pShareMemory->Commander.Beacon[AP_INDEX].RssiAverage = (float)rssiSum / AVERAGE_COUNT;
+    pShareMemory->Commander.Beacon[AP_INDEX].TxPowerAverage = (float)txPowerSum / AVERAGE_COUNT;
 
     /* 位置推定 */
-    pShareMemory->BeaconData[AP_INDEX].Distance = calcurateDistance();
+    pShareMemory->Commander.Beacon[AP_INDEX].Distance = calcurateDistance();
 
     m_Index++;
     if (AVERAGE_COUNT <= m_Index)
@@ -107,7 +107,7 @@ float WavePowerMonitor::calcurateDistance()
     SettingManager* setting = SettingManager::GetInstance();
 
     float retVal = 0.0f;
-    float diff = pShareMemory->BeaconData[AP_INDEX].TxPowerAverage - pShareMemory->BeaconData[AP_INDEX].RssiAverage;
+    float diff = pShareMemory->Commander.Beacon[AP_INDEX].TxPowerAverage - pShareMemory->Commander.Beacon[AP_INDEX].RssiAverage;
     float coeff = setting->GetWavePowerCoeff();
 
     retVal = pow(10.0f, diff / (coeff * 10.0f));

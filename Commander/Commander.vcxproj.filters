@@ -52,6 +52,12 @@
     <Filter Include="Task\HeartBeat">
       <UniqueIdentifier>{b5684407-9618-48ff-ad60-6654c6569522}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Task\BuzzerController">
+      <UniqueIdentifier>{245f641e-0818-45eb-9b4b-3c1851a39cff}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Task\LightController">
+      <UniqueIdentifier>{e4a584f8-a369-47d0-93c9-681c4b84f191}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Task\Main\main.cpp">
@@ -101,6 +107,12 @@
     </ClCompile>
     <ClCompile Include="Task\HeartBeat\HeartBeatManager.cpp">
       <Filter>Task\HeartBeat</Filter>
+    </ClCompile>
+    <ClCompile Include="Task\BuzzerController\BuzzerController.cpp">
+      <Filter>Task\BuzzerController</Filter>
+    </ClCompile>
+    <ClCompile Include="Task\LightController\LightController.cpp">
+      <Filter>Task\LightController</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -154,6 +166,12 @@
     </ClInclude>
     <ClInclude Include="Task\HeartBeat\HeartBeatManager.h">
       <Filter>Task\HeartBeat</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\BuzzerController\BuzzerController.h">
+      <Filter>Task\BuzzerController</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\LightController\LightController.h">
+      <Filter>Task\LightController</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

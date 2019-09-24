@@ -14,7 +14,7 @@ public :
         TIMER_STOP,
     } TypeEnum;
 
-    LoopThreadBase(const unsigned long cycle, const TypeEnum type);
+    LoopThreadBase(char* const taskName, const unsigned long cycle, const TypeEnum type);
     virtual ~LoopThreadBase();
 
 protected :

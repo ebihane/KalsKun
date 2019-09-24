@@ -1,6 +1,7 @@
 #define LAST_TEST_PROC
 
 #include <wiringPi.h>
+#include <softTone.h>
 
 /* GPIO ’è‹` */
 #define GPIO_USE_PIN_COUNT  (8)
@@ -22,14 +23,14 @@ typedef struct
 #ifdef MEMORY_MAIN
 static const GpioInfoStr GPIO_INFO_TABLE[GPIO_USE_PIN_COUNT]
 = {
-    {   IO_SHUTDOWN_1,      INPUT   },
-    {   IO_SHUTDOWN_2,      INPUT   },
-    {   IO_HEART_BEAT,      OUTPUT  },
-    {   IO_KUSATORI_MODE,   OUTPUT  },
-    {   IO_DIRECTION_LIGHT, OUTPUT  },
-    {   IO_YAKEI_MODE,      OUTPUT  },
-    {   IO_FAILURE_STATE,   OUTPUT  },
-    {   IO_BUZZER,          OUTPUT  },
+    {   IO_SHUTDOWN_1,      INPUT               },
+    {   IO_SHUTDOWN_2,      INPUT               },
+    {   IO_HEART_BEAT,      OUTPUT              },
+    {   IO_KUSATORI_MODE,   OUTPUT              },
+    {   IO_DIRECTION_LIGHT, OUTPUT              },
+    {   IO_YAKEI_MODE,      OUTPUT              },
+    {   IO_FAILURE_STATE,   OUTPUT              },
+    {   IO_BUZZER,          SOFT_TONE_OUTPUT    },
 };
 
 #else

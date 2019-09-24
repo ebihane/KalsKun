@@ -1,7 +1,8 @@
 #include "LoopThreadBase.h"
 
-LoopThreadBase::LoopThreadBase(const unsigned long cycle, const TypeEnum type)
- : LOOP_CYCLE(cycle)
+LoopThreadBase::LoopThreadBase(char* const taskName, const unsigned long cycle, const TypeEnum type)
+ : ThreadBase(taskName)
+ , LOOP_CYCLE(cycle)
  , PROC_TYPE(type)
 {
     /* nop. */

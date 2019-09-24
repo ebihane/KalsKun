@@ -2,7 +2,7 @@
 #include "FrontCameraReceiver.h"
 
 FrontCameraReceiver::FrontCameraReceiver(AdapterBase* const adapter)
- : ReceiverThread(adapter)
+ : ReceiverThread((char*)"FC_Receiver", adapter)
 {
     /* nop. */
 }

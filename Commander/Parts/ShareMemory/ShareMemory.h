@@ -1,5 +1,26 @@
 #pragma once
 
+
+/*==================*/
+/*  司令塔マイコン  */
+/*==================*/
+/* ブザー吹鳴モード */
+typedef enum
+{
+    E_MELODY_SILENT = 0,    /* 0: 停止 */
+    E_MELODY_SOUND_1,       /* 1: 曲 1 */
+    E_MELODY_WARNING,       /* 2: 警告 */
+    E_MELODY_ERROR,         /* 3: 異常発生 */
+} MelodyModeEnum;
+
+/* 指向性ライトモード */
+typedef enum
+{
+    E_LIGHT_OFF = 0,        /* 0: OFF */
+    E_LIGHT_ON,             /* 1: ON */
+    E_LIGHT_BLINK,          /* 2: 点滅 */
+} LightModeEnum;
+
 /*----------------*/
 /*  位置情報関連  */
 /*----------------*/
@@ -28,9 +49,18 @@ typedef struct
     float   Distance;
 } BeaconDataStr;
 
-/*------------------*/
+/* 司令塔マイコン 状態 */
+typedef struct
+{
+    BeaconDataStr   Beacon[BEACON_COUNT];
+    MelodyModeEnum  MelodyMode;
+    LightModeEnum   LightMode;
+    long            SystemError;
+} CommanderStateStr;
+
+/*==================*/
 /*  モータマイコン  */
-/*------------------*/
+/*==================*/
 /* モータマイコン向け 動作指示 */
 typedef enum
 {
@@ -69,9 +99,9 @@ typedef struct
     ControlModeEnum     RemoteMode;
 } MotorStatusStr;
 
-/*--------------*/
+/*==============*/
 /*  前方カメラ  */
-/*--------------*/
+/*==============*/
 /* 前方カメラ 状態 */
 typedef struct
 {
@@ -80,9 +110,9 @@ typedef struct
     long Avoidance;     /* 回避指示 */
 } FrontCameraStateStr;
 
-/*--------------*/
+/*==============*/
 /*  周辺カメラ  */
-/*--------------*/
+/*==============*/
 /* 周辺カメラ 状態 */
 typedef struct
 {
@@ -97,10 +127,10 @@ typedef struct
 /*=================*/
 typedef struct
 {
-    BeaconDataStr           BeaconData[BEACON_COUNT];
-    MotorStatusStr          MotorState;
-    AroundCameraStateStr    AroundCamera;
-    FrontCameraStateStr     FrontCamera;
+    CommanderStateStr       Commander;      /* 司令塔マイコン 情報 */
+    MotorStatusStr          Motor;          /* モータマイコン 情報 */
+    AroundCameraStateStr    AroundCamera;   /* 周辺カメラマイコン 情報 */
+    FrontCameraStateStr     FrontCamera;    /* 前方カメラマイコン 情報 */
 } ShareMemoryStr;
 
 #ifdef MEMORY_MAIN

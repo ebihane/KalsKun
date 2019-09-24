@@ -1,6 +1,7 @@
 #define _OPEN_THREADS
 
 #include <errno.h>
+#include <stdio.h>
 #include <string.h>
 #include <pthread.h>
 #include <wiringPi.h>
@@ -11,7 +12,7 @@
 // notice : コンパイルオプションに pthread 指定
 //
 
-ThreadBase::ThreadBase()
+ThreadBase::ThreadBase(char* const taskName)
  : m_Logger(NULL)
  , m_Handle(-1)
  , m_Stop(false)
@@ -19,7 +20,7 @@ ThreadBase::ThreadBase()
  , m_ThreadState(ThreadStateEnum::NotStart)
  , m_ThreadResult(ResultEnum::AbnormalEnd)
 {
-    /* nop. */
+    strncpy(&m_TaskName[0], &taskName[0], sizeof(m_TaskName));
 }
 
 ThreadBase::~ThreadBase()
@@ -122,6 +123,12 @@ void ThreadBase::MainProcedure()
 
     try
     {
+        {
+            char log[40] = { 0 };
+            snprintf(&log[0], sizeof(log), "[%s] Thread start.\n", &m_TaskName[0]);
+            m_Logger->LOG_INFO(log);
+        }
+
         m_ThreadResult = doProcedure();
     }
     catch (std::exception& e)
@@ -130,6 +137,13 @@ void ThreadBase::MainProcedure()
     }
 
     finalize();
+
+    {
+        char log[40] = { 0 };
+        snprintf(&log[0], sizeof(log), "[%s] Thread finish.\n", &m_TaskName[0]);
+        m_Logger->LOG_INFO(log);
+    }
+
     if (m_Logger != NULL)
     {
         delete m_Logger;

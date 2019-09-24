@@ -2,7 +2,7 @@
 #include "AroundCameraReceiver.h"
 
 AroundCameraReceiver::AroundCameraReceiver(AdapterBase* const adapter)
- : ReceiverThread(adapter)
+ : ReceiverThread((char*)"AC_Receiver", adapter)
 {
     /* nop. */
 }

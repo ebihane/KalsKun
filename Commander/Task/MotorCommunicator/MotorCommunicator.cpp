@@ -3,7 +3,7 @@
 #include "MotorCommunicator.h"
 
 MotorCommunicator::MotorCommunicator()
- : LoopThreadBase(100, TypeEnum::TIMER_STOP)
+ : LoopThreadBase((char*)"MotorComm", 100, TypeEnum::TIMER_STOP)
  , m_Queue(NULL)
  , m_Serial(NULL)
  , m_MotorCommand(MotorCommandEnum::E_COMMAND_STOP)
@@ -65,18 +65,18 @@ ResultEnum MotorCommunicator::initializeCore()
 
     /* お試しワンショット送信 */
     createSendData(MotorCommandEnum::E_COMMAND_STOP, CutterDriveEnum::E_CUTTER_STOP, &sendBuffer[0]);
-    if (m_Serial->Send(&sendBuffer[0], sizeof(sendBuffer)) != ResultEnum::NormalEnd)
+    if (serial->Send(&sendBuffer[0], sizeof(sendBuffer)) != ResultEnum::NormalEnd)
     {
         char log[40] = { 0 };
-        snprintf(&log[0], sizeof(log), "[doMainProc] Send failed. errno[%d]\n", m_Serial->GetLastError());
+        snprintf(&log[0], sizeof(log), "[doMainProc] Send failed. errno[%d]\n", serial->GetLastError());
         m_Logger->LOG_ERROR(log);
         goto FINISH;
     }
 
-    if (m_Serial->Receive(&recvBuffer[0], sizeof(recvBuffer)) != ResultEnum::NormalEnd)
+    if (serial->Receive(&recvBuffer[0], sizeof(recvBuffer)) != ResultEnum::NormalEnd)
     {
         char log[40] = { 0 };
-        snprintf(&log[0], sizeof(log), "[doMainProc] Receive failed. errno[%d]\n", m_Serial->GetLastError());
+        snprintf(&log[0], sizeof(log), "[doMainProc] Receive failed. errno[%d]\n", serial->GetLastError());
         m_Logger->LOG_ERROR(log);
         goto FINISH;
     }
@@ -262,36 +262,36 @@ ResultEnum MotorCommunicator::analyze(char* const buffer)
     }
 
     tempCommand = buffer[2] & 0x0F;
-    pShareMemory->MotorState.Command = (MotorCommandEnum)tempCommand;
+    pShareMemory->Motor.Command = (MotorCommandEnum)tempCommand;
     tempCommand = (buffer[2] >> 4) & 0x0F;
-    pShareMemory->MotorState.Cutter = (CutterDriveEnum)tempCommand;
+    pShareMemory->Motor.Cutter = (CutterDriveEnum)tempCommand;
 
     tempCommand = buffer[3];
     tempCommand <<= 8;
     tempCommand |= buffer[4];
-    pShareMemory->MotorState.PointX = tempCommand;
+    pShareMemory->Motor.PointX = tempCommand;
 
     tempCommand = buffer[5];
     tempCommand <<= 8;
     tempCommand |= buffer[6];
-    pShareMemory->MotorState.PointY = tempCommand;
+    pShareMemory->Motor.PointY = tempCommand;
 
     if ((buffer[7] & 0x01) != 0)
     {
-        pShareMemory->MotorState.ErrorStatus = 1;
+        pShareMemory->Motor.ErrorStatus = 1;
     }
     else
     {
-        pShareMemory->MotorState.ErrorStatus = 0;
+        pShareMemory->Motor.ErrorStatus = 0;
     }
 
     if ((buffer[7] & 0x02) != 0)
     {
-        pShareMemory->MotorState.RemoteMode = E_MODE_MANUAL;
+        pShareMemory->Motor.RemoteMode = E_MODE_MANUAL;
     }
     else
     {
-        pShareMemory->MotorState.RemoteMode = E_MODE_AUTO;
+        pShareMemory->Motor.RemoteMode = E_MODE_AUTO;
     }
 
 

@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include "ReceiverThread.h"
 
-ReceiverThread::ReceiverThread(AdapterBase* const adapter)
- : ThreadBase()
+ReceiverThread::ReceiverThread(char* const taskName, AdapterBase* const adapter)
+ : ThreadBase(taskName)
  , m_RecvData(NULL)
  , m_Adapter(adapter)
 {

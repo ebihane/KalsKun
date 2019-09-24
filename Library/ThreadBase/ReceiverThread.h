@@ -9,7 +9,7 @@ class ReceiverThread : public ThreadBase
 {
 public :
 
-    ReceiverThread(AdapterBase* const adapter);
+    ReceiverThread(char* const taskName, AdapterBase* const adapter);
     virtual ~ReceiverThread();
 
 protected :
