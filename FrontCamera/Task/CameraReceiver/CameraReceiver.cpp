@@ -3,7 +3,7 @@
 #include "CameraReceiver.h"
 
 CameraReceiver::CameraReceiver()
- : ThreadBase()
+ : ThreadBase((char*)"CameraReceiver")
  , m_UdpReceiver(NULL)
  , m_ReceiveBuffer(NULL)
 {

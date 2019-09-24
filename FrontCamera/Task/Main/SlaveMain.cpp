@@ -48,7 +48,7 @@ ResultEnum slaveInitialize(const int cameraNo)
         goto FINISH;
     }
 
-    client = new TcpClient("192.168.3.1", 10003);
+    client = new TcpClient((char*)"192.168.3.1", 10003);
     g_pStateSender = new StateSender(client);
     if (g_pStateSender == NULL)
     {
@@ -108,7 +108,6 @@ ResultEnum slaveMain(const int cameraNo)
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     long captureIndex = -1;
-    long sendIndex = -1;
     int key = 0;
 
     cv::Scalar				cvColor = cv::Scalar(0, 0, 256);

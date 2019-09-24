@@ -15,6 +15,4 @@ private :
     int m_SensorNo;
 
     ResultEnum doMainProc();
-    double pulseIn(int pinNo);
-
 };

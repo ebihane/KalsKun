@@ -4,10 +4,10 @@
 #include <stdio.h>
 
 UltrasoundManager::UltrasoundManager(const int sensorNo)
- : LoopThreadBase(100, TypeEnum::CYCLIC)
+ : LoopThreadBase((char*)"Ultrasound", 100, TypeEnum::CYCLIC)
  , m_SensorNo(sensorNo)
 {
-    /* nop. */
+    pShareMemory->UltrasoundData[m_SensorNo] = -1;
 }
 
 UltrasoundManager::~UltrasoundManager()
@@ -19,6 +19,11 @@ ResultEnum UltrasoundManager::doMainProc()
 {
     int triggerPin = 0;
     int echoPin = 0;
+    float durationTime = -1.0f;
+    struct timespec startTime;
+    struct timespec stopTime;
+    __time_t secondDiff;
+    __time_t nanosecDiff;
 
     if (m_SensorNo == 0)
     {
@@ -33,63 +38,51 @@ ResultEnum UltrasoundManager::doMainProc()
 
     // í¥âπîgèoóÕäJén
     digitalWrite(triggerPin, LOW);
-    delayMicroseconds(2);
-    digitalWrite(triggerPin, HIGH);
     delayMicroseconds(10);
+    digitalWrite(triggerPin, HIGH);
+    delayMicroseconds(1000);
     digitalWrite(triggerPin, LOW);
 
-    double duration = pulseIn(echoPin);
-    if (duration > 0.0f)
+    while (1)
     {
-        duration = duration / 2;                    //âùïúãóó£Çîºï™Ç…Ç∑ÇÈ
-        pShareMemory->UltrasoundData[m_SensorNo] = (float)(duration * 340 * 100 / 1000000);  // âπë¨Ç340m/sÇ…ê›íË
+        long signal = digitalRead(echoPin);
+        if (signal == HIGH)
+        {
+            break;
+        }
+    }
+
+    clock_gettime(CLOCK_REALTIME, &startTime);
+    while (1)
+    {
+        long signal = digitalRead(echoPin);
+        if (signal == LOW)
+        {
+
+            clock_gettime(CLOCK_REALTIME, &stopTime);
+            secondDiff = stopTime.tv_sec - startTime.tv_sec;
+            if (startTime.tv_nsec <= stopTime.tv_nsec)
+            {
+                nanosecDiff = stopTime.tv_nsec - startTime.tv_nsec;
+            }
+            else
+            {
+                nanosecDiff = (stopTime.tv_nsec + 1000000000) - startTime.tv_nsec;
+                secondDiff--;
+            }
+            durationTime = ((float)secondDiff * 1000000) + ((float)nanosecDiff / 1000);
+
+            break;
+        }
+    }
+
+    if (durationTime > 0)
+    {
+        durationTime = durationTime / 2;                    //âùïúãóó£Çîºï™Ç…Ç∑ÇÈ
+        pShareMemory->UltrasoundData[m_SensorNo] = (float)(durationTime * 340 * 100 / 1000000);  // âπë¨Ç340m/sÇ…ê›íË
     }
 
     return ResultEnum::NormalEnd;
 }
 
-double UltrasoundManager::pulseIn(int pinNo)
-{
-    double retVal = -1.0f;
-    Stopwatch highWatch;
-    Stopwatch lowWatch;
-
-    lowWatch.Start();
-    while (1)
-    {
-        double time = lowWatch.GetMicro();
-        if (time >= 1000000)
-        {
-            retVal = -2.0f;
-            goto FINISH;
-        }
-
-        long signal = digitalRead(pinNo);
-        if (signal == LOW)
-        {
-            break;
-        }
-    }
-
-    highWatch.Start();
-    while (1)
-    {
-        double time = highWatch.GetMicro();
-        if (time >= 1000000)
-        {
-            retVal = -3.0f;
-            goto FINISH;
-        }
-
-        long signal = digitalRead(pinNo);
-        if (signal == HIGH)
-        {
-            retVal = time;
-            break;
-        }
-    }
-
-FINISH:
-    return retVal;
-}
 

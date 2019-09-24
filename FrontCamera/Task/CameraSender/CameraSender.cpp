@@ -3,7 +3,7 @@
 #include "CameraSender.h"
 
 CameraSender::CameraSender()
- : ThreadBase()
+ : ThreadBase((char*)"CameraSender")
  , m_UdpSender(NULL)
  , m_SendBuffer(NULL)
 {
