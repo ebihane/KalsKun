@@ -104,12 +104,14 @@ SequencerBase::SequenceTypeEnum KusakariKun::processCore()
     /* 音楽を鳴らす指示 */
     pShareMemory->Commander.MelodyMode = MelodyModeEnum::E_MELODY_SOUND_1;
 
+#if 0
     /* 動作マップ更新 */
     SizeStr realPoint;
     realPoint.Width = (double)pShareMemory->Motor.PointX;
     realPoint.Length = (double)pShareMemory->Motor.PointY;
     RectStr point = convertRealPointToMapPoint(&realPoint);
     moveMap->ChangeMoved(&point);
+#endif
 
     /* 全網羅完了の場合は IDLE */
     if (moveMap->IsComplete() == true)
@@ -174,6 +176,7 @@ SequencerBase::SequenceTypeEnum KusakariKun::processCore()
         }
     }
 
+#if 0
     if ((m_PrevRect.X != point.X)
     ||  (m_PrevRect.Y != point.Y))
     {
@@ -184,6 +187,7 @@ SequencerBase::SequenceTypeEnum KusakariKun::processCore()
 
     m_PrevRect.X = point.X;
     m_PrevRect.Y = point.Y;
+#endif
     m_PrevAvoidance = avoidance;
 
     retVal = MY_SEQUENCE_TYPE;

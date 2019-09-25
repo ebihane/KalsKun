@@ -92,14 +92,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
       </ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Task\CameraReceiver\CameraReceiver.cpp" />
-    <ClCompile Include="Task\CameraSender\CameraSender.cpp" />
     <ClCompile Include="Task\HeartBeat\HeartBeatManager.cpp" />
-    <ClCompile Include="Task\Kinect\KinectCapture.cpp" />
-    <ClCompile Include="Task\Main\KinectMain.cpp" />
     <ClCompile Include="Task\Main\main.cpp" />
-    <ClCompile Include="Task\Main\MasterMain.cpp" />
-    <ClCompile Include="Task\Main\SlaveMain.cpp" />
     <ClCompile Include="Task\StateSender\StateSender.cpp" />
     <ClCompile Include="Task\Ultrasound\UltrasoundManager.cpp" />
   </ItemGroup>
@@ -112,13 +106,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
       </ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="Task\CameraReceiver\CameraReceiver.h" />
-    <ClInclude Include="Task\CameraSender\CameraSender.h" />
     <ClInclude Include="Task\HeartBeat\HeartBeatManager.h" />
-    <ClInclude Include="Task\Kinect\KinectCapture.h" />
-    <ClInclude Include="Task\Main\KinectMain.h" />
-    <ClInclude Include="Task\Main\MasterMain.h" />
-    <ClInclude Include="Task\Main\SlaveMain.h" />
     <ClInclude Include="Task\StateSender\StateSender.h" />
     <ClInclude Include="Task\Ultrasound\UltrasoundManager.h" />
   </ItemGroup>

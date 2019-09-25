@@ -29,4 +29,7 @@ private :
 
     ResultEnum createSendData(const MotorCommandEnum command, const CutterDriveEnum cutter, char* const buffer);
     ResultEnum analyze(char* const buffer);
+    ResultEnum receiveProc(char* const buffer);
+    void outputLog(char* const buffer, const long size, const char type);
+
 };

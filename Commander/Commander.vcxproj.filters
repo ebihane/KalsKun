@@ -58,6 +58,9 @@
     <Filter Include="Task\LightController">
       <UniqueIdentifier>{e4a584f8-a369-47d0-93c9-681c4b84f191}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Task\AnimalCamera">
+      <UniqueIdentifier>{247cfa26-a140-49a4-bba1-6fcbdf17e575}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Task\Main\main.cpp">
@@ -93,9 +96,6 @@
     <ClCompile Include="Parts\MappingData\MoveMap.cpp">
       <Filter>Parts\MappingData</Filter>
     </ClCompile>
-    <ClCompile Include="Task\FrontCamera\FrontCameraReceiver.cpp">
-      <Filter>Task\FrontCamera</Filter>
-    </ClCompile>
     <ClCompile Include="Parts\Setting\SettingManager.cpp">
       <Filter>Parts\SettingManager</Filter>
     </ClCompile>
@@ -113,6 +113,12 @@
     </ClCompile>
     <ClCompile Include="Task\LightController\LightController.cpp">
       <Filter>Task\LightController</Filter>
+    </ClCompile>
+    <ClCompile Include="Task\FrontCamera\FrontCameraReceiver.cpp">
+      <Filter>Task\FrontCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="Task\AnimalCamera\AnimalCameraReceiver.cpp">
+      <Filter>Task\AnimalCamera</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -152,9 +158,6 @@
     <ClInclude Include="Parts\MappingData\MoveMap.h">
       <Filter>Parts\MappingData</Filter>
     </ClInclude>
-    <ClInclude Include="Task\FrontCamera\FrontCameraReceiver.h">
-      <Filter>Task\FrontCamera</Filter>
-    </ClInclude>
     <ClInclude Include="Parts\Setting\SettingManager.h">
       <Filter>Parts\SettingManager</Filter>
     </ClInclude>
@@ -172,6 +175,12 @@
     </ClInclude>
     <ClInclude Include="Task\LightController\LightController.h">
       <Filter>Task\LightController</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\FrontCamera\FrontCameraReceiver.h">
+      <Filter>Task\FrontCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\AnimalCamera\AnimalCameraReceiver.h">
+      <Filter>Task\AnimalCamera</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

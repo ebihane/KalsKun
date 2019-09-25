@@ -16,6 +16,7 @@
 /* Task */
 #include "Task/AroundCamera/AroundCameraReceiver.h"
 #include "Task/FrontCamera/FrontCameraReceiver.h"
+#include "Task/AnimalCamera/AnimalCameraReceiver.h"
 #include "Task/MotorCommunicator/MotorCommunicator.h"
 #include "Task/HeartBeat/HeartBeatManager.h"
 
@@ -32,6 +33,7 @@ static Logger* g_pLogger = NULL;
 /* Task */
 static FrontCameraReceiver* g_pFrontCameraReceiver = NULL;
 static AroundCameraReceiver* g_pAroundCameraReceiver = NULL;
+static AnimalCameraReceiver* g_pAnimalCameraReceiver = NULL;
 static MotorCommunicator* g_pMotorCommunicator = NULL;
 static HeartBeatManager* g_pHeartBeatManager = NULL;
 
@@ -80,10 +82,9 @@ ResultEnum initialize()
     AreaMap* areaMap = AreaMap::GetInstance();
     MoveMap* moveMap = MoveMap::GetInstance();
     long lCnt = 0;
-    char command[32] = { 0 };
 
     /* I/O 初期化 */
-    int result = wiringPiSetupSys();
+    wiringPiSetupSys();
 
     for (lCnt = 0; lCnt < GPIO_USE_PIN_COUNT; lCnt++)
     {
@@ -153,9 +154,6 @@ ResultEnum initialize()
         moveMap->Save();
     }
 
-    snprintf(&command[0], sizeof(command), "wiringSetupSys Ret[%d]\n", result);
-    g_pLogger->LOG_INFO(command);
-
     /* Task 生成 */
     /* ハートビート制御スレッド 初期化 */
     g_pHeartBeatManager = new HeartBeatManager();
@@ -171,6 +169,15 @@ ResultEnum initialize()
     if (g_pFrontCameraReceiver == NULL)
     {
         g_pLogger->LOG_ERROR("[initialize] FrontCameraReceiver allocation failed.\n");
+        goto FINISH;
+    }
+
+    /* 動物カメラマイコン状態取得スレッド 初期化 */
+    server = new TcpServer(FC2_TO_COMMANDER_PORT);
+    g_pAnimalCameraReceiver = new AnimalCameraReceiver(server);
+    if (g_pAnimalCameraReceiver == NULL)
+    {
+        g_pLogger->LOG_ERROR("[initialize] AnimalCameraReceiver allocation failed.\n");
         goto FINISH;
     }
 
@@ -194,6 +201,7 @@ ResultEnum initialize()
     /* Task 起動 */
     g_pHeartBeatManager->Run();
     g_pFrontCameraReceiver->Run();
+    g_pAnimalCameraReceiver->Run();
     g_pAroundCameraReceiver->Run();
     g_pMotorCommunicator->Run();
 
@@ -219,7 +227,9 @@ void mainProcedure()
     SequencerBase::SequenceTypeEnum current = g_pSequencer->GetSequence();
     SequencerBase::SequenceTypeEnum next = SequencerBase::SequenceTypeEnum::E_SEQ_ERROR;
     Stopwatch watch;
+    char logStr[64] = { 0 };
 
+    g_pLogger->LOG_INFO("[mainProcedure] Main loop enter.\n");
     watch.Start();
     while (1)
     {
@@ -227,6 +237,9 @@ void mainProcedure()
         next = g_pSequencer->Process();
         if (next != current)
         {
+            snprintf(&logStr[0], sizeof(logStr), "[mainProcedure] Sequence Change. [%d -> %d]\n", current, next);
+            g_pLogger->LOG_INFO(logStr);
+
             g_pSequencer->Destroy();
             delete g_pSequencer;
             
@@ -281,6 +294,13 @@ void finalize()
         g_pAroundCameraReceiver = NULL;
     }
 
+    if (g_pAnimalCameraReceiver != NULL)
+    {
+        g_pAnimalCameraReceiver->Stop(5);
+        delete g_pAnimalCameraReceiver;
+        g_pAnimalCameraReceiver = NULL;
+    }
+
     if (g_pFrontCameraReceiver != NULL)
     {
         g_pFrontCameraReceiver->Stop(5);
@@ -313,10 +333,14 @@ void finalize()
 
 void signalHandler(int signum)
 {
-    printf("ERR! [LogWriter] Signal Catched. signum[%d]\n", signum);
+    printf("ERR! [Commander] Signal Catched. signum[%d]\n", signum);
+
+    if (g_pLogger != NULL)
+    {
+        g_pLogger->LOG_ERROR("[Commander] Signal Catched!!\n");
+    }
 
     finalize();
-    StopLoggerProcess();
 
     exit(0);
 }

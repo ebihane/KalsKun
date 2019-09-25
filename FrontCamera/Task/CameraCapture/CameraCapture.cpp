@@ -1,3 +1,8 @@
+#include <stdlib.h>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include "Parts/ShareMemory/ShareMemory.h"
@@ -9,7 +14,16 @@ CameraCapture::CameraCapture(const int index)
  , m_Start(false)
  , m_Capture(NULL)
 {
-    /* nop. */
+    m_CameraParameters[0] = 100;
+    m_CameraParameters[1] = 115;
+    m_CameraParameters[2] = 100;
+    m_CameraParameters[3] = 10;
+    m_CameraParameters[4] = 3;
+    m_CameraParameters[5] = 8;
+    m_CameraParameters[6] = 168;
+    m_CameraParameters[7] = 100;
+    m_CameraParameters[8] = 10;
+    m_CameraParameters[9] = 3;
 }
 
 CameraCapture::~CameraCapture()
@@ -32,6 +46,38 @@ ResultEnum CameraCapture::initialize()
 
     m_Start = false;
 
+    try
+    {
+        std::ifstream readFile("/home/pi/FrontCameraMconfig.txt");
+        std::string readData;
+        if (readFile.fail())
+        {
+            m_Logger->LOG_ERROR("[initialize] config file read error.");
+        }
+
+        int lineCount = 0;
+        while (getline(readFile, readData))
+        {
+            if (readData[0] == '#')
+            {
+                continue;
+            }
+
+            if (lineCount < 10)
+            {
+                m_CameraParameters[lineCount] = std::stol(readData);
+            }
+
+            lineCount++;
+        }
+    }
+    catch (Exception e)
+    {
+        char logBuffer[50] = { 0 };
+        snprintf(logBuffer, sizeof(logBuffer), "[initialize] exception. [%s]", e.msg);
+        m_Logger->LOG_ERROR(logBuffer);
+    }
+
     retVal = ResultEnum::NormalEnd;
 
     return retVal;
@@ -41,6 +87,8 @@ ResultEnum CameraCapture::doProcedure()
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     long       nextIndex = 0;
+    cv::Scalar cvColor = cv::Scalar(0, 0, 256);
+    cv::Point  cvPointStart = { 0x00 };
 
 RETRY:
     if (m_Capture == NULL)
@@ -70,13 +118,16 @@ RETRY:
         goto RETRY;
     }
 
+    pShareMemory->Capture.Index = 0;
     m_Capture->read(pShareMemory->Capture.Data[0]);
     m_Start = true;
 
-    pShareMemory->Capture.Index = -1;
-    nextIndex = 0;
+    nextIndex = 1;
+    m_Logger->LOG_INFO("[CameraCapture] Main loop start.\n");
     while (1)
     {
+        bool isDetected = false;
+
         if (isStopRequest() == true)
         {
             break;
@@ -89,7 +140,50 @@ RETRY:
             goto FINISH;
         }
 
-        // @todo : ここに画像補正を入れる
+        // 障害物検知 (現状は青色検知)
+        cvColor = cv::Scalar(256, 0, 0);
+        bool blueLineDetected = isColorLineDetected(pShareMemory->Capture.Data[nextIndex], cvColor, &m_CameraParameters[0]);
+        if (blueLineDetected == true)
+        {
+            cvPointStart = Point(30, 80);
+            putText(pShareMemory->Capture.Data[nextIndex], "blue detected.", cvPointStart, FONT_HERSHEY_SIMPLEX, 1.2, cvColor, 2, cv::FONT_HERSHEY_DUPLEX);
+
+            // 障害物検知したので、1:回避指令
+            pShareMemory->StateData = 1;
+            isDetected = true;
+        }
+
+        // 障害物検知 (現状は赤色検知)
+        cvColor = cv::Scalar(0, 0, 256);
+        bool redLineDetected = isColorLineDetected(pShareMemory->Capture.Data[nextIndex], cvColor, &m_CameraParameters[5]);
+        if (redLineDetected == true)
+        {
+            cvPointStart = Point(30, 30);
+            putText(pShareMemory->Capture.Data[nextIndex], "red detected.", cvPointStart, FONT_HERSHEY_SIMPLEX, 1.2, cvColor, 2, cv::FONT_HERSHEY_DUPLEX);
+
+            // 赤テープ検知したので、2:Uターン指令
+            pShareMemory->StateData = 2;
+            isDetected = true;
+        }
+
+        float distance = pShareMemory->UltrasoundData[0];
+
+        cvPointStart = Point(30, 130);
+        char logBuffer[50] = { 0 };
+        snprintf(logBuffer, sizeof(logBuffer), "distance1=%f", distance);
+        putText(pShareMemory->Capture.Data[nextIndex], logBuffer, cvPointStart, FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(256, 256, 256), 2, cv::FONT_HERSHEY_DUPLEX);
+
+        distance = pShareMemory->UltrasoundData[1];
+
+        cvPointStart = Point(30, 180);
+        snprintf(logBuffer, sizeof(logBuffer), "distance2=%f", distance);
+        putText(pShareMemory->Capture.Data[nextIndex], logBuffer, cvPointStart, FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(256, 256, 256), 2, cv::FONT_HERSHEY_DUPLEX);
+
+        // 何も検知していなければ、0:指令無し
+        if (isDetected == false)
+        {
+            pShareMemory->StateData = 0;
+        }
 
         pShareMemory->Capture.Index = nextIndex;
 
@@ -111,4 +205,130 @@ ResultEnum CameraCapture::finalize()
     m_Start = false;
 
     return ResultEnum::NormalEnd;
+}
+
+bool CameraCapture::isColorLineDetected(cv::Mat masterCapture, cv::Scalar cvColor, long* parameters)
+{
+    bool bRet = false;
+    int width = masterCapture.cols;
+    int height = masterCapture.rows;
+
+    uchar hueMin = (uchar)parameters[0];
+    uchar hueMax = (uchar)parameters[1];
+    uchar saturation = (uchar)parameters[2];
+    long widthThreshold = parameters[3];
+    long heightThreshold = parameters[4];
+
+    cv::Point         cvPointStart = { 0x00 };
+    cv::Point         cvPointEnd = { 0x00 };
+    cv::Mat            hsb;
+
+    cvPointStart = cv::Point(640, 0);
+    cvPointEnd = cv::Point(640, 480);
+
+    cv::cvtColor(masterCapture, hsb, cv::COLOR_BGR2HSV);
+    uchar hue, sat;
+
+    Mat convertMat = Mat(Size(width, height), CV_8UC1);
+
+    long detectCounter = 0;
+    long widthCounter = 0;
+    bool detected = false;
+
+    int detectPointX = 0;
+    int detectPointY = 0;
+
+    /* 縦方向を走査 */
+    for (int y = 0; y < height; y += 8)
+    {
+        bool lineDetected = false;
+
+        /* 横方向を走査 */
+        for (int x = 0; x < width; x += 8)
+        {
+            /* hue=色相を取得 */
+            hue = hsb.at<Vec3b>(y, x)[0];
+
+            /* sat=彩度を取得 */
+            sat = hsb.at<Vec3b>(y, x)[1];
+
+            /* 160度以上が指定された場合、判定条件を変更する */
+            if (hueMax > 160)
+            {
+                /* 指定の色相、彩度に合致するか判定 */
+                if ((hue < hueMin || hue > hueMax) && sat > saturation)
+                {
+                    cvPointStart = cv::Point(x, y);
+                    // cv::putText(masterCapture, ".", cvPointStart, FONT_HERSHEY_SIMPLEX, 1.2, cvColor, 2, cv::LINE_AA);
+                    convertMat.at<uchar>(y, x) = 255;
+
+                    /* 検知した横幅を測定する */
+                    widthCounter++;
+                }
+                else
+                {
+                    convertMat.at<uchar>(y, x) = 0;
+
+                    /* 検知無しの場合はカウンター初期化 */
+                    widthCounter = 0;
+                }
+            }
+            else
+            {
+                /* 指定の色相、彩度に合致するか判定 */
+                if ((hue > hueMin && hue < hueMax) && sat > saturation)
+                {
+                    cvPointStart = Point(x, y);
+                    // cv::putText(masterCapture, ".", cvPointStart, FONT_HERSHEY_SIMPLEX, 1.2, cvColor, 2, cv::LINE_AA);
+                    convertMat.at<uchar>(y, x) = 255;
+
+                    /* 検知した横幅を測定する */
+                    widthCounter++;
+                }
+                else
+                {
+                    convertMat.at<uchar>(y, x) = 0;
+                    widthCounter = 0;
+                }
+            }
+
+            /* 横幅の長さが一定値以上か確認 */
+            if (widthCounter >= widthThreshold)
+            {
+                detectPointX = x;
+
+                /* 横線を検知 */
+                lineDetected = true;
+            }
+        }
+
+        /* 横線を検知した回数をカウント */
+        if (lineDetected == true)
+        {
+            detectCounter++;
+        }
+        else
+        {
+            detectCounter = 0;
+        }
+
+        /* 横線の検知回数が連続n回以上であれば、検知と判断 */
+        if (detectCounter >= heightThreshold)
+        {
+            detectPointY = y;
+            detected = true;
+        }
+    }
+
+    if (detected == true)
+    {
+        rectangle(masterCapture,
+            cv::Point(detectPointX - (widthThreshold * 8), detectPointY - (heightThreshold * 8)),
+            cv::Point(detectPointX, detectPointY),
+            cvColor, 3);
+
+        bRet = true;
+    }
+
+    return(bRet);
 }

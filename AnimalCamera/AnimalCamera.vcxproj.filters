@@ -13,9 +13,6 @@
     <ClCompile Include="Task\HeartBeat\HeartBeatManager.cpp">
       <Filter>Task\HeartBeat</Filter>
     </ClCompile>
-    <ClCompile Include="Task\Ultrasound\UltrasoundManager.cpp">
-      <Filter>Task\Ultrasound</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Task">
@@ -39,9 +36,6 @@
     <Filter Include="Task\HeartBeat">
       <UniqueIdentifier>{c2e1eb67-367a-4353-8017-5398cfb32a76}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Task\Ultrasound">
-      <UniqueIdentifier>{aaca7877-b7d6-48ab-be1b-5dd1e28191d3}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Task\CameraCapture\CameraCapture.h">
@@ -53,14 +47,11 @@
     <ClInclude Include="Task\StateSender\StateSender.h">
       <Filter>Task\StateSender</Filter>
     </ClInclude>
-    <ClInclude Include="Parts\FrontCameraCommon.h">
+    <ClInclude Include="Parts\AnimalCameraCommon.h">
       <Filter>Parts</Filter>
     </ClInclude>
     <ClInclude Include="Task\HeartBeat\HeartBeatManager.h">
       <Filter>Task\HeartBeat</Filter>
-    </ClInclude>
-    <ClInclude Include="Task\Ultrasound\UltrasoundManager.h">
-      <Filter>Task\Ultrasound</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

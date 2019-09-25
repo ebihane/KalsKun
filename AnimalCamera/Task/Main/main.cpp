@@ -14,18 +14,17 @@ wiringPi; pthread; dl; rt;  opencv_core; opencv_video; opencv_videoio; opencv_hi
 
 /* Common */
 #include "Include/Common.h"
-#include "Parts/FrontCameraCommon.h"
+#include "Parts/AnimalCameraCommon.h"
 
 /* Parts */
 #include "Logger/Logger.h"
-#include "Parts/ShareMemory/ShareMemory.h"
 #include "Socket/TcpClient/TcpClient.h"
+#include "Parts/ShareMemory/ShareMemory.h"
 
 /* Task */
 #include "Task/CameraCapture/CameraCapture.h"
 #include "Task/StateSender/StateSender.h"
 #include "Task/HeartBeat/HeartBeatManager.h"
-#include "Task/Ultrasound/UltrasoundManager.h"
 
 /* Parts */
 static Logger* g_pLogger = NULL;
@@ -34,21 +33,17 @@ static Logger* g_pLogger = NULL;
 static CameraCapture* g_pCameraCapture = NULL;
 static StateSender* g_pStateSender = NULL;
 static HeartBeatManager* g_pHeartBeatManager = NULL;
-static UltrasoundManager* g_pUltrasoundManager1 = NULL;
-static UltrasoundManager* g_pUltrasoundManager2 = NULL;
 
 
-
-ResultEnum initialize(const char controllerType);
+ResultEnum initialize(const char cameraNo);
 void mainProcedure(const char isShow);
 void finalize();
 void signalHandler(int signum);
 
-/* ./FrontCamera.out (カメラ番号) */
+/* ./AnimalCamera.out (カメラ番号) */
 int main(int argc, char* argv[])
 {
     bool isMainLoopExit = false;
-        
     char cameraNo = 0;
     char isShow = 0;
 
@@ -73,7 +68,6 @@ int main(int argc, char* argv[])
     }
 
     mainProcedure(isShow);
-
     isMainLoopExit = true;
 
 FINISH:
@@ -109,8 +103,9 @@ ResultEnum initialize(const char cameraNo)
         goto FINISH;
     }
 
-    StartLoggerProcess((char*)"FrontCamera");
+    StartLoggerProcess((char*)"AnimalCamera");
 
+    /* Logger 準備 */
     g_pLogger = new Logger(Logger::LOG_ERROR | Logger::LOG_INFO, Logger::LogTypeEnum::BOTH_OUT);
     if (g_pLogger == NULL)
     {
@@ -125,31 +120,14 @@ ResultEnum initialize(const char cameraNo)
         goto FINISH;
     }
 
-    /* 超音波1 制御スレッド 初期化 */
-    g_pUltrasoundManager1 = new UltrasoundManager(0);
-    if (g_pUltrasoundManager1 == NULL)
-    {
-        g_pLogger->LOG_ERROR("[initialize] UltrasoundManager allocation failed.\n");
-        goto FINISH;
-    }
-
-    /* 超音波2 制御スレッド 初期化 */
-    g_pUltrasoundManager2 = new UltrasoundManager(1);
-    if (g_pUltrasoundManager2 == NULL)
-    {
-        g_pLogger->LOG_ERROR("[initialize] UltrasoundManager allocation failed.\n");
-        goto FINISH;
-    }
-
-    /* 自身のカメラをキャプチャするスレッドの生成 */
     g_pCameraCapture = new CameraCapture(cameraNo);
     if (g_pCameraCapture == NULL)
     {
-        g_pLogger->LOG_ERROR("[masterInitialize] g_pCameraCapture allocation failed.\n");
+        g_pLogger->LOG_ERROR("[slaveInitialize] g_pCameraCapture allocation failed.\n");
         goto FINISH;
     }
 
-    client = new TcpClient((char*)COMMANDER_IP_ADDRESS, 10002);
+    client = new TcpClient((char*)COMMANDER_IP_ADDRESS, FC2_TO_COMMANDER_PORT);
     g_pStateSender = new StateSender(client);
     if (g_pStateSender == NULL)
     {
@@ -159,13 +137,11 @@ ResultEnum initialize(const char cameraNo)
 
     g_pHeartBeatManager->Run();
     g_pCameraCapture->Run();
-    g_pUltrasoundManager1->Run();
-    g_pUltrasoundManager2->Run();
     g_pStateSender->Run();
 
     retVal = ResultEnum::NormalEnd;
 
-FINISH :
+FINISH:
     return retVal;
 }
 
@@ -184,7 +160,8 @@ void mainProcedure(const char isShow)
         {
             if (g_pCameraCapture->IsCaptureStart() == true)
             {
-                cv::imshow("camera", pShareMemory->Capture.Data[pShareMemory->Capture.Index]);
+                Mat slaveCapture = pShareMemory->Capture.Data[pShareMemory->Capture.Index];
+                cv::imshow("camera", slaveCapture);
                 key = cv::waitKey(1);
                 if (key == 'q')
                 {
@@ -199,9 +176,12 @@ void mainProcedure(const char isShow)
             int shutdown2 = digitalRead(IO_SHUTDOWN_2);
             if ((shutdown1 == LOW) && (shutdown2 == LOW))
             {
+                g_pLogger->LOG_INFO("[mainProcedure] Shutdown!!!\n");
                 break;
             }
         }
+
+        delay(10);
     }
 
     if (isShow == 1)
@@ -217,20 +197,6 @@ void finalize()
         g_pStateSender->Stop(5);
         delete g_pStateSender;
         g_pStateSender = NULL;
-    }
-
-    if (g_pUltrasoundManager2 != NULL)
-    {
-        g_pUltrasoundManager2->Stop(5);
-        delete g_pUltrasoundManager2;
-        g_pUltrasoundManager2 = NULL;
-    }
-
-    if (g_pUltrasoundManager1 != NULL)
-    {
-        g_pUltrasoundManager1->Stop(5);
-        delete g_pUltrasoundManager1;
-        g_pUltrasoundManager1 = NULL;
     }
 
     if (g_pCameraCapture != NULL)
@@ -264,11 +230,11 @@ void finalize()
 
 void signalHandler(int signum)
 {
-    printf("ERR! [FrontCamera] Signal Catched. signum[%d]\n", signum);
+    printf("ERR! [AnimalCamera] Signal Catched. signum[%d]\n", signum);
 
     if (g_pLogger != NULL)
     {
-        g_pLogger->LOG_ERROR("[FrontCamera] Signal Catched!!\n");
+        g_pLogger->LOG_ERROR("[AnimalCamera] Signal Catched!!\n");
     }
 
     finalize();

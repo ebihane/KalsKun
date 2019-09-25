@@ -12,6 +12,7 @@ wiringPi; pthread; dl; rt;  opencv_core; opencv_video; opencv_videoio; opencv_hi
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #include "Include/Common.h"
 #include "Parts/AroundCameraCommon.h"
@@ -36,11 +37,18 @@ static HeartBeatManager* g_pHeartBeat = NULL;
 ResultEnum initialize(const char cameraNo);
 void procMain();
 void finalize();
+void signalHandler(int signum);
 
 int main(int argc, char* argv[])
 {
+    bool isMainLoopExit = false;
     char cameraNo = 0;
     
+    signal(SIGKILL, signalHandler);
+    signal(SIGSEGV, signalHandler);
+    signal(SIGTERM, signalHandler);
+    signal(SIGABRT, signalHandler);
+
     if (2 < argc)
     {
         cameraNo = atoi(argv[2]);
@@ -53,8 +61,16 @@ int main(int argc, char* argv[])
 
     procMain();
 
+    isMainLoopExit = true;
+
 FINISH :
     finalize();
+
+    if (isMainLoopExit == true)
+    {
+        system("sudo shutdown -h now &");
+    }
+
     return 0;
 }
 
@@ -78,6 +94,10 @@ ResultEnum initialize(const char cameraNo)
         goto FINISH;
     }
 
+    /* LogWriter 起動 */
+    StartLoggerProcess((char*)"AroundCamera");
+
+    /* 共有メモリ準備 */
     pShareMemory = new ShareMemoryStr;
     if (pShareMemory == NULL)
     {
@@ -85,13 +105,7 @@ ResultEnum initialize(const char cameraNo)
         goto FINISH;
     }
 
-    pShareMemory->PatrolState = E_PATROL_NORMAL;
-
-
     /* Task 起動 */
-    /* LogWriter 起動 */
-    StartLoggerProcess((char*)"AroundCamera");
-
     g_pHeartBeat = new HeartBeatManager();
     if (g_pHeartBeat == NULL)
     {
@@ -108,6 +122,7 @@ ResultEnum initialize(const char cameraNo)
     }
 
     /* 司令塔マイコンへの情報送信スレッド 起動 */
+    pShareMemory->PatrolState = E_PATROL_NORMAL;
     client = new TcpClient((char*)COMMANDER_IP_ADDRESS, AC_TO_COMMANDER_PORT);
     g_pStateSender = new StateSender(client);
     if (g_pStateSender == NULL)
@@ -162,7 +177,13 @@ void finalize()
         pShareMemory = NULL;
     }
 
-    system("sudo shutdown -h now &");
+    StopLoggerProcess();
+
+    if (g_pLogger != NULL)
+    {
+        delete g_pLogger;
+        g_pLogger = NULL;
+    }
 }
 
 void procMain()
@@ -250,4 +271,17 @@ void procMain()
             }
         }
     }
+}
+
+void signalHandler(int signum)
+{
+    printf("ERR! [AroundCamera] Signal Catched. signum[%d]\n", signum);
+    if (g_pLogger != NULL)
+    {
+        g_pLogger->LOG_ERROR("[AroundCamera] Signal Catched!!\n");
+    }
+
+    finalize();
+
+    exit(0);
 }

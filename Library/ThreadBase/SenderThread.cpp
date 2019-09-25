@@ -35,7 +35,8 @@ ResultEnum SenderThread::initialize()
 {
     ResultEnum  retVal = ResultEnum::AbnormalEnd;
     ResultEnum  result = ResultEnum::AbnormalEnd;
-    
+    char logStr[80] = { 0 };
+
     if (m_Adapter == NULL)
     {
         m_Logger->LOG_ERROR("[initialize] m_Adapter allocation failed.\n");
@@ -44,7 +45,6 @@ ResultEnum SenderThread::initialize()
 
     if (m_Adapter->Open() != ResultEnum::NormalEnd)
     {
-        char logStr[80] = { 0 };
         snprintf(&logStr[0], sizeof(logStr), "[initialize] Adapter Open failed. errno[%d]\n", m_Adapter->GetLastError());
         m_Logger->LOG_ERROR(logStr);
         goto FINISH;
@@ -53,7 +53,6 @@ ResultEnum SenderThread::initialize()
     result = initializeCore();
     if (result != ResultEnum::NormalEnd)
     {
-        char logStr[80] = { 0 };
         snprintf(&logStr[0], sizeof(logStr), "[initialize] initializeCore failed. result[%d]\n", result);
         m_Logger->LOG_ERROR(logStr);
         goto FINISH;
@@ -78,6 +77,7 @@ ResultEnum SenderThread::doProcedure()
     bool isFirst = true;
     bool sendRequest = false;
     unsigned long size = 0;
+    char logStr[80] = { 0 };
 
 RECONNECT :
 
@@ -92,7 +92,6 @@ RECONNECT :
     result = m_Adapter->Connection();
     if (result != ResultEnum::NormalEnd)
     {
-        char logStr[80] = { 0 };
         snprintf(&logStr[0], sizeof(logStr), "[doProcedure] Connection failed. errno[%d]\n", m_Adapter->GetLastError());
         m_Logger->LOG_ERROR(logStr);
 
@@ -104,6 +103,7 @@ RECONNECT :
             }
             else
             {
+                delay(3000);
                 goto RECONNECT;
             }
         }
@@ -113,11 +113,13 @@ RECONNECT :
         }
     }
 
+    snprintf(&logStr[0], sizeof(logStr), "[doProcedure] %s Connection establish.\n", &m_TaskName[0]);
+    m_Logger->LOG_INFO(logStr);
+
     /* Ú‘±Šm—§Žžˆ— */
     result = doConnectedProc();
     if (result != ResultEnum::NormalEnd)
     {
-        char logStr[80] = { 0 };
         snprintf(&logStr[0], sizeof(logStr), "[doProcedure] doConnectedProc failed.\n");
         m_Logger->LOG_ERROR(logStr);
 
@@ -150,7 +152,6 @@ RECONNECT :
         result = m_Adapter->Send(m_SendData, size);
         if (result != ResultEnum::NormalEnd)
         {
-            char logStr[80] = { 0 };
             snprintf(&logStr[0], sizeof(logStr), "[doProcedure] Send failed. errno[%d]\n", m_Adapter->GetLastError());
             m_Logger->LOG_ERROR(logStr);
 

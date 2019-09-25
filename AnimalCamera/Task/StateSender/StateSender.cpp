@@ -36,9 +36,7 @@ bool StateSender::createSendData(char* const data, unsigned long* const size)
     p->Result = ResultEnum::NormalEnd;
     p->lParam[0] = m_SendCount;
     p->lParam[1] = pShareMemory->SystemError;
-	p->lParam[2] = pShareMemory->StateData;
-    p->fParam[0] = pShareMemory->UltrasoundData[0];
-    p->fParam[1] = pShareMemory->UltrasoundData[1];
+	p->lParam[2] = pShareMemory->Detection;
 
     *size = sizeof(EventInfo);
 

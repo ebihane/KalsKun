@@ -19,14 +19,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{677deaf6-157b-43ff-ba99-68b675ad17bc}</ProjectGuid>
+    <ProjectGuid>{c8ca1c9e-4e33-466d-af7d-d23931b1e45d}</ProjectGuid>
     <Keyword>Linux</Keyword>
-    <RootNamespace>Commander</RootNamespace>
+    <RootNamespace>AnimalCamera</RootNamespace>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
     <ApplicationType>Linux</ApplicationType>
     <ApplicationTypeRevision>1.0</ApplicationTypeRevision>
     <TargetLinuxPlatform>Raspberry</TargetLinuxPlatform>
     <LinuxProjectType>{8748239F-558C-44D1-944B-07B09C35B330}</LinuxProjectType>
+    <ProjectName>AnimalCamera</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'" Label="Configuration">
@@ -49,27 +50,28 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <IncludePath>D:\Tools\OpenCV\4.1.0\opencv\build\include;$(SolutionDir)\..;$(SolutionDir)\Library;$(MSBuildProjectDirectory);$(IncludePath)</IncludePath>
+    <IncludePath>C:\opencv\build\include;$(SolutionDir)\..;$(SolutionDir)\Library;$(MSBuildProjectDirectory);$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <IncludePath>D:\Tools\OpenCV\4.1.0\opencv\build\include;$(SolutionDir)\..;$(SolutionDir)\Library;$(MSBuildProjectDirectory);$(IncludePath)</IncludePath>
+    <IncludePath>D:\Tools\OpenCV\4.1.0\opencv\build\include;D:\Tools\freenect;$(SolutionDir)\..;$(SolutionDir)\Library;$(MSBuildProjectDirectory);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <Link>
-      <LibraryDependencies>wiringPi;pthread;dl;rt;Library</LibraryDependencies>
+      <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc;opencv_imgcodecs;opencv_objdetect;Library</LibraryDependencies>
     </Link>
     <RemotePostBuildEvent>
       <Command>sudo cp $(RemoteTargetPath) $(RemoteRootDir)/release</Command>
       <Message>
       </Message>
     </RemotePostBuildEvent>
-    <ClCompile>
-      <CppAdditionalWarning>switch;no-deprecated-declarations;empty-body;return-type;parentheses;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CppAdditionalWarning)</CppAdditionalWarning>
-    </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <Link>
-      <LibraryDependencies>wiringPi;pthread;dl;rt;Library</LibraryDependencies>
+      <LibraryDependencies>wiringPi;pthread;dl;rt;opencv_core;opencv_video;opencv_videoio;opencv_highgui;opencv_imgproc;opencv_imgcodecs;opencv_objdetect;Library</LibraryDependencies>
+      <AdditionalDependencies>$(StlAdditionalDependencies);%(Link.AdditionalDependencies)</AdditionalDependencies>
+      <SharedLibrarySearchPath>%(Link.SharedLibrarySearchPath)</SharedLibrarySearchPath>
+      <AdditionalLibraryDirectories>%(Link.AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <RemotePostBuildEvent>
       <Command>sudo cp $(RemoteTargetPath) $(RemoteRootDir)/release</Command>
@@ -77,61 +79,48 @@
       </Message>
     </RemotePostBuildEvent>
     <ClCompile>
+      <AdditionalIncludeDirectories>/usr/local/include/opencv4;/usr/local/include/libusb-1.0;/usr/local/include/libfreenect;$(RemoteRootDir);$(RemoteRootDir)/Library;$(RemoteProjectDir);%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CAdditionalWarning>switch;no-deprecated-declarations;empty-body;return-type;parentheses;no-pointer-sign;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CAdditionalWarning)</CAdditionalWarning>
-    </ClCompile>
-    <ClCompile>
-      <CppAdditionalWarning>switch;no-deprecated-declarations;empty-body;return-type;parentheses;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CppAdditionalWarning)</CppAdditionalWarning>
-      <AdditionalIncludeDirectories>$(RemoteRootDir);$(RemoteProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <CppAdditionalWarning>switch;no-deprecated-declarations;empty-body;return-type;parentheses;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable</CppAdditionalWarning>
+      <AdditionalOptions>`pkg-config opencv --cflags` `pkg-config opencv --libs` %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Parts\MappingData\AreaMap.cpp" />
-    <ClCompile Include="Parts\MappingData\MappingData.cpp" />
-    <ClCompile Include="Parts\MappingData\MoveMap.cpp" />
-    <ClCompile Include="Parts\PositionData\PositionData.cpp" />
-    <ClCompile Include="Parts\Setting\SettingManager.cpp" />
-    <ClCompile Include="Task\AnimalCamera\AnimalCameraReceiver.cpp" />
-    <ClCompile Include="Task\AroundCamera\AroundCameraReceiver.cpp" />
-    <ClCompile Include="Task\BuzzerController\BuzzerController.cpp" />
-    <ClCompile Include="Task\FrontCamera\FrontCameraReceiver.cpp" />
+    <ClCompile Include="Task\CameraCapture\CameraCapture.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+      </ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Task\HeartBeat\HeartBeatManager.cpp" />
-    <ClCompile Include="Task\LightController\LightController.cpp" />
     <ClCompile Include="Task\Main\main.cpp" />
-    <ClCompile Include="Task\Main\Sequencer\Error\ErrorKun.cpp" />
-    <ClCompile Include="Task\Main\Sequencer\Idle\HimajinKun.cpp" />
-    <ClCompile Include="Task\Main\Sequencer\Kusakari\KusakariKun.cpp" />
-    <ClCompile Include="Task\Main\Sequencer\SequencerBase.cpp" />
-    <ClCompile Include="Task\Main\Sequencer\Yakei\YakeiKun.cpp" />
-    <ClCompile Include="Task\MotorCommunicator\MotorCommunicator.cpp" />
-    <ClCompile Include="Task\WavePowerMonitor\WavePowerMonitor.cpp" />
+    <ClCompile Include="Task\StateSender\StateSender.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Parts\CommanderCommon.h" />
-    <ClInclude Include="Parts\MappingData\AreaMap.h" />
-    <ClInclude Include="Parts\MappingData\MappingData.h" />
-    <ClInclude Include="Parts\MappingData\MoveMap.h" />
-    <ClInclude Include="Parts\PositionData\PositionData.h" />
-    <ClInclude Include="Parts\Setting\SettingManager.h" />
+    <ClInclude Include="Parts\AnimalCameraCommon.h" />
     <ClInclude Include="Parts\ShareMemory\ShareMemory.h" />
-    <ClInclude Include="Task\AnimalCamera\AnimalCameraReceiver.h" />
-    <ClInclude Include="Task\AroundCamera\AroundCameraReceiver.h" />
-    <ClInclude Include="Task\BuzzerController\BuzzerController.h" />
-    <ClInclude Include="Task\FrontCamera\FrontCameraReceiver.h" />
+    <ClInclude Include="Task\CameraCapture\CameraCapture.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+      </ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Task\HeartBeat\HeartBeatManager.h" />
-    <ClInclude Include="Task\LightController\LightController.h" />
-    <ClInclude Include="Task\Main\Sequencer\Error\ErrorKun.h" />
-    <ClInclude Include="Task\Main\Sequencer\Idle\HimajinKun.h" />
-    <ClInclude Include="Task\Main\Sequencer\Kusakari\KusakariKun.h" />
-    <ClInclude Include="Task\Main\Sequencer\SequencerBase.h" />
-    <ClInclude Include="Task\Main\Sequencer\Yakei\YakeiKun.h" />
-    <ClInclude Include="Task\MotorCommunicator\MotorCommunicator.h" />
-    <ClInclude Include="Task\WavePowerMonitor\WavePowerMonitor.h" />
+    <ClInclude Include="Task\StateSender\StateSender.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>
+      <AdditionalIncludeDirectories>/usr/local/include/opencv4;/usr/local/include/libusb-1.0;/usr/local/include/libfreenect;$(RemoteRootDir);$(RemoteRootDir)/Library;$(RemoteProjectDir);%(ClCompile.AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <CAdditionalWarning>switch;no-deprecated-declarations;empty-body;return-type;parentheses;no-pointer-sign;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable;%(CAdditionalWarning)</CAdditionalWarning>
-      <AdditionalIncludeDirectories>$(RemoteRootDir);$(RemoteProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <CppAdditionalWarning>switch;no-deprecated-declarations;empty-body;return-type;parentheses;no-format;uninitialized;unreachable-code;unused-function;unused-value;unused-variable</CppAdditionalWarning>
+      <AdditionalOptions>`pkg-config opencv --cflags` `pkg-config opencv --libs` %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
+    <Link />
+    <Link>
+      <AdditionalDependencies>$(StlAdditionalDependencies);%(Link.AdditionalDependencies)</AdditionalDependencies>
+      <SharedLibrarySearchPath>%(Link.SharedLibrarySearchPath)</SharedLibrarySearchPath>
+      <AdditionalLibraryDirectories>%(Link.AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />

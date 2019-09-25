@@ -40,6 +40,8 @@ ResultEnum FrontCameraReceiver::analyze(char* const buffer)
     pShareMemory->FrontCamera.ReceiveCount = p->lParam[0];
     pShareMemory->FrontCamera.SystemError = p->lParam[1];
     pShareMemory->FrontCamera.Avoidance = p->lParam[2];
+    pShareMemory->FrontCamera.Distance[0] = p->fParam[0];
+    pShareMemory->FrontCamera.Distance[1] = p->fParam[1];
 
     retVal = ResultEnum::NormalEnd;
 

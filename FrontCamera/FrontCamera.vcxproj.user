@@ -5,4 +5,7 @@
     <RemoteDebuggingTarget>-2107660171;192.168.3.2 (username=, port=22, authentication=Password)</RemoteDebuggingTarget>
     <DebuggerFlavor>LinuxDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
+    <RemoteTarget>-2107660171;192.168.3.2 (username=, port=22, authentication=Password)</RemoteTarget>
+  </PropertyGroup>
 </Project>

@@ -21,11 +21,11 @@ private :
     int m_CameraIndex;
     bool m_Start;
     cv::VideoCapture* m_Capture;
-    long  m_CameraParameters[10];
+    cv::CascadeClassifier m_Cascade;
 
     ResultEnum initialize();
     ResultEnum doProcedure();
     ResultEnum finalize();
-    bool isColorLineDetected(cv::Mat masterCapture, cv::Scalar cvColor, long* parameters);
+    bool isFaceExist(cv::Mat masterCapture, cv::CascadeClassifier cascade);
 
 };

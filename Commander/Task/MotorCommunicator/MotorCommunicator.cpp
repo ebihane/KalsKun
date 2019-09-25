@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "MotorCommunicator.h"
 
 MotorCommunicator::MotorCommunicator()
@@ -114,11 +115,11 @@ ResultEnum MotorCommunicator::doMainProc()
     char sendBuffer[3] = { 0 };
     char recvBuffer[8] = { 0 };
     bool receivable = false;
+    char log[80] = { 0 };
     EventInfo ev = { 0 };
     
     if (m_Queue->IsReceivable(receivable) != ResultEnum::NormalEnd)
     {
-        char log[64] = { 0 };
         snprintf(&log[0], sizeof(log), "[doMainProc] Queue::IsReceivable failed. errno[%d]\n", m_Queue->GetLastError());
         m_Logger->LOG_ERROR(log);
         goto FINISH;
@@ -156,19 +157,17 @@ ResultEnum MotorCommunicator::doMainProc()
         createSendData(MotorCommandEnum::E_COMMAND_MONITOR, m_CutterMode, &sendBuffer[0]);
     }
 
+    outputLog(&sendBuffer[0], 3, 0);
     if (m_Serial->Send(&sendBuffer[0], sizeof(sendBuffer)) != ResultEnum::NormalEnd)
     {
-        char log[40] = { 0 };
         snprintf(&log[0], sizeof(log), "[doMainProc] Send failed. errno[%d]\n", m_Serial->GetLastError());
         m_Logger->LOG_ERROR(log);
         goto FINISH;
     }
 
-    if (m_Serial->Receive(&recvBuffer[0], sizeof(recvBuffer)) != ResultEnum::NormalEnd)
+    if (receiveProc(&recvBuffer[0]) != ResultEnum::NormalEnd)
     {
-        char log[40] = { 0 };
-        snprintf(&log[0], sizeof(log), "[doMainProc] Receive failed. errno[%d]\n", m_Serial->GetLastError());
-        m_Logger->LOG_ERROR(log);
+        m_Logger->LOG_ERROR("[doMainProc] receiveProc failed.\n");
         goto FINISH;
     }
 
@@ -297,4 +296,68 @@ ResultEnum MotorCommunicator::analyze(char* const buffer)
 
 FINISH :
     return retVal;
+}
+
+ResultEnum MotorCommunicator::receiveProc(char* const buffer)
+{
+    ResultEnum retVal = ResultEnum::AbnormalEnd;
+    char once = 0;
+    char log[80] = { 0 };
+
+
+    while (1)
+    {
+        if (m_Serial->Receive(&once, 1) != ResultEnum::NormalEnd)
+        {
+            snprintf(&log[0], sizeof(log), "[receiveProc] Receive failed. errno[%d]\n", m_Serial->GetLastError());
+            m_Logger->LOG_ERROR(log);
+            goto FINISH;
+        }
+
+        snprintf(&log[0], sizeof(log), "[receiveProc] Receive : %02Xh\n", once);
+        m_Logger->LOG_INFO(log);
+
+        if (once == 0xFF)
+        {
+            buffer[0] = once;
+            if (m_Serial->Receive(&buffer[1], 7) != ResultEnum::NormalEnd)
+            {
+                snprintf(&log[0], sizeof(log), "[receiveProc] Receive failed. errno[%d]\n", m_Serial->GetLastError());
+                m_Logger->LOG_ERROR(log);
+                goto FINISH;
+            }
+
+            outputLog(&buffer[0], 8, 1);
+            break;
+        }
+    }
+
+    retVal = ResultEnum::NormalEnd;
+
+FINISH :
+    return retVal;
+}
+
+void MotorCommunicator::outputLog(char* const buffer, const long size, const char type)
+{
+    char log[80] = { 0 };
+    char once[8] = { 0 };
+
+    if (type == 0)
+    {
+        snprintf(&log[0], sizeof(log), "[doMainProc] Send (%d) :", size);
+    }
+    else
+    {
+        snprintf(&log[0], sizeof(log), "[doMainProc] Recv (%d) :", size);
+    }
+
+    for (long index = 0; index < size; index++)
+    {
+        snprintf(&once[0], sizeof(once), " %02X", buffer[index]);
+        strncat(&log[0], &once[0], sizeof(log));
+    }
+
+    strncat(&log[0], "\n", sizeof(log));
+    m_Logger->LOG_INFO(log);
 }

@@ -108,7 +108,19 @@ typedef struct
     long ReceiveCount;  /* 受信回数 */
     long SystemError;   /* システムエラー状態 */
     long Avoidance;     /* 回避指示 */
+    float Distance[2];  /* 障害物との距離 */
 } FrontCameraStateStr;
+
+/*==============*/
+/*  動物カメラ  */
+/*==============*/
+/* 動物カメラ 状態 */
+typedef struct
+{
+    long ReceiveCount;  /* 受信回数 */
+    long SystemError;   /* システムエラー状態 */
+    long Detection;     /* 動物検知状態 */
+} AnimalCameraState;
 
 /*==============*/
 /*  周辺カメラ  */
@@ -131,6 +143,7 @@ typedef struct
     MotorStatusStr          Motor;          /* モータマイコン 情報 */
     AroundCameraStateStr    AroundCamera;   /* 周辺カメラマイコン 情報 */
     FrontCameraStateStr     FrontCamera;    /* 前方カメラマイコン 情報 */
+    AnimalCameraState       AnimalCamera;   /* 動物カメラマイコン 情報 */
 } ShareMemoryStr;
 
 #ifdef MEMORY_MAIN

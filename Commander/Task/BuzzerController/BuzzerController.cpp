@@ -84,7 +84,7 @@ ResultEnum BuzzerController::doMainProc()
     }
     else if (m_Mode == MelodyModeEnum::E_MELODY_WARNING)
     {
-        softToneWrite(IO_BUZZER, 500);
+        softToneWrite(IO_BUZZER, 300);
     }
     else if (m_Mode == MelodyModeEnum::E_MELODY_ERROR)
     {

@@ -16,7 +16,7 @@ typedef struct
     long Code;          /* イベントコード */
     ResultEnum Result;  /* 実行結果 */
     long lParam[5];     /* long 型パラメータ */
-    long fParam[10];    /* float 型パラメータ */
+    float fParam[10];   /* float 型パラメータ */
 } EventInfo;
 
 /* 座標構造体 */
