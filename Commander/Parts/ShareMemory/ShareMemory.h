@@ -1,5 +1,14 @@
 #pragma once
 
+/*========*/
+/*  共通  */
+/*========*/
+/* 検知状態定数 */
+typedef enum
+{
+    NOT_DETECT = 0,
+    DETECTED,
+} DetectTypeEnum;
 
 /*==================*/
 /*  司令塔マイコン  */
@@ -49,13 +58,15 @@ typedef struct
     float   Distance;
 } BeaconDataStr;
 
+/*---------------------*/
 /* 司令塔マイコン 状態 */
+/*---------------------*/
 typedef struct
 {
     BeaconDataStr   Beacon[BEACON_COUNT];
     MelodyModeEnum  MelodyMode;
     LightModeEnum   LightMode;
-    long            SystemError;
+    bool            SystemError;
 } CommanderStateStr;
 
 /*==================*/
@@ -66,7 +77,7 @@ typedef enum
 {
     E_COMMAND_STOP = 0, /* 0: 停止 */
     E_COMMAND_FRONT,    /* 1: 前進 */
-    E_COMMAND_U_TURN,   /* 2: Uターン */
+    E_COMMAND_R_TURN,   /* 2: 右ターン */
     E_COMMAND_AVOID,    /* 3: 回避 */
     E_COMMAND_REMOTE,   /* 4: 遠隔動作 */
     E_COMMAND_MONITOR,  /* 5: モニタ */
@@ -91,24 +102,35 @@ typedef enum
 /* モータマイコン 状態 */
 typedef struct
 {
+    long                CommunicationCount;
     MotorCommandEnum    Command;
     CutterDriveEnum     Cutter;
     long                PointX;
     long                PointY;
-    long                ErrorStatus;
+    DetectTypeEnum      ErrorStatus;
     ControlModeEnum     RemoteMode;
 } MotorStatusStr;
 
 /*==============*/
 /*  前方カメラ  */
 /*==============*/
+/* 動作指示定数 */
+typedef enum
+{
+    NOT_REQUEST = 0,    /* 0: 要求無し */
+    AVOIDANCE,          /* 1: 回避指示 */
+    TURN,               /* 2: ターン指示 */
+} MoveTypeEnum;
+
 /* 前方カメラ 状態 */
 typedef struct
 {
-    long ReceiveCount;  /* 受信回数 */
-    long SystemError;   /* システムエラー状態 */
-    long Avoidance;     /* 回避指示 */
-    float Distance[2];  /* 障害物との距離 */
+    long ReceiveCount;          /* 受信回数 */
+    long SystemError;           /* システムエラー状態 */
+    MoveTypeEnum MoveType;      /* 回避指示 */
+    DetectTypeEnum RedTape;     /* 赤テープ検知 */
+    DetectTypeEnum BlueObject;  /* 障害物検知 */
+    float Distance[2];          /* 障害物との距離 */
 } FrontCameraStateStr;
 
 /*==============*/
@@ -117,9 +139,10 @@ typedef struct
 /* 動物カメラ 状態 */
 typedef struct
 {
-    long ReceiveCount;  /* 受信回数 */
-    long SystemError;   /* システムエラー状態 */
-    long Detection;     /* 動物検知状態 */
+    long ReceiveCount;          /* 受信回数 */
+    long SystemError;           /* システムエラー状態 */
+    DetectTypeEnum Human;       /* 人検知 */
+    DetectTypeEnum Animal;      /* 動物検知 */
 } AnimalCameraState;
 
 /*==============*/
@@ -128,11 +151,10 @@ typedef struct
 /* 周辺カメラ 状態 */
 typedef struct
 {
-    long ReceiveCount;  /* 受信回数 */
-    long SystemError;   /* システムエラー状態 */
-    long PersonDetect;  /* 人検知状態 */
+    long ReceiveCount;          /* 受信回数 */
+    long SystemError;           /* システムエラー状態 */
+    DetectTypeEnum Detect;      /* 赤外線検知状態 */
 } AroundCameraStateStr;
-
 
 /*=================*/
 /* 共有メモリ 本体 */

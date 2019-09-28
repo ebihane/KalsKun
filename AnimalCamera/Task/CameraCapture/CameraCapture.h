@@ -21,11 +21,14 @@ private :
     int m_CameraIndex;
     bool m_Start;
     cv::VideoCapture* m_Capture;
-    cv::CascadeClassifier m_Cascade;
+
+    cv::CascadeClassifier m_HumanFaceCascade;
+    cv::CascadeClassifier m_AnimalCascade;
+    cv::CascadeClassifier m_AnimalCascade2;
 
     ResultEnum initialize();
     ResultEnum doProcedure();
     ResultEnum finalize();
-    bool isFaceExist(cv::Mat masterCapture, cv::CascadeClassifier cascade);
+    bool isDetect(cv::Mat& masterCapture, cv::CascadeClassifier& cascade);
 
 };

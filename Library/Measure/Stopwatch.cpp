@@ -44,21 +44,6 @@ FINISH :
     return retVal;
 }
 
-double Stopwatch::GetMicro()
-{
-    double retVal = FLT_MIN;
-
-    if (m_Running != false)
-    {
-        goto FINISH;
-    }
-
-    retVal = calcDiffMicroTime(&m_StopTime);
-
-FINISH:
-    return retVal;
-}
-
 float Stopwatch::GetSplit()
 {
     float retVal = FLT_MIN;
@@ -103,35 +88,5 @@ float Stopwatch::calcDiffTime(struct timespec* target)
     retVal = (float)secondDiff + ((float)nanosecDiff / (float)SEC_TO_NSEC);
 
 FINISH :
-    return retVal;
-}
-
-double Stopwatch::calcDiffMicroTime(struct timespec* target)
-{
-    double retVal = 0.0;
-    unsigned long secondDiff = 0;
-    unsigned long nanosecDiff = 0;
-
-    if (m_Running != true)
-    {
-        retVal = FLT_MIN;
-        goto FINISH;
-    }
-
-    secondDiff = target->tv_sec - m_StartTime.tv_sec;
-
-    if (m_StartTime.tv_nsec <= target->tv_nsec)
-    {
-        nanosecDiff = target->tv_nsec - m_StartTime.tv_nsec;
-    }
-    else
-    {
-        nanosecDiff = (target->tv_nsec + SEC_TO_NSEC) - m_StartTime.tv_nsec;
-        secondDiff--;
-    }
-
-    retVal = (double)secondDiff + ((double)nanosecDiff / (double)SEC_TO_NSEC) * 1000000;
-
-FINISH:
     return retVal;
 }

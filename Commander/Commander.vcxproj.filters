@@ -61,6 +61,9 @@
     <Filter Include="Task\AnimalCamera">
       <UniqueIdentifier>{247cfa26-a140-49a4-bba1-6fcbdf17e575}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Task\Patrol">
+      <UniqueIdentifier>{370bfe0e-a61f-40ad-81b8-7467f6798f77}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Task\Main\main.cpp">
@@ -119,6 +122,9 @@
     </ClCompile>
     <ClCompile Include="Task\AnimalCamera\AnimalCameraReceiver.cpp">
       <Filter>Task\AnimalCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="Task\Patrol\PatrolThread.cpp">
+      <Filter>Task\Patrol</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -181,6 +187,9 @@
     </ClInclude>
     <ClInclude Include="Task\AnimalCamera\AnimalCameraReceiver.h">
       <Filter>Task\AnimalCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\Patrol\PatrolThread.h">
+      <Filter>Task\Patrol</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

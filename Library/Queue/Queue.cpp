@@ -34,6 +34,10 @@ ResultEnum Queue::Open()
     {
         /* 存在している場合はそのキューのハンドルを取得 */
         m_Queue = queue;
+
+        mq_getattr(queue, &attr);
+        memcpy(&m_Attr, &attr, sizeof(mq_attr));
+
         retVal = ResultEnum::NormalEnd;
         goto FINISH;
     }

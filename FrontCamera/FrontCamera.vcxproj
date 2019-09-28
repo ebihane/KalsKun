@@ -92,6 +92,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
       </ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="Task\CameraSender\CameraSender.cpp" />
     <ClCompile Include="Task\HeartBeat\HeartBeatManager.cpp" />
     <ClCompile Include="Task\Main\main.cpp" />
     <ClCompile Include="Task\StateSender\StateSender.cpp" />
@@ -106,6 +107,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
       </ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="Task\CameraSender\CameraSender.h" />
     <ClInclude Include="Task\HeartBeat\HeartBeatManager.h" />
     <ClInclude Include="Task\StateSender\StateSender.h" />
     <ClInclude Include="Task\Ultrasound\UltrasoundManager.h" />

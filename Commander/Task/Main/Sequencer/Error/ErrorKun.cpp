@@ -4,12 +4,12 @@
 ErrorKun::ErrorKun()
  : SequencerBase(SequencerBase::SequenceTypeEnum::E_SEQ_ERROR)
 {
-
+    /* nop. */
 }
 
 ErrorKun::~ErrorKun()
 {
-
+    /* Nop. */
 }
 
 ResultEnum ErrorKun::initializeCore()
@@ -30,15 +30,25 @@ SequencerBase::SequenceTypeEnum ErrorKun::processCore()
     /* エラー状態であることを示す出力 */
     digitalWrite(IO_FAILURE_STATE, HIGH);
 
-    /* 別マイコンのシステム異常解除 */
+    /* エラー音 */
+    pShareMemory->Commander.MelodyMode = MelodyModeEnum::E_MELODY_ERROR;
+
+    /* 点滅 */
+    pShareMemory->Commander.LightMode = LightModeEnum::E_LIGHT_BLINK;
+
+    /* 別マイコンのシステム異常発生中 */
     if ((pShareMemory->FrontCamera.SystemError != 0)
+    ||  (pShareMemory->AnimalCamera.SystemError != 0)
     ||  (pShareMemory->AroundCamera.SystemError != 0))
     {
         goto FINISH;
     }
 
-
-
+    /* 司令塔マイコンのシステム異常発生中 */
+    if (pShareMemory->Commander.SystemError != false)
+    {
+        goto FINISH;
+    }
 
     /* 全ての異常が解除されたら、直前のモードに戻る */
     retVal = m_BeforeSequence;

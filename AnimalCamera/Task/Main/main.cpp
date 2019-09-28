@@ -52,12 +52,12 @@ int main(int argc, char* argv[])
     signal(SIGTERM, signalHandler);
     signal(SIGABRT, signalHandler);
 
-    if (2 < argc)
+    if (2 <= argc)
     {
         cameraNo = atoi(argv[1]);
     }
 
-    if (3 < argc)
+    if (3 <= argc)
     {
         isShow = atoi(argv[2]);
     }
@@ -97,15 +97,25 @@ ResultEnum initialize(const char cameraNo)
         }
     }
 
+    /* 共有メモリ インスタンス生成 */
     pShareMemory = new ShareMemoryStr();
     if (pShareMemory == NULL)
     {
         goto FINISH;
     }
 
+    /* データ初期化 */
+    pShareMemory->SystemError = false;
+    pShareMemory->Human = DetectTypeEnum::NOT_DETECT;
+    pShareMemory->Animal = DetectTypeEnum::NOT_DETECT;
+
+    /* Log Process 起動 */
     StartLoggerProcess((char*)"AnimalCamera");
 
-    /* Logger 準備 */
+    /* Log Process 生成待ち */
+    delay(100);
+
+    /* Log Accessor 生成 */
     g_pLogger = new Logger(Logger::LOG_ERROR | Logger::LOG_INFO, Logger::LogTypeEnum::BOTH_OUT);
     if (g_pLogger == NULL)
     {
@@ -120,6 +130,7 @@ ResultEnum initialize(const char cameraNo)
         goto FINISH;
     }
 
+    /* カメラ取得スレッド 起動 */
     g_pCameraCapture = new CameraCapture(cameraNo);
     if (g_pCameraCapture == NULL)
     {
@@ -127,6 +138,7 @@ ResultEnum initialize(const char cameraNo)
         goto FINISH;
     }
 
+    /* 状態送信スレッド 起動 */
     client = new TcpClient((char*)COMMANDER_IP_ADDRESS, FC2_TO_COMMANDER_PORT);
     g_pStateSender = new StateSender(client);
     if (g_pStateSender == NULL)
@@ -153,6 +165,7 @@ void mainProcedure(const char isShow)
 
     snprintf(&logStr[0], sizeof(logStr), "[mainProcedure] Main loop start. isShow[%d]\n", isShow);
     g_pLogger->LOG_INFO(logStr);
+
     watch.Start();
     while (1)
     {

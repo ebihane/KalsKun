@@ -16,7 +16,7 @@ RedwavePatrol::~RedwavePatrol()
 
 ResultEnum RedwavePatrol::initializeCore()
 {
-    pShareMemory->PatrolState = E_PATROL_NORMAL;
+    pShareMemory->Detect = DetectTypeEnum::NOT_DETECT;
     return ResultEnum::NormalEnd;
 }
 
@@ -43,7 +43,7 @@ ResultEnum RedwavePatrol::doMainProc()
 
     if (detected == true)
     {
-        pShareMemory->PatrolState = E_PATROL_DETECT;
+        pShareMemory->Detect = DetectTypeEnum::DETECTED;
     }
     else
     {
@@ -54,7 +54,7 @@ ResultEnum RedwavePatrol::doMainProc()
         
         if (5.0f <= m_NormalReturnWatch.GetSplit())
         {
-            pShareMemory->PatrolState = E_PATROL_NORMAL;
+            pShareMemory->Detect = DetectTypeEnum::NOT_DETECT;
         }
     }
 
@@ -65,6 +65,6 @@ ResultEnum RedwavePatrol::doMainProc()
 
 ResultEnum RedwavePatrol::finalizeCore()
 {
-    pShareMemory->PatrolState = E_PATROL_NORMAL;
+    pShareMemory->Detect = DetectTypeEnum::NOT_DETECT;
     return ResultEnum::NormalEnd;
 }

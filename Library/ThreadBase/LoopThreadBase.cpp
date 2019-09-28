@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "LoopThreadBase.h"
 
 LoopThreadBase::LoopThreadBase(char* const taskName, const unsigned long cycle, const TypeEnum type)
@@ -26,19 +27,24 @@ ResultEnum LoopThreadBase::doProcedure()
     unsigned long elapsedMsec = 0;
     unsigned long waitTime = 0;
 
-    m_Logger->LOG_INFO("[doProcedure] Main loop enter.\n");
+
+    snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::doProcedure] Main loop enter.\n", m_TaskName);
+    m_Logger->LOG_INFO(m_LogStr);
+
     while (1)
     {
         if (isStopRequest() == true)
         {
-            m_Logger->LOG_INFO("[doProcedure] Thread stop request.\n");
+            snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::doProcedure] Thread stop request.\n", m_TaskName);
+            m_Logger->LOG_INFO(m_LogStr);
             break;
         }
 
         m_Watch.Start();
         if (doMainProc() != ResultEnum::NormalEnd)
         {
-            m_Logger->LOG_ERROR("[doProcedure] doMainProc failed.\n");
+            snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::doProcedure] doMainProc failed.\n", m_TaskName);
+            m_Logger->LOG_INFO(m_LogStr);
             goto FINISH;
         }
         m_Watch.Stop();
@@ -61,10 +67,11 @@ ResultEnum LoopThreadBase::doProcedure()
 
         delay(waitTime);
     }
-    m_Logger->LOG_INFO("[doProcedure] Main loop exit.\n");
+
+    snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::doProcedure] Main loop exit.\n", m_TaskName);
+    m_Logger->LOG_INFO(m_LogStr);
 
 FINISH :
-
     return retVal;
 }
 

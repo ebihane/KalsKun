@@ -44,7 +44,7 @@ void mainProcedure(const char isShow);
 void finalize();
 void signalHandler(int signum);
 
-/* ./FrontCamera.out (カメラ番号) */
+/* ./FrontCamera.out (カメラ番号) (表示有無) */
 int main(int argc, char* argv[])
 {
     bool isMainLoopExit = false;
@@ -57,12 +57,12 @@ int main(int argc, char* argv[])
     signal(SIGTERM, signalHandler);
     signal(SIGABRT, signalHandler);
 
-    if (2 < argc)
+    if (2 <= argc)
     {
         cameraNo = atoi(argv[1]);
     }
 
-    if (3 < argc)
+    if (3 <= argc)
     {
         isShow = atoi(argv[2]);
     }
@@ -103,14 +103,28 @@ ResultEnum initialize(const char cameraNo)
         }
     }
 
+    /* 共有メモリ インスタンス生成 */
     pShareMemory = new ShareMemoryStr();
     if (pShareMemory == NULL)
     {
         goto FINISH;
     }
 
+    /* データ初期化 */
+    pShareMemory->SystemError = false;
+    pShareMemory->MoveType = MoveTypeEnum::NOT_REQUEST;
+    pShareMemory->RedTape = DetectTypeEnum::NOT_DETECT;
+    pShareMemory->BlueObject = DetectTypeEnum::NOT_DETECT;
+    pShareMemory->UltrasoundData[0] = 999.9f;
+    pShareMemory->UltrasoundData[1] = 999.9f;
+
+    /* Log Process 起動 */
     StartLoggerProcess((char*)"FrontCamera");
 
+    /* Log Process 生成待ち */
+    delay(100);
+
+    /* Log Accessor 生成 */
     g_pLogger = new Logger(Logger::LOG_ERROR | Logger::LOG_INFO, Logger::LogTypeEnum::BOTH_OUT);
     if (g_pLogger == NULL)
     {
@@ -141,7 +155,7 @@ ResultEnum initialize(const char cameraNo)
         goto FINISH;
     }
 
-    /* 自身のカメラをキャプチャするスレッドの生成 */
+    /* カメラ取得スレッド 起動 */
     g_pCameraCapture = new CameraCapture(cameraNo);
     if (g_pCameraCapture == NULL)
     {
@@ -149,6 +163,7 @@ ResultEnum initialize(const char cameraNo)
         goto FINISH;
     }
 
+    /* 状態送信スレッド 起動 */
     client = new TcpClient((char*)COMMANDER_IP_ADDRESS, 10002);
     g_pStateSender = new StateSender(client);
     if (g_pStateSender == NULL)
@@ -177,9 +192,31 @@ void mainProcedure(const char isShow)
 
     snprintf(&logStr[0], sizeof(logStr), "[mainProcedure] Main loop start. isShow[%d]\n", isShow);
     g_pLogger->LOG_INFO(logStr);
+
     watch.Start();
     while (1)
     {
+        /* 赤テープ検知 */
+        if (pShareMemory->RedTape != DetectTypeEnum::NOT_DETECT)
+        {
+            /* ターン指示 */
+            pShareMemory->MoveType = MoveTypeEnum::TURN;
+        }
+        /* 青い物体があり、その距離が 40cm 以内 */
+        else if ((pShareMemory->BlueObject != DetectTypeEnum::NOT_DETECT)
+             &&  ((40 <= pShareMemory->UltrasoundData[0])
+             ||   (40 <= pShareMemory->UltrasoundData[1])))
+        {
+            /* 回避指示 */
+            pShareMemory->MoveType = MoveTypeEnum::AVOIDANCE;
+        }
+        /* 上記以外 */
+        else
+        {
+            /* 要求無し */
+            pShareMemory->MoveType = MoveTypeEnum::NOT_REQUEST;
+        }
+
         if (isShow == 1)
         {
             if (g_pCameraCapture->IsCaptureStart() == true)
@@ -202,6 +239,8 @@ void mainProcedure(const char isShow)
                 break;
             }
         }
+
+        delay(10);
     }
 
     if (isShow == 1)

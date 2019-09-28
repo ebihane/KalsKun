@@ -35,7 +35,7 @@ static RedwavePatrol* g_pRedwavePatrol = NULL;
 static HeartBeatManager* g_pHeartBeat = NULL;
 
 ResultEnum initialize(const char cameraNo);
-void procMain();
+void procMain(const char isShow);
 void finalize();
 void signalHandler(int signum);
 
@@ -43,15 +43,21 @@ int main(int argc, char* argv[])
 {
     bool isMainLoopExit = false;
     char cameraNo = 0;
+    char isShow = 0;
     
     signal(SIGKILL, signalHandler);
     signal(SIGSEGV, signalHandler);
     signal(SIGTERM, signalHandler);
     signal(SIGABRT, signalHandler);
 
-    if (2 < argc)
+    if (2 <= argc)
     {
-        cameraNo = atoi(argv[2]);
+        cameraNo = atoi(argv[1]);
+    }
+
+    if (3 <= argc)
+    {
+        isShow = atoi(argv[2]);
     }
 
     if (initialize(cameraNo) != ResultEnum::NormalEnd)
@@ -59,7 +65,7 @@ int main(int argc, char* argv[])
         goto FINISH;
     }
 
-    procMain();
+    procMain(isShow);
 
     isMainLoopExit = true;
 
@@ -88,24 +94,31 @@ ResultEnum initialize(const char cameraNo)
         pinMode(GPIO_INFO_TABLE[lCnt].PinNo, GPIO_INFO_TABLE[lCnt].Mode);
     }
 
+    /* 共有メモリ準備 */
+    pShareMemory = new ShareMemoryStr;
+    if (pShareMemory == NULL)
+    {
+        goto FINISH;
+    }
+
+    /* データ初期化 */
+    pShareMemory->SystemError = false;
+    pShareMemory->Detect = DetectTypeEnum::NOT_DETECT;
+
+    /* Log Process 起動 */
+    StartLoggerProcess((char*)"AroundCamera");
+
+    /* Log Process 生成待ち */
+    delay(100);
+
+    /* Log Accessor 生成 */
     g_pLogger = new Logger(Logger::LOG_ERROR | Logger::LOG_INFO, Logger::BOTH_OUT);
     if (g_pLogger == NULL)
     {
         goto FINISH;
     }
 
-    /* LogWriter 起動 */
-    StartLoggerProcess((char*)"AroundCamera");
-
-    /* 共有メモリ準備 */
-    pShareMemory = new ShareMemoryStr;
-    if (pShareMemory == NULL)
-    {
-        g_pLogger->LOG_ERROR("[initialize] pShareMemory allocation failed.\n");
-        goto FINISH;
-    }
-
-    /* Task 起動 */
+    /* ハートビート制御スレッド 初期化 */
     g_pHeartBeat = new HeartBeatManager();
     if (g_pHeartBeat == NULL)
     {
@@ -113,7 +126,7 @@ ResultEnum initialize(const char cameraNo)
         goto FINISH;
     }
 
-    /* 360°カメラ取り込みスレッド 起動 */
+    /* 360°カメラ取り込みスレッド 初期化 */
     g_pCameraCapture = new CameraCapture(cameraNo);
     if (g_pCameraCapture == NULL)
     {
@@ -121,8 +134,7 @@ ResultEnum initialize(const char cameraNo)
         goto FINISH;
     }
 
-    /* 司令塔マイコンへの情報送信スレッド 起動 */
-    pShareMemory->PatrolState = E_PATROL_NORMAL;
+    /* 司令塔マイコンへの情報送信スレッド 初期化 */
     client = new TcpClient((char*)COMMANDER_IP_ADDRESS, AC_TO_COMMANDER_PORT);
     g_pStateSender = new StateSender(client);
     if (g_pStateSender == NULL)
@@ -186,14 +198,19 @@ void finalize()
     }
 }
 
-void procMain()
+void procMain(const char isShow)
 {
     Stopwatch watch;
     Stopwatch yakeiWatch;
     Stopwatch returnWatch;
     int kusakari = 0;
     int yakei = 0;
+    int key = 0;
     bool isYakei = false;
+    char log[80] = { 0 };
+
+    snprintf(&log[0], sizeof(log), "[procMain] Main Loop enter. isShow[%d]\n", isShow);
+    g_pLogger->LOG_INFO(log);
 
     watch.Start();
     while (1)
@@ -270,6 +287,24 @@ void procMain()
                 g_pRedwavePatrol = NULL;
             }
         }
+
+        if (isShow == 1)
+        {
+            if (g_pCameraCapture->IsCaptureStart() == true)
+            {
+                cv::imshow("camera", pShareMemory->Capture.Data[pShareMemory->Capture.Index]);
+                key = cv::waitKey(1);
+                if (key == 'q')
+                {
+                    break;
+                }
+            }
+        }
+    }
+
+    if (isShow == 1)
+    {
+        cv::destroyAllWindows();
     }
 }
 

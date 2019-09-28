@@ -28,11 +28,7 @@ CameraCapture::CameraCapture(const int index)
 
 CameraCapture::~CameraCapture()
 {
-    if (m_Capture != NULL)
-    {
-        delete m_Capture;
-        m_Capture = NULL;
-    }
+    finalize();
 }
 
 bool CameraCapture::IsCaptureStart()
@@ -52,7 +48,7 @@ ResultEnum CameraCapture::initialize()
         std::string readData;
         if (readFile.fail())
         {
-            m_Logger->LOG_ERROR("[initialize] config file read error.");
+            m_Logger->LOG_ERROR("[CameraCapture::initialize] config file read error.");
         }
 
         int lineCount = 0;
@@ -71,11 +67,10 @@ ResultEnum CameraCapture::initialize()
             lineCount++;
         }
     }
-    catch (Exception e)
+    catch (Exception& e)
     {
-        char logBuffer[50] = { 0 };
-        snprintf(logBuffer, sizeof(logBuffer), "[initialize] exception. [%s]", e.msg);
-        m_Logger->LOG_ERROR(logBuffer);
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[CameraCapture::initialize] Exception! [%s]", e.what());
+        m_Logger->LOG_ERROR(m_LogStr);
     }
 
     retVal = ResultEnum::NormalEnd;
@@ -91,107 +86,119 @@ ResultEnum CameraCapture::doProcedure()
     cv::Point  cvPointStart = { 0x00 };
 
 RETRY:
-    if (m_Capture == NULL)
+
+    m_Start = false;
+
+    if (m_Capture != NULL)
     {
-        m_Capture = new cv::VideoCapture(m_CameraIndex);
-        if (m_Capture == NULL)
-        {
-            m_Logger->LOG_ERROR("[CameraCapture] m_Capture allocation failed.\n");
-            goto FINISH;
-        }
+        delete m_Capture;
+        m_Capture = NULL;
     }
 
-    m_Capture->set(CAP_PROP_FRAME_WIDTH, 640);
-    m_Capture->set(CAP_PROP_FRAME_HEIGHT, 480);
+    m_Capture = new cv::VideoCapture(m_CameraIndex);
+    if (m_Capture == NULL)
+    {
+        m_Logger->LOG_ERROR("[CameraCapture] m_Capture allocation failed.\n");
+        goto FINISH;
+    }
 
     if (m_Capture->isOpened() == false)
     {
-        if (m_Capture != NULL)
-        {
-            delete m_Capture;
-            m_Capture = NULL;
-        }
-
-        delay(100);
-
-        m_Logger->LOG_ERROR("[CameraCapture] isOpened is false.\n");
-        goto RETRY;
-    }
-
-    pShareMemory->Capture.Index = 0;
-    m_Capture->read(pShareMemory->Capture.Data[0]);
-    m_Start = true;
-
-    nextIndex = 1;
-    m_Logger->LOG_INFO("[CameraCapture] Main loop start.\n");
-    while (1)
-    {
-        bool isDetected = false;
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[CameraCapture] Camera No.[%ld] Open failed.\n", m_CameraIndex);
+        m_Logger->LOG_ERROR(m_LogStr);
 
         if (isStopRequest() == true)
         {
+            m_Logger->LOG_INFO("[CameraCapture] Thread stop request.\n");
+            goto FINISH;
+        }
+
+        m_CameraIndex++;
+        if (100 <= m_CameraIndex)
+        {
+            m_CameraIndex = 0;
+        }
+
+        delay(100);
+        goto RETRY;
+    }
+
+    /* サイズの指定 */
+    m_Capture->set(CAP_PROP_FRAME_WIDTH, 640);
+    m_Capture->set(CAP_PROP_FRAME_HEIGHT, 480);
+
+    /* 最初の画像取り込み */
+    pShareMemory->Capture.Index = 0;
+    m_Capture->read(pShareMemory->Capture.Data[0]);
+    m_Start = true;
+    nextIndex = 1;
+
+    snprintf(&m_LogStr[0], sizeof(m_LogStr), "[CameraCapture] Main loop start. CameraNo[%d]\n", m_CameraIndex);
+    m_Logger->LOG_INFO(m_LogStr);
+    while (1)
+    {
+        /* 停止要求 */
+        if (isStopRequest() == true)
+        {
+            m_Logger->LOG_INFO("[CameraCapture] Stop request.\n");
             break;
         }
 
+        /* カメラ画像取り込み */
         if (m_Capture->read(pShareMemory->Capture.Data[nextIndex]) == false)
         {
             m_Logger->LOG_ERROR("[CameraCapture] Camera read failed.\n");
             pShareMemory->SystemError = true;
-            goto FINISH;
+            goto RETRY;
         }
 
-        // 障害物検知 (現状は青色検知)
+        // 障害物検知 (現状は青)
         cvColor = cv::Scalar(256, 0, 0);
         bool blueLineDetected = isColorLineDetected(pShareMemory->Capture.Data[nextIndex], cvColor, &m_CameraParameters[0]);
-        if (blueLineDetected == true)
+        if (blueLineDetected == false)
+        {
+            pShareMemory->BlueObject = DetectTypeEnum::NOT_DETECT;
+        }
+        else
         {
             cvPointStart = Point(30, 80);
             putText(pShareMemory->Capture.Data[nextIndex], "blue detected.", cvPointStart, FONT_HERSHEY_SIMPLEX, 1.2, cvColor, 2, cv::FONT_HERSHEY_DUPLEX);
-
-            // 障害物検知したので、1:回避指令
-            pShareMemory->StateData = 1;
-            isDetected = true;
+            pShareMemory->BlueObject = DetectTypeEnum::DETECTED;
         }
 
-        // 障害物検知 (現状は赤色検知)
+        // 赤テープ
         cvColor = cv::Scalar(0, 0, 256);
         bool redLineDetected = isColorLineDetected(pShareMemory->Capture.Data[nextIndex], cvColor, &m_CameraParameters[5]);
-        if (redLineDetected == true)
+        if (redLineDetected == false)
+        {
+            pShareMemory->RedTape = DetectTypeEnum::NOT_DETECT;
+        }
+        else
         {
             cvPointStart = Point(30, 30);
             putText(pShareMemory->Capture.Data[nextIndex], "red detected.", cvPointStart, FONT_HERSHEY_SIMPLEX, 1.2, cvColor, 2, cv::FONT_HERSHEY_DUPLEX);
-
-            // 赤テープ検知したので、2:Uターン指令
-            pShareMemory->StateData = 2;
-            isDetected = true;
+            pShareMemory->RedTape = DetectTypeEnum::DETECTED;
         }
 
-        float distance = pShareMemory->UltrasoundData[0];
-
-        cvPointStart = Point(30, 130);
-        char logBuffer[50] = { 0 };
-        snprintf(logBuffer, sizeof(logBuffer), "distance1=%f", distance);
-        putText(pShareMemory->Capture.Data[nextIndex], logBuffer, cvPointStart, FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(256, 256, 256), 2, cv::FONT_HERSHEY_DUPLEX);
-
-        distance = pShareMemory->UltrasoundData[1];
-
-        cvPointStart = Point(30, 180);
-        snprintf(logBuffer, sizeof(logBuffer), "distance2=%f", distance);
-        putText(pShareMemory->Capture.Data[nextIndex], logBuffer, cvPointStart, FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(256, 256, 256), 2, cv::FONT_HERSHEY_DUPLEX);
-
-        // 何も検知していなければ、0:指令無し
-        if (isDetected == false)
+        for (int index = 0; index < 2; index++)
         {
-            pShareMemory->StateData = 0;
+            float distance = pShareMemory->UltrasoundData[index];
+            char distanseStr[50] = { 0 };
+
+            cvPointStart = Point(30, 130 + (50 * index));
+
+            snprintf(&distanseStr[0], sizeof(distanseStr), "distance%d=%f", index + 1, distance);
+            putText(pShareMemory->Capture.Data[nextIndex], &distanseStr[0], cvPointStart, FONT_HERSHEY_SIMPLEX, 1.2, cv::Scalar(256, 256, 256), 2, cv::FONT_HERSHEY_DUPLEX);
         }
 
         pShareMemory->Capture.Index = nextIndex;
-
         nextIndex++;
         if (CAMERA_DATA_MAX <= nextIndex)
         {
             nextIndex = 0;
         }
+
+        delay(10);
     }
 
 
@@ -204,10 +211,16 @@ ResultEnum CameraCapture::finalize()
 {
     m_Start = false;
 
+    if (m_Capture != NULL)
+    {
+        delete m_Capture;
+        m_Capture = NULL;
+    }
+
     return ResultEnum::NormalEnd;
 }
 
-bool CameraCapture::isColorLineDetected(cv::Mat masterCapture, cv::Scalar cvColor, long* parameters)
+bool CameraCapture::isColorLineDetected(cv::Mat& masterCapture, cv::Scalar cvColor, long* parameters)
 {
     bool bRet = false;
     int width = masterCapture.cols;

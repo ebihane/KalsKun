@@ -16,6 +16,9 @@
     <ClCompile Include="Task\Ultrasound\UltrasoundManager.cpp">
       <Filter>Task\Ultrasound</Filter>
     </ClCompile>
+    <ClCompile Include="Task\CameraSender\CameraSender.cpp">
+      <Filter>Task\CameraSender</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Task">
@@ -42,6 +45,9 @@
     <Filter Include="Task\Ultrasound">
       <UniqueIdentifier>{aaca7877-b7d6-48ab-be1b-5dd1e28191d3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Task\CameraSender">
+      <UniqueIdentifier>{c121d145-245a-49cd-92fc-0ccbba578423}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Task\CameraCapture\CameraCapture.h">
@@ -61,6 +67,9 @@
     </ClInclude>
     <ClInclude Include="Task\Ultrasound\UltrasoundManager.h">
       <Filter>Task\Ultrasound</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\CameraSender\CameraSender.h">
+      <Filter>Task\CameraSender</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

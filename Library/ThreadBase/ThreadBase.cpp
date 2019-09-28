@@ -6,6 +6,7 @@
 #include <pthread.h>
 #include <wiringPi.h>
 #include <exception>
+#include "Measure/Stopwatch.h"
 #include "ThreadBase.h"
 
 //
@@ -20,6 +21,7 @@ ThreadBase::ThreadBase(char* const taskName)
  , m_ThreadState(ThreadStateEnum::NotStart)
  , m_ThreadResult(ResultEnum::AbnormalEnd)
 {
+    memset(&m_TaskName[0], '\0', sizeof(m_TaskName));
     strncpy(&m_TaskName[0], &taskName[0], sizeof(m_TaskName));
 }
 
@@ -50,7 +52,8 @@ ResultEnum ThreadBase::Run()
     {
         m_LastError = errno;
         m_ThreadState = ThreadStateEnum::Error;
-        m_Logger->LOG_ERROR("[ThreadBase] pthread_attr_init failed.\n");
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::ThreadBase] pthread_attr_init failed.\n", m_TaskName);
+        m_Logger->LOG_ERROR(m_LogStr);
         goto FINISH;
     }
 
@@ -58,14 +61,16 @@ ResultEnum ThreadBase::Run()
     {
         m_LastError = errno;
         m_ThreadState = ThreadStateEnum::Error;
-        m_Logger->LOG_ERROR("[ThreadBase] pthread_attr_setdetachstate failed.\n");
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::ThreadBase] pthread_attr_setdetachstate failed.\n", m_TaskName);
+        m_Logger->LOG_ERROR(m_LogStr);
         goto FINISH;
     }
 
     if (initialize() != ResultEnum::NormalEnd)
     {
         m_ThreadState = ThreadStateEnum::Error;
-        m_Logger->LOG_ERROR("[ThreadBase] initialize failed.\n");
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::ThreadBase] initialize failed.\n", m_TaskName);
+        m_Logger->LOG_ERROR(m_LogStr);
         goto FINISH;
     }
 
@@ -73,7 +78,8 @@ ResultEnum ThreadBase::Run()
     {
         m_LastError = errno;
         m_ThreadState = ThreadStateEnum::Error;
-        m_Logger->LOG_ERROR("[ThreadBase] pthread_create failed.\n");
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::ThreadBase] pthread_create failed.\n", m_TaskName);
+        m_Logger->LOG_ERROR(m_LogStr);
         goto FINISH;
     }
 
@@ -89,23 +95,29 @@ FINISH :
 ResultEnum ThreadBase::Stop(const unsigned long timeoutSec)
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
-    unsigned long cnt = 0;
-    unsigned long timeoutSec100msec = timeoutSec * 10;
+    Stopwatch watch;
 
     m_Stop = true;
+    snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::Stop] Stop Request set. timeout[%ld sec]\n", m_TaskName, timeoutSec);
+    m_Logger->LOG_INFO(m_Logger);
+
+    watch.Start();
     while (1)
     {
-        if (timeoutSec100msec < cnt)
+        if ((float)timeoutSec <= watch.GetSplit())
         {
+            snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::Stop] Stop Timeout.\n", m_TaskName);
+            m_Logger->LOG_ERROR(m_Logger);
             goto FINISH;
         }
 
         if (m_ThreadState != ThreadStateEnum::Executing)
         {
+            snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::Stop] Thread stopped.\n", m_TaskName);
+            m_Logger->LOG_INFO(m_Logger);
             break;
         }
 
-        cnt++;
         delay(100);
     }
 
@@ -123,26 +135,21 @@ void ThreadBase::MainProcedure()
 
     try
     {
-        {
-            char log[40] = { 0 };
-            snprintf(&log[0], sizeof(log), "[%s] Thread start.\n", &m_TaskName[0]);
-            m_Logger->LOG_INFO(log);
-        }
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s] Thread start.\n", &m_TaskName[0]);
+        m_Logger->LOG_INFO(m_LogStr);
 
         m_ThreadResult = doProcedure();
     }
     catch (std::exception& e)
     {
-        m_Logger->LOG_ERROR(e.what());
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s] Exception! [%s]\n", &m_TaskName[0], e.what());
+        m_Logger->LOG_ERROR(m_LogStr);
     }
 
     finalize();
 
-    {
-        char log[40] = { 0 };
-        snprintf(&log[0], sizeof(log), "[%s] Thread finish.\n", &m_TaskName[0]);
-        m_Logger->LOG_INFO(log);
-    }
+    snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s] Thread finish.\n", &m_TaskName[0]);
+    m_Logger->LOG_INFO(m_LogStr);
 
     if (m_Logger != NULL)
     {

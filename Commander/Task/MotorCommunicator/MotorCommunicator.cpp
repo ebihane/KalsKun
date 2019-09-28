@@ -127,6 +127,13 @@ ResultEnum MotorCommunicator::doMainProc()
 
     if (receivable == true)
     {
+        if (m_Queue->Receive(&ev) != ResultEnum::NormalEnd)
+        {
+            snprintf(&log[0], sizeof(log), "[doMainProc] Queue::Receive failed. errno[%d]\n", m_Queue->GetLastError());
+            m_Logger->LOG_ERROR(log);
+            goto FINISH;
+        }
+
         switch (ev.Code)
         {
             case 0 :    /* 0: “®ì•ÏX */
@@ -154,7 +161,7 @@ ResultEnum MotorCommunicator::doMainProc()
     }
     else
     {
-        createSendData(MotorCommandEnum::E_COMMAND_MONITOR, m_CutterMode, &sendBuffer[0]);
+        createSendData(m_MotorCommand, m_CutterMode, &sendBuffer[0]);
     }
 
     outputLog(&sendBuffer[0], 3, 0);
@@ -172,6 +179,7 @@ ResultEnum MotorCommunicator::doMainProc()
     }
 
     analyze(&recvBuffer[0]);
+    pShareMemory->Motor.CommunicationCount++;
 
     retVal = ResultEnum::NormalEnd;
 
@@ -277,11 +285,11 @@ ResultEnum MotorCommunicator::analyze(char* const buffer)
 
     if ((buffer[7] & 0x01) != 0)
     {
-        pShareMemory->Motor.ErrorStatus = 1;
+        pShareMemory->Motor.ErrorStatus = DetectTypeEnum::DETECTED;
     }
     else
     {
-        pShareMemory->Motor.ErrorStatus = 0;
+        pShareMemory->Motor.ErrorStatus = DetectTypeEnum::NOT_DETECT;
     }
 
     if ((buffer[7] & 0x02) != 0)
@@ -314,9 +322,6 @@ ResultEnum MotorCommunicator::receiveProc(char* const buffer)
             goto FINISH;
         }
 
-        snprintf(&log[0], sizeof(log), "[receiveProc] Receive : %02Xh\n", once);
-        m_Logger->LOG_INFO(log);
-
         if (once == 0xFF)
         {
             buffer[0] = once;
@@ -340,6 +345,7 @@ FINISH :
 
 void MotorCommunicator::outputLog(char* const buffer, const long size, const char type)
 {
+#if 0
     char log[80] = { 0 };
     char once[8] = { 0 };
 
@@ -360,4 +366,5 @@ void MotorCommunicator::outputLog(char* const buffer, const long size, const cha
 
     strncat(&log[0], "\n", sizeof(log));
     m_Logger->LOG_INFO(log);
+#endif
 }

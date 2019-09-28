@@ -19,6 +19,9 @@
 #include "Task/AnimalCamera/AnimalCameraReceiver.h"
 #include "Task/MotorCommunicator/MotorCommunicator.h"
 #include "Task/HeartBeat/HeartBeatManager.h"
+#include "Task/BuzzerController/BuzzerController.h"
+#include "Task/LightController/LightController.h"
+#include "Task/Patrol/PatrolThread.h"
 
 /* Sequencer */
 #include "Task/Main/Sequencer/SequencerBase.h"
@@ -36,6 +39,9 @@ static AroundCameraReceiver* g_pAroundCameraReceiver = NULL;
 static AnimalCameraReceiver* g_pAnimalCameraReceiver = NULL;
 static MotorCommunicator* g_pMotorCommunicator = NULL;
 static HeartBeatManager* g_pHeartBeatManager = NULL;
+static BuzzerController* g_pBuzzerThread = NULL;
+static LightController* g_pLightThread = NULL;
+static PatrolThread* g_pPatrolThread = NULL;
 
 /* Sequencer */
 static SequencerBase* g_pSequencer = NULL;
@@ -110,14 +116,50 @@ ResultEnum initialize()
         goto FINISH;
     }
 
-    /* ログ関連 初期化 */
+    /* 司令塔状態 初期化 */
+    pShareMemory->Commander.SystemError = false;
+    pShareMemory->Commander.LightMode = LightModeEnum::E_LIGHT_OFF;
+    pShareMemory->Commander.MelodyMode = MelodyModeEnum::E_MELODY_SILENT;
+
+    /* モータマイコン状態 初期化 */
+    pShareMemory->Motor.CommunicationCount = 0;
+    pShareMemory->Motor.Command = MotorCommandEnum::E_COMMAND_STOP;
+    pShareMemory->Motor.Cutter = CutterDriveEnum::E_CUTTER_STOP;
+    pShareMemory->Motor.PointX = 0;
+    pShareMemory->Motor.PointY = 0;
+    pShareMemory->Motor.ErrorStatus = DetectTypeEnum::NOT_DETECT;
+    pShareMemory->Motor.RemoteMode = ControlModeEnum::E_MODE_MANUAL;
+
+    /* 前方カメラマイコン状態 初期化 */
+    pShareMemory->FrontCamera.ReceiveCount = 0;
+    pShareMemory->FrontCamera.SystemError = 0;
+    pShareMemory->FrontCamera.MoveType = MoveTypeEnum::NOT_REQUEST;
+    pShareMemory->FrontCamera.RedTape = DetectTypeEnum::NOT_DETECT;
+    pShareMemory->FrontCamera.BlueObject = DetectTypeEnum::NOT_DETECT;
+
+    /* 動物カメラ状態 初期化 */
+    pShareMemory->AnimalCamera.ReceiveCount = 0;
+    pShareMemory->AnimalCamera.SystemError = 0;
+    pShareMemory->AnimalCamera.Human = DetectTypeEnum::NOT_DETECT;
+    pShareMemory->AnimalCamera.Animal = DetectTypeEnum::NOT_DETECT;
+
+    /* 周辺カメラ状態 初期化 */
+    pShareMemory->AroundCamera.ReceiveCount = 0;
+    pShareMemory->AroundCamera.SystemError = 0;
+    pShareMemory->AroundCamera.Detect = DetectTypeEnum::NOT_DETECT;
+
+    /* Log Process 起動 */
+    StartLoggerProcess((char*)"Commander");
+
+    /* Log Process 起動完了待ち */
+    delay(100);
+
+    /* Log Accessor 生成 */
     g_pLogger = new Logger(Logger::LOG_ERROR | Logger::LOG_INFO, Logger::LogTypeEnum::BOTH_OUT);
     if (g_pLogger == NULL)
     {
         goto FINISH;
     }
-
-    StartLoggerProcess((char*)"Commander");
 
     /* 設定 */
     setting = SettingManager::GetInstance();
@@ -190,6 +232,22 @@ ResultEnum initialize()
         goto FINISH;
     }
 
+    /* ブザー吹鳴スレッド生成 */
+    g_pBuzzerThread = new BuzzerController();
+    if (g_pBuzzerThread == NULL)
+    {
+        g_pLogger->LOG_ERROR("[initialize] BuzzerThread allocation failed.\n");
+        goto FINISH;
+    }
+
+    /* 指向性ライト制御スレッド生成 */
+    g_pLightThread = new LightController();
+    if (g_pLightThread == NULL)
+    {
+        g_pLogger->LOG_ERROR("[initialize] LightThread allocation failed.\n");
+        goto FINISH;
+    }
+
     /* モータマイコン通信スレッド 初期化 */
     g_pMotorCommunicator = new MotorCommunicator();
     if (g_pMotorCommunicator == NULL)
@@ -198,12 +256,32 @@ ResultEnum initialize()
         goto FINISH;
     }
 
+    /* パトロールスレッド 初期化 */
+    g_pPatrolThread = new PatrolThread();
+    if (g_pPatrolThread == NULL)
+    {
+        g_pLogger->LOG_ERROR("[initialize] g_pPatrolThread allocation failed.\n");
+        goto FINISH;
+    }
+
+    /* パトロール対象スレッドを登録 */
+    g_pPatrolThread->AddTarget(g_pHeartBeatManager);
+    g_pPatrolThread->AddTarget(g_pFrontCameraReceiver);
+    g_pPatrolThread->AddTarget(g_pAnimalCameraReceiver);
+    g_pPatrolThread->AddTarget(g_pAroundCameraReceiver);
+    g_pPatrolThread->AddTarget(g_pBuzzerThread);
+    g_pPatrolThread->AddTarget(g_pLightThread);
+    g_pPatrolThread->AddTarget(g_pMotorCommunicator);
+
     /* Task 起動 */
     g_pHeartBeatManager->Run();
     g_pFrontCameraReceiver->Run();
     g_pAnimalCameraReceiver->Run();
     g_pAroundCameraReceiver->Run();
+    g_pBuzzerThread->Run();
+    g_pLightThread->Run();
     g_pMotorCommunicator->Run();
+    g_pPatrolThread->Run();
 
     /* Sequencer 生成 */
     /* 最初は Idle 状態 */
@@ -280,11 +358,32 @@ void mainProcedure()
 
 void finalize()
 {
+    if (g_pPatrolThread != NULL)
+    {
+        g_pPatrolThread->Stop(5);
+        delete g_pPatrolThread;
+        g_pPatrolThread = NULL;
+    }
+
     if (g_pMotorCommunicator != NULL)
     {
         g_pMotorCommunicator->Stop(5);
         delete g_pMotorCommunicator;
         g_pMotorCommunicator = NULL;
+    }
+
+    if (g_pLightThread != NULL)
+    {
+        g_pLightThread->Stop(5);
+        delete g_pLightThread;
+        g_pLightThread = NULL;
+    }
+
+    if (g_pBuzzerThread != NULL)
+    {
+        g_pBuzzerThread->Stop(5);
+        delete g_pBuzzerThread;
+        g_pBuzzerThread = NULL;
     }
 
     if (g_pAroundCameraReceiver != NULL)

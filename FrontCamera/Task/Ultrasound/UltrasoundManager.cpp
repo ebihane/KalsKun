@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 UltrasoundManager::UltrasoundManager(const int sensorNo)
- : LoopThreadBase((char*)"Ultrasound", 100, TypeEnum::CYCLIC)
+ : LoopThreadBase((char*)"Ultrasound", 100, TypeEnum::TIMER_STOP)
  , m_SensorNo(sensorNo)
 {
     pShareMemory->UltrasoundData[m_SensorNo] = -1;
@@ -24,6 +24,7 @@ ResultEnum UltrasoundManager::doMainProc()
     struct timespec stopTime;
     __time_t secondDiff;
     __time_t nanosecDiff;
+    Stopwatch watch;
 
     if (m_SensorNo == 0)
     {
@@ -35,13 +36,16 @@ ResultEnum UltrasoundManager::doMainProc()
         triggerPin = IO_TRIGGER2_PIN;
         echoPin = IO_ECHO2_PIN;
     }
-
+    
+RETRY :
     // í¥âπîgèoóÕäJén
     digitalWrite(triggerPin, LOW);
-    delayMicroseconds(10);
+    delayMicroseconds(2);
     digitalWrite(triggerPin, HIGH);
-    delayMicroseconds(1000);
+    delayMicroseconds(10);
     digitalWrite(triggerPin, LOW);
+
+    watch.Start();
 
     while (1)
     {
@@ -50,6 +54,19 @@ ResultEnum UltrasoundManager::doMainProc()
         {
             break;
         }
+
+        if (1.0f <= watch.GetSplit())
+        {
+            if (isStopRequest() == true)
+            {
+                goto FINISH;
+            }
+
+            delay(10);
+            goto RETRY;
+        }
+
+        delayMicroseconds(1);
     }
 
     clock_gettime(CLOCK_REALTIME, &startTime);
@@ -58,7 +75,6 @@ ResultEnum UltrasoundManager::doMainProc()
         long signal = digitalRead(echoPin);
         if (signal == LOW)
         {
-
             clock_gettime(CLOCK_REALTIME, &stopTime);
             secondDiff = stopTime.tv_sec - startTime.tv_sec;
             if (startTime.tv_nsec <= stopTime.tv_nsec)
@@ -74,6 +90,19 @@ ResultEnum UltrasoundManager::doMainProc()
 
             break;
         }
+
+        if (1.0f <= watch.GetSplit())
+        {
+            if (isStopRequest() == true)
+            {
+                goto FINISH;
+            }
+
+            delay(10);
+            goto RETRY;
+        }
+
+        delayMicroseconds(1);
     }
 
     if (durationTime > 0)
@@ -82,6 +111,7 @@ ResultEnum UltrasoundManager::doMainProc()
         pShareMemory->UltrasoundData[m_SensorNo] = (float)(durationTime * 340 * 100 / 1000000);  // âπë¨Ç340m/sÇ…ê›íË
     }
 
+FINISH:
     return ResultEnum::NormalEnd;
 }
 

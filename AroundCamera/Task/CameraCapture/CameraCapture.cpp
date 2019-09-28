@@ -43,8 +43,8 @@ ResultEnum CameraCapture::doProcedure()
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     long nextIndex = 0;
-    long detectState = 0;
-    long beforeDetectState = 0;
+    DetectTypeEnum detectState = DetectTypeEnum::NOT_DETECT;
+    DetectTypeEnum beforeDetectState = DetectTypeEnum::NOT_DETECT;
 
     if (m_Capture == NULL)
     {
@@ -86,10 +86,10 @@ ResultEnum CameraCapture::doProcedure()
         }
 
         /* ˜^‰æŽÀŽ{”»’è */
-        detectState = pShareMemory->PatrolState;
-        if (detectState == E_PATROL_DETECT)
+        detectState = pShareMemory->Detect;
+        if (detectState == DetectTypeEnum::DETECTED)
         {
-            if (beforeDetectState != E_PATROL_DETECT)
+            if (beforeDetectState != DetectTypeEnum::DETECTED)
             {
                 if (startVideoWrite() != true)
                 {
@@ -101,7 +101,7 @@ ResultEnum CameraCapture::doProcedure()
         }
         else
         {
-            if (beforeDetectState == E_PATROL_DETECT)
+            if (beforeDetectState == DetectTypeEnum::DETECTED)
             {
                 stopVideoWrite();
             }

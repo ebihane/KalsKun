@@ -2,7 +2,7 @@
 #include "StateSender.h"
 
 StateSender::StateSender(AdapterBase* const adapter)
- : SenderThread((char*)"StateSender", adapter)
+ : SenderThread((char*)"StateSender", adapter, true)
  , m_SendTiming(false)
  , m_SendCount(0)
 {
@@ -22,6 +22,11 @@ ResultEnum StateSender::initializeCore()
 
     EventInfo* p = new EventInfo();
     m_SendData = (char*)p;
+
+    EventInfo* q = new EventInfo();
+    m_RecvData = (char*)q;
+    m_RecvSize = sizeof(EventInfo);
+
     return ResultEnum::NormalEnd;
 }
 
@@ -42,7 +47,7 @@ bool StateSender::createSendData(char* const data, unsigned long* const size)
     p->Result = ResultEnum::NormalEnd;
     p->lParam[0] = m_SendCount;
     p->lParam[1] = pShareMemory->SystemError;
-    p->lParam[2] = (long)pShareMemory->PatrolState;
+    p->lParam[2] = pShareMemory->Detect;
 
     *size = sizeof(EventInfo);
 

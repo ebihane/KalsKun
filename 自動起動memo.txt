@@ -1,0 +1,43 @@
+〇 GPIOの自動登録 (ラズパイの初期処理で実行される)
+1. cd /usr/local/bin
+2. sudo nano gpio_init.sh
+3. gpio_init.sh に以下の内容を記述
+
+#!bin/bash
+gpio export X in (or out)  ※ X はピン番号
+…
+
+記述後、Ctrl + O で保存し、Ctrl + X で閉じる
+
+4. sudo chmod 777 gpio_init.sh
+5. cd /etc
+6. sudo nano rc.local
+7. rc.local の 「exit 0」の前に以下の内容を記述
+
+sudo /usr/local/bin/gpio_init.sh
+
+記述後、Ctrl + O で保存し、Ctrl + X で閉じる
+
+
+〇 プログラムの自動起動 (デスクトップ表示後に起動する … rc.local よりも後)
+1. cd /etc/xdg/autostart
+2. sudo nano XXXXX.desktop  ※ XXXXX には起動するプログラムの名前
+3. XXXXX.desktopに以下の内容を記述
+
+[Desktop Entry]
+Type=Application
+Name=XXXXX  ※ プログラムの名前
+Exec=/home/pi/projects/release/XXXXX.out  ※ プログラムのパスを指定。sudoはいらない
+
+記述後、Ctrl + O で保存し、Ctrl + X で閉じる
+
+4. lxsession-edit
+5. 上記で作成した XXXXX が表示されているので、チェックが入っていることを確認
+
+〇 プログラム所有者の変更
+1. cd /home/pi/projects/release
+2. sudo chown pi:pi XXXXX.out
+   → 所有ユーザ、グループを「pi」にしておく
+3. ls -l を実行し、所有者が変わっていることを確認
+   LogWriter.outの所有者がpiでない場合はこちらも実施
+

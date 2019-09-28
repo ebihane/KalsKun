@@ -31,6 +31,7 @@ protected :
 
     Logger* m_Logger;
     char m_TaskName[16];
+    char m_LogStr[LOG_OUT_MAX];
 
     virtual ResultEnum initialize() = 0;
     virtual ResultEnum doProcedure() = 0;

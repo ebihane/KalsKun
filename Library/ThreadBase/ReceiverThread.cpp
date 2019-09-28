@@ -2,9 +2,10 @@
 #include <stdlib.h>
 #include "ReceiverThread.h"
 
-ReceiverThread::ReceiverThread(char* const taskName, AdapterBase* const adapter)
+ReceiverThread::ReceiverThread(char* const taskName, AdapterBase* const adapter, const bool responseExist)
  : ThreadBase(taskName)
  , m_RecvData(NULL)
+ , RESPONSE_EXIST(responseExist)
  , m_Adapter(adapter)
 {
     /* nop. */
@@ -26,6 +27,12 @@ ResultEnum ReceiverThread::doConnectedProc()
     return ResultEnum::NormalEnd;
 }
 
+unsigned long ReceiverThread::createResponse(char* const buffer)
+{
+    /* Œp³‚µ‚È‚¢ê‡‚ÍƒTƒCƒY 0 ‚ð•Ô‚· */
+    return 0;
+}
+
 ResultEnum ReceiverThread::finalizeCore()
 {
     /* Œp³‚µ‚È‚¢ê‡‚Í‰½‚à‚¹‚¸³í‚ð•Ô‚· */
@@ -36,33 +43,44 @@ ResultEnum ReceiverThread::initialize()
 {
     ResultEnum  retVal = ResultEnum::AbnormalEnd;
     ResultEnum  result = ResultEnum::AbnormalEnd;
-    char logStr[80] = { 0 };
 
     if (m_Adapter == NULL)
     {
-        m_Logger->LOG_ERROR("[initialize] m_Adapter allocation failed.\n");
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::initialize] m_Adapter allocation failed.\n", m_TaskName);
+        m_Logger->LOG_ERROR(m_LogStr);
         goto FINISH;
     }
 
     if (m_Adapter->Open() != ResultEnum::NormalEnd)
     {
-        snprintf(&logStr[0], sizeof(logStr), "[initialize] m_Adapter Open failed. errno[%d]\n", m_Adapter->GetLastError());
-        m_Logger->LOG_ERROR(logStr);
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::initialize] m_Adapter Open failed. errno[%d]\n", m_TaskName, m_Adapter->GetLastError());
+        m_Logger->LOG_ERROR(m_LogStr);
         goto FINISH;
     }
 
     result = initializeCore();
     if (result != ResultEnum::NormalEnd)
     {
-        snprintf(&logStr[0], sizeof(logStr), "[initialize] initializeCore failed. result[%d]\n", result);
-        m_Logger->LOG_ERROR(logStr);
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::initialize] initializeCore failed. result[%d]\n", m_TaskName, result);
+        m_Logger->LOG_ERROR(m_LogStr);
         goto FINISH;
     }
 
     if (m_RecvData == NULL)
     {
-        m_Logger->LOG_ERROR("[initialize] m_SendData is NULL.\n");
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::initialize] m_SendData is NULL.\n", m_TaskName);
+        m_Logger->LOG_ERROR(m_LogStr);
         goto FINISH;
+    }
+
+    if (RESPONSE_EXIST == true)
+    {
+        if (m_ResponseData == NULL)
+        {
+            snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::initialize] m_ResponseData is NULL.\n", m_TaskName);
+            m_Logger->LOG_ERROR(m_LogStr);
+            goto FINISH;
+        }
     }
 
     retVal = ResultEnum::NormalEnd;
@@ -77,9 +95,13 @@ ResultEnum ReceiverThread::doProcedure()
     ResultEnum result = ResultEnum::AbnormalEnd;
     bool isFirst = true;
     bool receivable = false;
-    char logStr[80] = { 0 };
+    unsigned long responseSize = 0;
+
 
 RECONNECT :
+
+    snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::doProcedure] Connection start.\n", m_TaskName);
+    m_Logger->LOG_INFO(m_LogStr);
 
     /* Ú‘±Žž‚Ì‰Šú‰»ˆ— */
     doReconnectInitialize(isFirst);
@@ -92,10 +114,15 @@ RECONNECT :
     result = m_Adapter->Connection();
     if (result != ResultEnum::NormalEnd)
     {
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::doProcedure] Connection failed. errno[%d]\n", m_TaskName, m_Adapter->GetLastError());
+        m_Logger->LOG_ERROR(m_LogStr);
+
         if (result == ResultEnum::Reconnect)
         {
             if (isStopRequest() == true)
             {
+                snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::doProcedure] Thread Stop request.\n", m_TaskName);
+                m_Logger->LOG_INFO(m_LogStr);
                 goto FINISH;
             }
             else
@@ -106,22 +133,21 @@ RECONNECT :
         }
         else
         {
-            snprintf(&logStr[0], sizeof(logStr), "[doProcedure] Connection failed. errno[%d]\n", m_Adapter->GetLastError());
-            m_Logger->LOG_ERROR(logStr);
-
+            snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::doProcedure] Thread finish.\n", m_TaskName);
+            m_Logger->LOG_ERROR(m_LogStr);
             goto FINISH;
         }
     }
 
-    snprintf(&logStr[0], sizeof(logStr), "[doProcedure] %s Connection establish.\n", &m_TaskName[0]);
-    m_Logger->LOG_INFO(logStr);
+    snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::doProcedure] Connection establish.\n", m_TaskName);
+    m_Logger->LOG_INFO(m_LogStr);
 
     /* Ú‘±Šm—§Žžˆ— */
     result = doConnectedProc();
     if (result != ResultEnum::NormalEnd)
     {
-        snprintf(&logStr[0], sizeof(logStr), "[doProcedure] doConnectedProc failed.\n");
-        m_Logger->LOG_ERROR(logStr);
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::doProcedure] doConnectedProc failed.\n", m_TaskName);
+        m_Logger->LOG_ERROR(m_LogStr);
 
         if (result == ResultEnum::Reconnect)
         {
@@ -129,18 +155,22 @@ RECONNECT :
         }
         else
         {
+            snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::doProcedure] Thread finish.\n", m_TaskName);
+            m_Logger->LOG_ERROR(m_LogStr);
             goto FINISH;
         }
     }
 
-    m_Logger->LOG_INFO("[doProcedure] Main loop enter.\n");
+    snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::doProcedure] Main loop enter.\n", m_TaskName);
+    m_Logger->LOG_INFO(m_LogStr);
+
     while (1)
     {
         result = m_Adapter->IsReceivable(receivable);
         if (result != ResultEnum::NormalEnd)
         {
-            snprintf(&logStr[0], sizeof(logStr), "[doProcedure] IsReceivable failed. errno[%d]\n", m_Adapter->GetLastError());
-            m_Logger->LOG_ERROR(logStr);
+            snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::doProcedure] IsReceivable failed. errno[%d]\n", m_TaskName, m_Adapter->GetLastError());
+            m_Logger->LOG_ERROR(m_LogStr);
 
             if (result == ResultEnum::Reconnect)
             {
@@ -148,6 +178,8 @@ RECONNECT :
             }
             else
             {
+                snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::doProcedure] Thread finish.\n", m_TaskName);
+                m_Logger->LOG_ERROR(m_LogStr);
                 goto FINISH;
             }
         }
@@ -156,7 +188,8 @@ RECONNECT :
         {
             if (isStopRequest() == true)
             {
-                m_Logger->LOG_INFO("[doProcedure] Thread stop request.\n");
+                snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::doProcedure] Thread stop request.\n", m_TaskName);
+                m_Logger->LOG_INFO(m_LogStr);
                 break;
             }
 
@@ -167,8 +200,8 @@ RECONNECT :
         result = receive();
         if (result != ResultEnum::NormalEnd)
         {
-            snprintf(&logStr[0], sizeof(logStr), "[doProcedure] Receive failed. errno[%d]\n", m_Adapter->GetLastError());
-            m_Logger->LOG_ERROR(logStr);
+            snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::doProcedure] Receive failed. errno[%d]\n", m_TaskName, m_Adapter->GetLastError());
+            m_Logger->LOG_ERROR(m_LogStr);
 
             if (result == ResultEnum::Reconnect)
             {
@@ -176,6 +209,8 @@ RECONNECT :
             }
             else
             {
+                snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::doProcedure] Thread finish.\n", m_TaskName);
+                m_Logger->LOG_ERROR(m_LogStr);
                 goto FINISH;
             }
         }
@@ -184,8 +219,8 @@ RECONNECT :
         result = analyze(&m_RecvData[0]);
         if (result != ResultEnum::NormalEnd)
         {
-            snprintf(&logStr[0], sizeof(logStr), "[doProcedure] analyze failed.\n");
-            m_Logger->LOG_ERROR(logStr);
+            snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::doProcedure] analyze failed.\n", m_TaskName);
+            m_Logger->LOG_ERROR(m_LogStr);
 
             if (result == ResultEnum::Reconnect)
             {
@@ -193,11 +228,37 @@ RECONNECT :
             }
             else
             {
+                snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::doProcedure] Thread finish.\n", m_TaskName);
+                m_Logger->LOG_ERROR(m_LogStr);
                 goto FINISH;
             }
         }
+
+        if (RESPONSE_EXIST == true)
+        {
+            responseSize = createResponse(&m_ResponseData[0]);
+            result = m_Adapter->Send(&m_ResponseData[0], responseSize);
+            if (result != ResultEnum::NormalEnd)
+            {
+                snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::doProcedure] Send failed. errno[%d]\n", m_TaskName, m_Adapter->GetLastError());
+                m_Logger->LOG_ERROR(m_LogStr);
+
+                if (result == ResultEnum::Reconnect)
+                {
+                    goto RECONNECT;
+                }
+                else
+                {
+                    snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::doProcedure] Thread finish.\n", m_TaskName);
+                    m_Logger->LOG_ERROR(m_LogStr);
+                    goto FINISH;
+                }
+            }
+        }
     }
-    m_Logger->LOG_INFO("[doProcedure] Main loop exit.\n");
+
+    snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::doProcedure] Main loop exit.\n", m_TaskName);
+    m_Logger->LOG_INFO(m_LogStr);
 
     retVal = ResultEnum::NormalEnd;
 

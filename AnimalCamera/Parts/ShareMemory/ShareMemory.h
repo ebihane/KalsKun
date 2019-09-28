@@ -6,6 +6,13 @@ using namespace cv;
 
 #define CAMERA_DATA_MAX (10)
 
+/* ŒŸ’mó‘Ô’è” */
+typedef enum
+{
+    NOT_DETECT = 0,
+    DETECTED,
+} DetectTypeEnum;
+
 typedef struct
 {
     unsigned char Index;
@@ -15,9 +22,10 @@ typedef struct
 typedef struct
 {
     bool SystemError;
+    DetectTypeEnum Human;
+    DetectTypeEnum Animal;
     CameraDataStr Capture;
     CameraDataStr Communicate;
-    long Detection;
 } ShareMemoryStr;
 
 #ifdef MEMORY_MAIN

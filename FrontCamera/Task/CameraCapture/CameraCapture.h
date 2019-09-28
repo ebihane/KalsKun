@@ -26,6 +26,6 @@ private :
     ResultEnum initialize();
     ResultEnum doProcedure();
     ResultEnum finalize();
-    bool isColorLineDetected(cv::Mat masterCapture, cv::Scalar cvColor, long* parameters);
+    bool isColorLineDetected(cv::Mat& masterCapture, cv::Scalar cvColor, long* parameters);
 
 };

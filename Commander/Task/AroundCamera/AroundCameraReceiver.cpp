@@ -1,8 +1,10 @@
+#include <string.h>
+#include "Parts/CommanderCommon.h"
 #include "Parts/ShareMemory/ShareMemory.h"
 #include "AroundCameraReceiver.h"
 
 AroundCameraReceiver::AroundCameraReceiver(AdapterBase* const adapter)
- : ReceiverThread((char*)"AC_Receiver", adapter)
+ : ReceiverThread((char*)"AC_Receiver", adapter, true)
 {
     /* nop. */
 }
@@ -17,6 +19,25 @@ ResultEnum AroundCameraReceiver::initializeCore()
     EventInfo* p = new EventInfo;
     m_RecvData = (char*)p;
 
+    EventInfo* q = new EventInfo;
+    m_ResponseData = (char*)q;
+
+    return ResultEnum::NormalEnd;
+}
+
+void AroundCameraReceiver::doReconnectInitialize(const bool isFirst)
+{
+    /* 再接続時はシステムエラー扱いとする */
+    if (isFirst != true)
+    {
+        pShareMemory->AroundCamera.SystemError = 1;
+    }
+}
+
+ResultEnum AroundCameraReceiver::doConnectedProc()
+{
+    /* 接続完了により一時的にシステムエラー解除 */
+    pShareMemory->AroundCamera.SystemError = 0;
     return ResultEnum::NormalEnd;
 }
 
@@ -39,9 +60,19 @@ ResultEnum AroundCameraReceiver::analyze(char* const buffer)
 
     pShareMemory->AroundCamera.ReceiveCount = p->lParam[0];
     pShareMemory->AroundCamera.SystemError = p->lParam[1];
-    pShareMemory->AroundCamera.PersonDetect = p->lParam[2];
+    pShareMemory->AroundCamera.Detect = (DetectTypeEnum)p->lParam[2];
 
     retVal = ResultEnum::NormalEnd;
 
     return retVal;
+}
+
+unsigned long AroundCameraReceiver::createResponse(char* const buffer)
+{
+    EventInfo* p = (EventInfo*)buffer;
+
+    memset(p, 0x00, sizeof(EventInfo));
+    p->Result = ResultEnum::NormalEnd;
+
+    return sizeof(EventInfo);
 }
