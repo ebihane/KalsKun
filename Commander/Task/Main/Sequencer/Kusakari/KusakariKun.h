@@ -22,9 +22,11 @@ private:
     {
         MoveTypeEnum        MoveType;       /* from 前方カメラ : 動作指示 */
         DetectTypeEnum      Animal;         /* from 動物カメラ : 動物検知状態 */
+        SizeStr             RealPosition;   /* from モータ : ロボット実現在位置 */
         RectStr             Position;       /* from モータ : ロボット位置座標 */
         MotorCommandEnum    CurrentMove;    /* from モータ : 現在の動作状態 */
         ControlModeEnum     ControlMode;    /* from モータ : コントロールモード */
+        long                TurnCount;      /* from 司令塔 : ターン回数 */
     } StateInfoStr;
     
     /* 動作指示構造体 */

@@ -26,6 +26,7 @@ public :
     ThreadStateEnum GetState();
     int GetLastError();
     void ChangeLogInfo(const char logLevel, const Logger::LogTypeEnum logType);
+    void GetName(char* const name);
 
 protected :
 

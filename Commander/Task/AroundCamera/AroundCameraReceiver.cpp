@@ -25,22 +25,6 @@ ResultEnum AroundCameraReceiver::initializeCore()
     return ResultEnum::NormalEnd;
 }
 
-void AroundCameraReceiver::doReconnectInitialize(const bool isFirst)
-{
-    /* 再接続時はシステムエラー扱いとする */
-    if (isFirst != true)
-    {
-        pShareMemory->AroundCamera.SystemError = 1;
-    }
-}
-
-ResultEnum AroundCameraReceiver::doConnectedProc()
-{
-    /* 接続完了により一時的にシステムエラー解除 */
-    pShareMemory->AroundCamera.SystemError = 0;
-    return ResultEnum::NormalEnd;
-}
-
 bool AroundCameraReceiver::isReceiveComplete(char* const buffer, const unsigned long size)
 {
     bool retVal = false;

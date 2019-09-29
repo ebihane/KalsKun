@@ -73,6 +73,16 @@ void SettingManager::CreateDefaultData()
     m_ApAddress[2].X = 8;
     m_ApAddress[2].Y = 9;
 
+    /* 草刈り開始時刻 */
+    m_KusakariStart.DayOfWeek = DayOfWeekEnum::Nothing;
+    m_KusakariStart.Hour = 0;
+    m_KusakariStart.Minute = 0;
+
+    /* 夜警開始時刻 */
+    m_YakeiStart.DayOfWeek = DayOfWeekEnum::Nothing;
+    m_YakeiStart.Hour = 0;
+    m_YakeiStart.Minute = 0;
+
     /* 保存する */
     Save();
 }
@@ -128,6 +138,12 @@ ResultEnum SettingManager::Save()
     fprintf(fp, "MapCount(X),%ld\n", m_MapCount.X);
     fprintf(fp, "MapCount(Y),%ld\n", m_MapCount.Y);
     fprintf(fp, "WavePowerCoeff,%lf\n", m_WavePowerCoeff);
+    fprintf(fp, "KusakariDayOfWeek,%d\n", m_KusakariStart.DayOfWeek);
+    fprintf(fp, "KusakariStartHour,%d\n", m_KusakariStart.Hour);
+    fprintf(fp, "KusakariStartMinute,%d\n", m_KusakariStart.Minute);
+    fprintf(fp, "YakeiDayOfWeek,%d\n", m_YakeiStart.DayOfWeek);
+    fprintf(fp, "YakeiDayOfWeek,%d\n", m_YakeiStart.Hour);
+    fprintf(fp, "YakeiDayOfWeek,%d\n", m_YakeiStart.Minute);
     fprintf(fp, "APCount,%ld\n", m_ApCount);
     for (size = 0; size < m_ApCount; size++)
     {
@@ -245,6 +261,30 @@ ResultEnum SettingManager::Load()
     fgets(&buffer[0], sizeof(buffer), fp);
     parseString(&buffer[0], &once[0], ',', sizeof(buffer));
     m_WavePowerCoeff = (float)atof(&once[0]);
+
+    fgets(&buffer[0], sizeof(buffer), fp);
+    parseString(&buffer[0], &once[0], ',', sizeof(buffer));
+    m_KusakariStart.DayOfWeek = (DayOfWeekEnum)atol(&once[0]);
+
+    fgets(&buffer[0], sizeof(buffer), fp);
+    parseString(&buffer[0], &once[0], ',', sizeof(buffer));
+    m_KusakariStart.Hour = (unsigned char)atol(&once[0]);
+
+    fgets(&buffer[0], sizeof(buffer), fp);
+    parseString(&buffer[0], &once[0], ',', sizeof(buffer));
+    m_KusakariStart.Minute = (unsigned char)atol(&once[0]);
+
+    fgets(&buffer[0], sizeof(buffer), fp);
+    parseString(&buffer[0], &once[0], ',', sizeof(buffer));
+    m_YakeiStart.DayOfWeek = (DayOfWeekEnum)atol(&once[0]);
+
+    fgets(&buffer[0], sizeof(buffer), fp);
+    parseString(&buffer[0], &once[0], ',', sizeof(buffer));
+    m_YakeiStart.Hour = (unsigned char)atol(&once[0]);
+
+    fgets(&buffer[0], sizeof(buffer), fp);
+    parseString(&buffer[0], &once[0], ',', sizeof(buffer));
+    m_YakeiStart.Minute = (unsigned char)atol(&once[0]);
 
     fgets(&buffer[0], sizeof(buffer), fp);
     parseString(&buffer[0], &once[0], ',', sizeof(buffer));
@@ -376,6 +416,32 @@ void SettingManager::SetWavePowerCoeff(const float coeff)
     m_WavePowerCoeff = coeff;
 }
 
+/* 草刈り開始時刻 */
+SettingManager::TimeSettingStr SettingManager::GetKusakariStartTime()
+{
+    return m_KusakariStart;
+}
+
+void SettingManager::SetKusakariStartTime(TimeSettingStr* const date)
+{
+    m_KusakariStart.DayOfWeek = date->DayOfWeek;
+    m_KusakariStart.Hour = date->Hour;
+    m_KusakariStart.Minute = date->Minute;
+}
+
+/* 夜警開始時刻 */
+SettingManager::TimeSettingStr SettingManager::GetYakeiStartTime()
+{
+    return m_YakeiStart;
+}
+
+void SettingManager::SetYakeStartTime(TimeSettingStr* const date)
+{
+    m_YakeiStart.DayOfWeek = date->DayOfWeek;
+    m_YakeiStart.Hour = date->Hour;
+    m_YakeiStart.Minute = date->Minute;
+}
+
 /* アクセスポイント */
 long SettingManager::GetApCount()
 {
@@ -425,12 +491,14 @@ long SettingManager::calcurateSettingSize()
 {
     long retVal = 0;
 
-    retVal += sizeof(m_RobotSize);            /* ロボットサイズ */
-    retVal += sizeof(m_FarmSize);             /* 畑のサイズ */
-    retVal += sizeof(m_MapCount);             /* マップの個数 */
-    retVal += sizeof(m_WavePowerCoeff);       /* 電波の伝搬係数 */
-    retVal += sizeof(m_ApCount);              /* アクセスポイントの個数 */
-    retVal += sizeof(RectStr) * m_ApCount;    /* アクセスポイントの座標 */
+    retVal += sizeof(m_RobotSize);          /* ロボットサイズ */
+    retVal += sizeof(m_FarmSize);           /* 畑のサイズ */
+    retVal += sizeof(m_MapCount);           /* マップの個数 */
+    retVal += sizeof(m_WavePowerCoeff);     /* 電波の伝搬係数 */
+    retVal += sizeof(m_KusakariStart);      /* 草刈り開始時刻情報 */
+    retVal += sizeof(m_YakeiStart);         /* 夜警開始時刻情報 */
+    retVal += sizeof(m_ApCount);            /* アクセスポイントの個数 */
+    retVal += sizeof(RectStr) * m_ApCount;  /* アクセスポイントの座標 */
 
     return retVal;
 }

@@ -8,3 +8,9 @@
 /Library/obj
 /LogWriter/obj
 obj
+/AroundCamera/bin
+/Commander/bin
+/AnimalCamera/bin
+/FrontCamera/bin
+/LogWriter/bin
+/Library/bin

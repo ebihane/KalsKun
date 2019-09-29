@@ -19,6 +19,9 @@
     <ClCompile Include="Task\CameraSender\CameraSender.cpp">
       <Filter>Task\CameraSender</Filter>
     </ClCompile>
+    <ClCompile Include="Task\ErrorLed\ErrorLedManager.cpp">
+      <Filter>Task\ErrorLed</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Task">
@@ -48,6 +51,9 @@
     <Filter Include="Task\CameraSender">
       <UniqueIdentifier>{c121d145-245a-49cd-92fc-0ccbba578423}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Task\ErrorLed">
+      <UniqueIdentifier>{8a3d5ed0-b99e-48ca-b92c-863ab704820f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Task\CameraCapture\CameraCapture.h">
@@ -70,6 +76,9 @@
     </ClInclude>
     <ClInclude Include="Task\CameraSender\CameraSender.h">
       <Filter>Task\CameraSender</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\ErrorLed\ErrorLedManager.h">
+      <Filter>Task\ErrorLed</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

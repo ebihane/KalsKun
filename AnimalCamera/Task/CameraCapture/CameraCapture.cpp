@@ -1,3 +1,7 @@
+/* @todo : とりあえず顔検知はなし (周辺カメラの赤外線で対応) */
+/* 必要な場合は以下の #define を復活させる */
+/* #define FACE_DETECT_EXIST */
+
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include "Parts/ShareMemory/ShareMemory.h"
@@ -27,7 +31,9 @@ ResultEnum CameraCapture::initialize()
     ResultEnum retVal = ResultEnum::AbnormalEnd;
 
     m_Start = false;
+#ifdef FACE_DETECT_EXIST
     m_HumanFaceCascade = cv::CascadeClassifier("/home/pi/haarcascade_frontalface_alt.xml");
+#endif
     m_AnimalCascade = cv::CascadeClassifier("/home/pi/haarcascade_frontalcatface.xml");
     m_AnimalCascade2 = cv::CascadeClassifier("/home/pi/haarcascade_frontalcatface_extended.xml");
 
@@ -42,6 +48,9 @@ ResultEnum CameraCapture::doProcedure()
     long       nextIndex = 0;
     cv::Scalar cvColor = cv::Scalar(0, 0, 256);
     cv::Point   cvPointStart = { 0x00 };
+    cv::Mat grayMap;
+    cv::Mat resizeMap;
+    cv::Size resizeSize = cv::Size(320, 240);
 
 RETRY:
 
@@ -110,8 +119,15 @@ RETRY:
             goto RETRY;
         }
 
+        /* グレースケール変換 */
+        cv::cvtColor(pShareMemory->Capture.Data[nextIndex], grayMap, cv::COLOR_BGR2GRAY);
+
+        /* サイズ縮小 */
+        cv::resize(grayMap, resizeMap, resizeSize);
+
+#ifdef FACE_DETECT_EXIST
         /* 顔検知 */
-        bool faceDetected = isDetect(pShareMemory->Capture.Data[nextIndex], m_HumanFaceCascade);
+        bool faceDetected = isDetect(resizeMap, m_HumanFaceCascade);
         if (faceDetected == true)
         {
             cvPointStart = Point(30, 130);
@@ -126,10 +142,11 @@ RETRY:
             // 不審者非検知
             pShareMemory->Human = DetectTypeEnum::NOT_DETECT;
         }
+#endif
 
         /* 動物検知 */
-        bool animalDetected = isDetect(pShareMemory->Capture.Data[nextIndex], m_AnimalCascade);
-        bool animal2Detected = isDetect(pShareMemory->Capture.Data[nextIndex], m_AnimalCascade2);
+        bool animalDetected = isDetect(resizeMap, m_AnimalCascade);
+        bool animal2Detected = isDetect(resizeMap, m_AnimalCascade2);
         if ((animalDetected == true) || (animal2Detected == true))
         {
             cvPointStart = Point(30, 180);
@@ -168,28 +185,16 @@ ResultEnum CameraCapture::finalize()
     return ResultEnum::NormalEnd;
 }
 
-bool CameraCapture::isDetect(cv::Mat& masterCapture, cv::CascadeClassifier& cascade)
+bool CameraCapture::isDetect(cv::Mat& target, cv::CascadeClassifier& cascade)
 {
     bool retVal = false;
 
-    cv::Mat gray_map;
-    std::vector<cv::Rect> faces;
-    cv::cvtColor(masterCapture, gray_map, cv::COLOR_BGR2GRAY);
-    cv::Mat resizeMap;
-    cv::Size size = cv::Size(320, 240);
-    cv::resize(gray_map, resizeMap, size);
-    cascade.detectMultiScale(resizeMap, faces, 1.1, 3, 0, cv::Size(20, 20));
-    if (faces.size() > 0)
+    std::vector<cv::Rect> detectList;
+    cascade.detectMultiScale(target, detectList, 1.1, 3, 0, cv::Size(20, 20));
+    if (detectList.size() > 0)
     {
         retVal = true;
     }
-
-    //for (int i = 0; i < faces.size(); i++)
-    //{
-    //    rectangle(masterCapture, cv::Point(faces[i].x, faces[i].y), cv::Point(faces[i].x + faces[i].width, faces[i].y + faces[i].height), cv::Scalar(0, 0, 255), 3); //検出した顔を赤色矩形で囲む
-    //    cv::putText(masterCapture, "DETECTION!!", cv::Point(faces[i].x + 30, faces[i].y), cv::FONT_HERSHEY_DUPLEX, 1.2, cv::Scalar(0, 0, 200), 2, 3);
-    //    retVal = true;
-    //}
 
     return retVal;
 }

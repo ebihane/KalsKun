@@ -18,8 +18,9 @@ typedef enum
 {
     E_MELODY_SILENT = 0,    /* 0: 停止 */
     E_MELODY_SOUND_1,       /* 1: 曲 1 */
-    E_MELODY_WARNING,       /* 2: 警告 */
-    E_MELODY_ERROR,         /* 3: 異常発生 */
+    E_MELODY_SOUND_2,       /* 2: 曲 2 */
+    E_MELODY_WARNING,       /* 3: 警告 */
+    E_MELODY_ERROR,         /* 4: 異常発生 */
 } MelodyModeEnum;
 
 /* 指向性ライトモード */
@@ -81,7 +82,8 @@ typedef enum
     E_COMMAND_AVOID,    /* 3: 回避 */
     E_COMMAND_REMOTE,   /* 4: 遠隔動作 */
     E_COMMAND_MONITOR,  /* 5: モニタ */
-    E_COMMAND_MAX,      /* 6: コマンド数 */
+    E_COMMAND_L_TURN,   /* 6: 左ターン */
+    E_COMMAND_MAX,      /* 7: コマンド数 */
 } MotorCommandEnum;
 
 /* モータマイコン向け 草刈り刃動作指示 */
@@ -109,6 +111,7 @@ typedef struct
     long                PointY;
     DetectTypeEnum      ErrorStatus;
     ControlModeEnum     RemoteMode;
+    DetectTypeEnum      CommunicationError;
 } MotorStatusStr;
 
 /*==============*/

@@ -88,6 +88,7 @@
     <ClCompile Include="Parts\MappingData\AreaMap.cpp" />
     <ClCompile Include="Parts\MappingData\MappingData.cpp" />
     <ClCompile Include="Parts\MappingData\MoveMap.cpp" />
+    <ClCompile Include="Parts\MotorSimulator\MotorSimulator.cpp" />
     <ClCompile Include="Parts\PositionData\PositionData.cpp" />
     <ClCompile Include="Parts\Setting\SettingManager.cpp" />
     <ClCompile Include="Task\AnimalCamera\AnimalCameraReceiver.cpp" />
@@ -111,6 +112,7 @@
     <ClInclude Include="Parts\MappingData\AreaMap.h" />
     <ClInclude Include="Parts\MappingData\MappingData.h" />
     <ClInclude Include="Parts\MappingData\MoveMap.h" />
+    <ClInclude Include="Parts\MotorSimulator\MotorSimulator.h" />
     <ClInclude Include="Parts\PositionData\PositionData.h" />
     <ClInclude Include="Parts\Setting\SettingManager.h" />
     <ClInclude Include="Parts\ShareMemory\ShareMemory.h" />

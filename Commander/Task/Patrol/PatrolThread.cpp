@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "Parts/ShareMemory/ShareMemory.h"
 #include "PatrolThread.h"
 
@@ -19,109 +20,68 @@ void PatrolThread::AddTarget(ThreadBase* const target)
 {
     if (target != NULL)
     {
-        m_TargetList.push_back(target);
+        ThreadInfo* info = new ThreadInfo();
+        target->GetName(&(info->Name[0]));
+        info->Thread = target;
+        info->PreviewState = false;
+        m_TargetList.push_back(info);
     }
+}
+
+ResultEnum PatrolThread::initializeCore()
+{
+    strncpy(&m_FrontCamera.Name[0], "FrontCamera", sizeof(m_FrontCamera.Name));
+    strncpy(&m_AnimalCamera.Name[0], "AnimalCamera", sizeof(m_AnimalCamera.Name));
+    strncpy(&m_AroundCamera.Name[0], "AroundCamera", sizeof(m_AnimalCamera.Name));
+    strncpy(&m_MotorMicon.Name[0], "Motor", sizeof(m_MotorMicon.Name));
+
+    m_FrontCamera.PreviewCount = 0;
+    m_AnimalCamera.PreviewCount = 0;
+    m_AroundCamera.PreviewCount = 0;
+    m_MotorMicon.PreviewCount = 0;
+
+    m_FrontCamera.PreviewState = true;
+    m_AnimalCamera.PreviewState = true;
+    m_AroundCamera.PreviewState = true;
+    m_MotorMicon.PreviewState = true;
+
+    return ResultEnum::NormalEnd;
 }
 
 ResultEnum PatrolThread::doMainProc()
 {
     bool systemError = false;
-    long motorCount = pShareMemory->Motor.CommunicationCount;
-    long frontCameraCount = pShareMemory->FrontCamera.ReceiveCount;
-    long animalCameraCount = pShareMemory->AnimalCamera.ReceiveCount;
-    long aroundCameraCount = pShareMemory->AroundCamera.ReceiveCount;
 
     /* 必要なスレッドが不正終了している */
-    int index = 0;
-    for (list<ThreadBase*>::iterator itr = m_TargetList.begin(); itr != m_TargetList.end(); ++itr)
+    if (isThreadsOk() != true)
     {
-        ThreadBase* target = *itr;
-        ThreadBase::ThreadStateEnum state = target->GetState();
-        if ((state != ThreadBase::ThreadStateEnum::NotStart) && (state != ThreadBase::ThreadStateEnum::Executing))
-        {
-            snprintf(&m_LogStr[0], sizeof(m_LogStr), "[Patrol] Task(%d) Illegal state. state[%d]\n", index, state);
-            m_Logger->LOG_ERROR(m_LogStr);
-            systemError = true;
-        }
-        index++;
-    }
-
-    if (frontCameraCount == 0)
-    {
-        m_PrevFrontCameraCount = frontCameraCount;
-    }
-    else if (frontCameraCount != m_PrevFrontCameraCount)
-    {
-        m_FrontCameraWatch.Start();
-        m_PrevFrontCameraCount = frontCameraCount;
-    }
-    else if (m_FrontCameraWatch.GetSplit() <= 5.0f)
-    {
-        /* nop. */
-    }
-    else
-    {
-        /* 前方カメラマイコンとの通信が 5 秒間取れない */
         systemError = true;
     }
 
-    if (animalCameraCount == 0)
+    /* 前方カメラ 通信確認 */
+    if (isOtherConStateOk(pShareMemory->FrontCamera.ReceiveCount, &m_FrontCamera) != true)
     {
-        m_PrevAnimalCameraCount = animalCameraCount;
-    }
-    else if (animalCameraCount != m_PrevAnimalCameraCount)
-    {
-        m_AnimalCameraWatch.Start();
-        m_PrevAnimalCameraCount = animalCameraCount;
-    }
-    else if (m_AnimalCameraWatch.GetSplit() <= 5.0f)
-    {
-        /* nop. */
-    }
-    else
-    {
-        /* 動物カメラマイコンとの通信が 5 秒間取れない */
         systemError = true;
     }
 
-    if (aroundCameraCount == 0)
+    /* 動物カメラ 通信確認 */
+    if (isOtherConStateOk(pShareMemory->AnimalCamera.ReceiveCount, &m_AnimalCamera) != true)
     {
-        m_PrevAroundCameraCount = aroundCameraCount;
-    }
-    else if (aroundCameraCount != m_PrevAroundCameraCount)
-    {
-        m_AroundCameraWatch.Start();
-        m_PrevAroundCameraCount = aroundCameraCount;
-    }
-    else if (m_AroundCameraWatch.GetSplit() <= 5.0f)
-    {
-        /* nop. */
-    }
-    else
-    {
-        /* 周辺カメラマイコンとの通信が 5 秒間取れない */
         systemError = true;
     }
 
-    if (motorCount == 0)
+    /* 周辺カメラ 通信確認 */
+    if (isOtherConStateOk(pShareMemory->AroundCamera.ReceiveCount, &m_AroundCamera) != true)
     {
-        m_PrevMotorCount = motorCount;
-    }
-    else if (motorCount != m_PrevMotorCount)
-    {
-        m_MotorWatch.Start();
-        m_PrevMotorCount = motorCount;
-    }
-    else if (m_MotorWatch.GetSplit() <= 5.0f)
-    {
-        /* nop. */
-    }
-    else
-    {
-        /* モータマイコンとの通信が 5 秒間取れない */
         systemError = true;
     }
-    
+
+    /* モータマイコン 通信確認 */
+    if (isOtherConStateOk(pShareMemory->Motor.CommunicationCount, &m_MotorMicon) != true)
+    {
+        systemError = true;
+    }
+
     pShareMemory->Commander.SystemError = systemError;
 
     return ResultEnum::NormalEnd;
@@ -132,8 +92,104 @@ ResultEnum PatrolThread::finalizeCore()
     /* シャットダウン時以外、自身が終了することは想定していない */
     if (pShareMemory != NULL)
     {
-        pShareMemory->Commander.SystemError = 1;
+        pShareMemory->Commander.SystemError = true;
     }
 
     return ResultEnum::NormalEnd;
+}
+
+bool PatrolThread::isThreadsOk()
+{
+    bool retVal = true;
+    bool state = false;
+
+    for (list<ThreadInfo*>::iterator itr = m_TargetList.begin(); itr != m_TargetList.end(); ++itr)
+    {
+        ThreadInfo* target = *itr;
+
+        ThreadBase::ThreadStateEnum threadState = target->Thread->GetState();
+
+        if ((threadState != ThreadBase::ThreadStateEnum::NotStart)
+        &&  (threadState != ThreadBase::ThreadStateEnum::Executing))
+        {
+            retVal = false;
+            state = false;
+        }
+        else
+        {
+            state = true;
+        }
+
+        /* OK -> NG */
+        if ((target->PreviewState == true) && (state == false))
+        {
+            snprintf(&m_LogStr[0], sizeof(m_LogStr), "[Patrol] Task[%s] Illegal state. state[%d]\n", &(target->Name[0]), threadState);
+            m_Logger->LOG_ERROR(m_LogStr);
+        }
+        /* NG -> OK */
+        else if ((target->PreviewState == false) && (state == true))
+        {
+            snprintf(&m_LogStr[0], sizeof(m_LogStr), "[Patrol] Task[%s] State OK return. state[%d]\n", &(target->Name[0]), threadState);
+            m_Logger->LOG_INFO(m_LogStr);
+        }
+        else
+        {
+            /* nop. */
+        }
+
+        target->PreviewState = state;
+    }
+
+    return retVal;
+}
+
+bool PatrolThread::isOtherConStateOk(const long count, StateInfo* const info)
+{
+    bool retVal = true;
+
+    /* 未接続 */
+    if (count == 0)
+    {
+        info->PreviewCount = count;
+        goto FINISH;
+    }
+
+    /* 通信回数が更新された */
+    if (count != info->PreviewCount)
+    {
+        info->Watch.Start();
+        info->PreviewCount = count;
+        goto FINISH;
+    }
+
+    /* 通信回数変化なし 5 秒以内 */
+    if (info->Watch.GetSplit() <= 5.0f)
+    {
+        goto FINISH;
+    }
+
+    /* 他マイコンとの通信が 5 秒間取れない */
+    retVal = false;
+
+FINISH :
+
+    /* OK -> NG */
+    if ((info->PreviewState == true) && (retVal == false))
+    {
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[Patrol] %s-Con Connect Error. Count[%ld]\n", &(info->Name[0]), info->PreviewCount);
+        m_Logger->LOG_ERROR(m_LogStr);
+    }
+    else if ((info->PreviewState == false) && (retVal == true))
+    {
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[Patrol] %s-Con Connect OK. Count[%ld]\n", &(info->Name[0]), info->PreviewCount);
+        m_Logger->LOG_INFO(m_LogStr);
+    }
+    else
+    {
+        /* nop. */
+    }
+
+    info->PreviewState = retVal;
+
+    return retVal;
 }

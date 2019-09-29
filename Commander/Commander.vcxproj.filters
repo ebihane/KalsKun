@@ -64,6 +64,9 @@
     <Filter Include="Task\Patrol">
       <UniqueIdentifier>{370bfe0e-a61f-40ad-81b8-7467f6798f77}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Parts\MotorSimulator">
+      <UniqueIdentifier>{6329794f-de2c-4e6b-8253-e92d29dbbb68}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Task\Main\main.cpp">
@@ -125,6 +128,9 @@
     </ClCompile>
     <ClCompile Include="Task\Patrol\PatrolThread.cpp">
       <Filter>Task\Patrol</Filter>
+    </ClCompile>
+    <ClCompile Include="Parts\MotorSimulator\MotorSimulator.cpp">
+      <Filter>Parts\MotorSimulator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -190,6 +196,9 @@
     </ClInclude>
     <ClInclude Include="Task\Patrol\PatrolThread.h">
       <Filter>Task\Patrol</Filter>
+    </ClInclude>
+    <ClInclude Include="Parts\MotorSimulator\MotorSimulator.h">
+      <Filter>Parts\MotorSimulator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

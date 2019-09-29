@@ -179,6 +179,11 @@ void ThreadBase::ChangeLogInfo(const char logLevel, const Logger::LogTypeEnum lo
     }
 }
 
+void ThreadBase::GetName(char* const name)
+{
+    strncpy(&name[0], &m_TaskName[0], sizeof(m_TaskName));
+}
+
 bool ThreadBase::isStopRequest()
 {
     return m_Stop;

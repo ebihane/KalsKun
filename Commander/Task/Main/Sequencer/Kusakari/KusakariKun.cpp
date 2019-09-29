@@ -31,6 +31,7 @@ ResultEnum KusakariKun::initializeCore()
     m_PreviewState.Position.Y = -1;
     m_PreviewState.CurrentMove = MotorCommandEnum::E_COMMAND_MAX;
     m_PreviewState.ControlMode = ControlModeEnum::E_MODE_MANUAL;
+    m_PreviewState.TurnCount = 0;
 
     /* 直前の動作情報を初期化 */
     m_PreviewDrive.Melody = MelodyModeEnum::E_MELODY_SILENT;
@@ -60,7 +61,7 @@ SequencerBase::SequenceTypeEnum KusakariKun::processCore()
 
     /* 状態収集 */
     correctCurrentState(&state);
-    
+
     /* 状態から動作を決定 */
     drive.Melody = decideMelodyMode(&state);
     drive.Light = decideLightMode(&state);
@@ -75,6 +76,15 @@ SequencerBase::SequenceTypeEnum KusakariKun::processCore()
     /* 動作マップ更新 */
     m_MoveMap->ChangeMoved(&state.Position);
 
+#if 1
+    if ((m_PreviewState.Position.X != state.Position.X) || (m_PreviewState.Position.Y != state.Position.Y))
+    {
+        char log[64] = { 0 };
+        snprintf(&log[0], sizeof(log), "[processCore] Move. Array[%ld, %ld] Real[%f, %f]\n", state.Position.X, state.Position.Y, state.RealPosition.Width, state.RealPosition.Length);
+        m_Logger.LOG_INFO(log);
+    }
+#endif
+
     /* 次の動作を決定 */
     retVal = decideNextSequence(&state);
 
@@ -82,33 +92,19 @@ SequencerBase::SequenceTypeEnum KusakariKun::processCore()
     m_PreviewState = state;
     m_PreviewDrive = drive;
 
-#if 0
-    if ((m_PrevRect.X != point.X)
-    ||  (m_PrevRect.Y != point.Y))
-    {
-        char log[64] = { 0 };
-        snprintf(&log[0], sizeof(log), "[processCore] Move. Array[%ld, %ld] Real[%f, %f]\n", point.X, point.Y);
-        m_Logger.LOG_INFO(log);
-    }
-
-    m_PrevRect.X = point.X;
-    m_PrevRect.Y = point.Y;
-#endif
-
     return retVal;
 }
 
 void KusakariKun::correctCurrentState(StateInfoStr* const state)
 {
-    SizeStr realPoint;
-    realPoint.Width = (double)pShareMemory->Motor.PointX;
-    realPoint.Length = (double)pShareMemory->Motor.PointY;
-
     state->MoveType = pShareMemory->FrontCamera.MoveType;
     state->Animal = pShareMemory->AnimalCamera.Animal;
-    state->Position = convertRealPointToMapPoint(&realPoint);
+    state->RealPosition.Width = (double)pShareMemory->Motor.PointX;
+    state->RealPosition.Length = (double)pShareMemory->Motor.PointY;
+    state->Position = convertRealPointToMapPoint(&(state->RealPosition));
     state->CurrentMove = pShareMemory->Motor.Command;
     state->ControlMode = pShareMemory->Motor.RemoteMode;
+    state->TurnCount = m_PreviewState.TurnCount;
 }
 
 MelodyModeEnum KusakariKun::decideMelodyMode(StateInfoStr* const state)
@@ -121,7 +117,7 @@ MelodyModeEnum KusakariKun::decideMelodyMode(StateInfoStr* const state)
     }
     else
     {
-        retVal = MelodyModeEnum::E_MELODY_SOUND_1;
+        retVal = MelodyModeEnum::E_MELODY_SOUND_2;
     }
 
     return retVal;
@@ -152,7 +148,23 @@ MotorCommandEnum KusakariKun::decideMotorCommand(StateInfoStr* const state)
 
     if (state->MoveType == MoveTypeEnum::TURN)
     {
-        retVal = MotorCommandEnum::E_COMMAND_R_TURN;
+        if ((m_PreviewDrive.MotorCommand != MotorCommandEnum::E_COMMAND_L_TURN)
+        &&  (m_PreviewDrive.MotorCommand != MotorCommandEnum::E_COMMAND_R_TURN))
+        {
+            state->TurnCount++;
+            char logStr[LOG_OUT_MAX] = { 0 };
+            snprintf(&logStr[0], sizeof(logStr), "[Kusakari] Turn : %ld\n", state->TurnCount);
+            m_Logger.LOG_INFO(logStr);
+        }
+
+        if ((state->TurnCount % 2) == 0)
+        {
+            retVal = MotorCommandEnum::E_COMMAND_L_TURN;
+        }
+        else
+        {
+            retVal = MotorCommandEnum::E_COMMAND_R_TURN;
+        }
     }
     else if (state->MoveType == MoveTypeEnum::AVOIDANCE)
     {
@@ -160,6 +172,11 @@ MotorCommandEnum KusakariKun::decideMotorCommand(StateInfoStr* const state)
     }
     else
     {
+        
+
+
+
+
         retVal = MotorCommandEnum::E_COMMAND_FRONT;
     }
 
@@ -209,6 +226,14 @@ SequencerBase::SequenceTypeEnum KusakariKun::decideNextSequence(StateInfoStr* co
     if (state->ControlMode == ControlModeEnum::E_MODE_MANUAL)
     {
         m_Logger.LOG_INFO("[decideNextSequence] Manual Mode.\n");
+        retVal = SequenceTypeEnum::E_SEQ_IDLE;
+        goto FINISH;
+    }
+
+    /* ターン回数 6 回以上で IDLE */
+    if (6 <= state->TurnCount)
+    {
+        m_Logger.LOG_INFO("[decideNextSequence] Trun Count Arrival.\n");
         retVal = SequenceTypeEnum::E_SEQ_IDLE;
         goto FINISH;
     }

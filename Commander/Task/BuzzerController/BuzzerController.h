@@ -15,6 +15,9 @@ protected :
 
 private :
 
+    static const unsigned char  MELODY_1_TABLE_MAX = 44;
+    static const unsigned char  MELODY_2_TABLE_MAX = 164;
+
     /* 音程情報構造体 */
     typedef struct
     {
@@ -22,8 +25,8 @@ private :
         float Time;         /* キープする時間 (sec) */
     } MelodyLineStr;
 
-    static const MelodyLineStr  MELODY_1_TABLE[44];
-    static const MelodyLineStr  MELODY_2_TABLE[120];
+    static const MelodyLineStr  MELODY_1_TABLE[MELODY_1_TABLE_MAX];
+    static const MelodyLineStr  MELODY_2_TABLE[MELODY_2_TABLE_MAX];
 
     Stopwatch       m_Watch;
     float           m_ThreshTime;

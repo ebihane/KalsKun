@@ -22,13 +22,15 @@ private :
     bool m_Start;
     cv::VideoCapture* m_Capture;
 
+#ifdef FACE_DETECT_EXIST
     cv::CascadeClassifier m_HumanFaceCascade;
+#endif
     cv::CascadeClassifier m_AnimalCascade;
     cv::CascadeClassifier m_AnimalCascade2;
 
     ResultEnum initialize();
     ResultEnum doProcedure();
     ResultEnum finalize();
-    bool isDetect(cv::Mat& masterCapture, cv::CascadeClassifier& cascade);
+    bool isDetect(cv::Mat& target, cv::CascadeClassifier& cascade);
 
 };

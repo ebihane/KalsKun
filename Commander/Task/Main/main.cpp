@@ -12,6 +12,7 @@
 #include "Parts/ShareMemory/ShareMemory.h"
 #include "Parts/MappingData/AreaMap.h"
 #include "Parts/MappingData/MoveMap.h"
+#include "Parts/MotorSimulator/MotorSimulator.h"
 
 /* Task */
 #include "Task/AroundCamera/AroundCameraReceiver.h"
@@ -46,22 +47,28 @@ static PatrolThread* g_pPatrolThread = NULL;
 /* Sequencer */
 static SequencerBase* g_pSequencer = NULL;
 
-ResultEnum initialize();
+ResultEnum initialize(const char isMotorSimulator);
 void mainProcedure();
 void finalize();
 void signalHandler(int signum);
 
 
-int main(void)
+int main(int argc, char* argv[])
 {
     bool isMainLoopExit = false;
+    char isMotorSimulator = 0;
+
+    if (2 <= argc)
+    {
+        isMotorSimulator = (char)atoi(argv[1]);
+    }
 
     signal(SIGKILL, signalHandler);
     signal(SIGSEGV, signalHandler);
     signal(SIGTERM, signalHandler);
     signal(SIGABRT, signalHandler);
 
-    if (initialize() != ResultEnum::NormalEnd)
+    if (initialize(isMotorSimulator) != ResultEnum::NormalEnd)
     {
         goto FINISH;
     }
@@ -80,11 +87,13 @@ FINISH :
     return 0;
 }
 
-ResultEnum initialize()
+ResultEnum initialize(const char isMotorSimulator)
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     SettingManager* setting = NULL;
     TcpServer* server = NULL;
+    AdapterBase* adapter = NULL;
+    Serial::SerialInfoStr serialSetting;
     AreaMap* areaMap = AreaMap::GetInstance();
     MoveMap* moveMap = MoveMap::GetInstance();
     long lCnt = 0;
@@ -248,8 +257,30 @@ ResultEnum initialize()
         goto FINISH;
     }
 
+    if (isMotorSimulator == 1)
+    {
+        /* モータシミュレータ */
+        adapter = new MotorSimulator();
+    }
+    else
+    {
+        /* シリアルポート設定 */
+        serialSetting.Baudrate = Serial::BaudrateEnum::E_Baudrate_115200;
+        serialSetting.Parity = Serial::ParityEnum::E_Parity_Non;
+        serialSetting.StopBit = Serial::StopBitEnum::E_StopBit_1Bit;
+        serialSetting.DataLength = Serial::DataLengthEnum::E_Data_8bit;
+
+        /* シリアル通信クラス生成 */
+        adapter = new Serial((char*)"ttyUSB0", &serialSetting);
+        if (adapter == NULL)
+        {
+            g_pLogger->LOG_ERROR("[initialize] Serial allocation failed.\n");
+            goto FINISH;
+        }
+    }
+
     /* モータマイコン通信スレッド 初期化 */
-    g_pMotorCommunicator = new MotorCommunicator();
+    g_pMotorCommunicator = new MotorCommunicator(adapter);
     if (g_pMotorCommunicator == NULL)
     {
         g_pLogger->LOG_ERROR("[initialize] g_pMotorCommunicator allocation failed.\n");

@@ -25,22 +25,6 @@ ResultEnum AnimalCameraReceiver::initializeCore()
     return ResultEnum::NormalEnd;
 }
 
-void AnimalCameraReceiver::doReconnectInitialize(const bool isFirst)
-{
-    /* 再接続時はシステムエラー扱いとする */
-    if (isFirst != true)
-    {
-        pShareMemory->AnimalCamera.SystemError = 1;
-    }
-}
-
-ResultEnum AnimalCameraReceiver::doConnectedProc()
-{
-    /* 接続完了により一時的にシステムエラー解除 */
-    pShareMemory->AnimalCamera.SystemError = 0;
-    return ResultEnum::NormalEnd;
-}
-
 bool AnimalCameraReceiver::isReceiveComplete(char* const buffer, const unsigned long size)
 {
     bool retVal = false;

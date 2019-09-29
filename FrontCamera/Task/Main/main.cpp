@@ -26,6 +26,7 @@ wiringPi; pthread; dl; rt;  opencv_core; opencv_video; opencv_videoio; opencv_hi
 #include "Task/StateSender/StateSender.h"
 #include "Task/HeartBeat/HeartBeatManager.h"
 #include "Task/Ultrasound/UltrasoundManager.h"
+#include "Task/ErrorLed/ErrorLedManager.h"
 
 /* Parts */
 static Logger* g_pLogger = NULL;
@@ -36,8 +37,7 @@ static StateSender* g_pStateSender = NULL;
 static HeartBeatManager* g_pHeartBeatManager = NULL;
 static UltrasoundManager* g_pUltrasoundManager1 = NULL;
 static UltrasoundManager* g_pUltrasoundManager2 = NULL;
-
-
+static ErrorLedManager* g_pErrorLedManager = NULL;
 
 ResultEnum initialize(const char controllerType);
 void mainProcedure(const char isShow);
@@ -159,7 +159,7 @@ ResultEnum initialize(const char cameraNo)
     g_pCameraCapture = new CameraCapture(cameraNo);
     if (g_pCameraCapture == NULL)
     {
-        g_pLogger->LOG_ERROR("[masterInitialize] g_pCameraCapture allocation failed.\n");
+        g_pLogger->LOG_ERROR("[initialize] g_pCameraCapture allocation failed.\n");
         goto FINISH;
     }
 
@@ -168,16 +168,28 @@ ResultEnum initialize(const char cameraNo)
     g_pStateSender = new StateSender(client);
     if (g_pStateSender == NULL)
     {
-        g_pLogger->LOG_ERROR("[masterInitialize] g_pStateSender allocation failed.\n");
+        g_pLogger->LOG_ERROR("[initialize] g_pStateSender allocation failed.\n");
         goto FINISH;
     }
+
+#if ERROR_LED_EXIST
+    /* ˆÙíó‘Ô LED §ŒäƒXƒŒƒbƒh ‰Šú‰» */
+    g_pErrorLedManager = new ErrorLedManager();
+    if (g_pErrorLedManager == NULL)
+    {
+        g_pLogger->LOG_ERROR("[initialize] g_pErrorLedManager allocation failed.\n");
+        goto FINISH;
+    }
+#endif
 
     g_pHeartBeatManager->Run();
     g_pCameraCapture->Run();
     g_pUltrasoundManager1->Run();
     g_pUltrasoundManager2->Run();
     g_pStateSender->Run();
-
+#if ERROR_LED_EXIST
+    g_pErrorLedManager->Run();
+#endif
     retVal = ResultEnum::NormalEnd;
 
 FINISH :
@@ -251,6 +263,13 @@ void mainProcedure(const char isShow)
 
 void finalize()
 {
+    if (g_pErrorLedManager != NULL)
+    {
+        g_pErrorLedManager->Stop(5);
+        delete g_pErrorLedManager;
+        g_pErrorLedManager = NULL;
+    }
+
     if (g_pStateSender != NULL)
     {
         g_pStateSender->Stop(5);

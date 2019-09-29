@@ -27,12 +27,14 @@ wiringPi; pthread; dl; rt;  opencv_core; opencv_video; opencv_videoio; opencv_hi
 #include "Task/StateSender/StateSender.h"
 #include "Task/RedwavePatrol/RedwavePatrol.h"
 #include "Task/HeartBeat/HeartBeatManager.h"
+#include "Task/ErrorLed/ErrorLedManager.h"
 
 static Logger* g_pLogger = NULL;
 static CameraCapture* g_pCameraCapture = NULL;
 static StateSender* g_pStateSender = NULL;
 static RedwavePatrol* g_pRedwavePatrol = NULL;
 static HeartBeatManager* g_pHeartBeat = NULL;
+static ErrorLedManager* g_pErrorLedManager = NULL;
 
 ResultEnum initialize(const char cameraNo);
 void procMain(const char isShow);
@@ -143,9 +145,18 @@ ResultEnum initialize(const char cameraNo)
         goto FINISH;
     }
 
+    /* ˆÙíó‘Ô LED §ŒäƒXƒŒƒbƒh ‰Šú‰» */
+    g_pErrorLedManager = new ErrorLedManager();
+    if (g_pErrorLedManager == NULL)
+    {
+        g_pLogger->LOG_ERROR("[initialize] g_pErrorLedManager allocation failed.\n");
+        goto FINISH;
+    }
+
     g_pHeartBeat->Run();
     g_pStateSender->Run();
     g_pCameraCapture->Run();
+    g_pErrorLedManager->Run();
 
     retVal = ResultEnum::NormalEnd;
 
@@ -155,6 +166,13 @@ FINISH:
 
 void finalize()
 {
+    if (g_pErrorLedManager != NULL)
+    {
+        g_pErrorLedManager->Stop(5);
+        delete g_pErrorLedManager;
+        g_pErrorLedManager = NULL;
+    }
+
     if (g_pRedwavePatrol != NULL)
     {
         g_pRedwavePatrol->Stop(10);

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdio.h>
 #include "Queue/Queue.h"
 #include "Serial/Serial.h"
 #include "ThreadBase/LoopThreadBase.h"
@@ -9,7 +10,7 @@ class MotorCommunicator : public LoopThreadBase
 {
 public :
 
-    MotorCommunicator();
+    MotorCommunicator(AdapterBase* const adapter);
     virtual ~MotorCommunicator();
 
 protected :
@@ -18,8 +19,11 @@ protected :
 private :
 
     Queue* m_Queue;
-    Serial* m_Serial;
+    AdapterBase* m_Adapter;
+    FILE* m_LogFile;
 
+    bool m_IsOpen;
+    bool m_Opened;
     MotorCommandEnum m_MotorCommand;
     CutterDriveEnum m_CutterMode;
 

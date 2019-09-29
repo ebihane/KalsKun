@@ -13,6 +13,9 @@
     <ClCompile Include="Task\HeartBeat\HeartBeatManager.cpp">
       <Filter>Task\HeartBeat</Filter>
     </ClCompile>
+    <ClCompile Include="Task\ErrorLed\ErrorLedManager.cpp">
+      <Filter>Task\ErrorLed</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Task">
@@ -36,6 +39,9 @@
     <Filter Include="Task\HeartBeat">
       <UniqueIdentifier>{c2e1eb67-367a-4353-8017-5398cfb32a76}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Task\ErrorLed">
+      <UniqueIdentifier>{289ba69a-317b-4c24-afe3-70cc80e3355c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Task\CameraCapture\CameraCapture.h">
@@ -52,6 +58,9 @@
     </ClInclude>
     <ClInclude Include="Task\HeartBeat\HeartBeatManager.h">
       <Filter>Task\HeartBeat</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\ErrorLed\ErrorLedManager.h">
+      <Filter>Task\ErrorLed</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

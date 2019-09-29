@@ -6,6 +6,28 @@ class SettingManager
 {
 public :
 
+    /* 曜日定数 */
+    typedef enum
+    {
+        Sunday = 0,     /* 0: 日曜日 */
+        Monday,         /* 1: 月曜日 */
+        Tuesday,        /* 2: 火曜日 */
+        Wednesday,      /* 3: 水曜日 */
+        Tharsday,       /* 4: 木曜日 */
+        Friday,         /* 5: 金曜日 */
+        Saturday,       /* 6: 土曜日 */
+        Everyday,       /* 7: 毎日 */
+        Nothing,        /* 8: 無し */
+    } DayOfWeekEnum;
+
+    /* 開始日時 */
+    typedef struct
+    {
+        DayOfWeekEnum   DayOfWeek;
+        unsigned char   Hour;
+        unsigned char   Minute;
+    } TimeSettingStr;
+
     /* インスタンス取得 */
     static SettingManager* const GetInstance();
 
@@ -36,6 +58,14 @@ public :
     float GetWavePowerCoeff();                  /* 取得 */
     void SetWavePowerCoeff(const float coeff);  /* 設定 */
 
+    /* 草刈り開始時刻 */
+    TimeSettingStr GetKusakariStartTime();                  /* 取得 */
+    void SetKusakariStartTime(TimeSettingStr* const date);  /* 設定 */
+
+    /* 夜警開始時刻 */
+    TimeSettingStr GetYakeiStartTime();                     /* 取得 */
+    void SetYakeStartTime(TimeSettingStr* const date);      /* 設定 */
+
     /* アクセスポイント */
     long GetApCount();                          /* 個数 取得 */
     void GetApAddress(RectStr* data);           /* 座標 取得 */
@@ -48,14 +78,16 @@ private :
 
     static SettingManager* m_This;  /* 自クラスインスタンス */
 
-    int         m_LastErrorNo;      /* 最後に発生したシステムエラー */
+    int             m_LastErrorNo;      /* 最後に発生したシステムエラー */
 
-    SizeStr     m_RobotSize;        /* ロボットサイズ */
-    SizeStr     m_FarmSize;         /* 畑のサイズ */
-    RectStr     m_MapCount;         /* マップの個数 */
-    float       m_WavePowerCoeff;   /* 電波の伝搬係数 */
-    long        m_ApCount;          /* アクセスポイントの個数 */
-    RectStr*    m_ApAddress;        /* アクセスポイントの座標 */
+    SizeStr         m_RobotSize;        /* ロボットサイズ */
+    SizeStr         m_FarmSize;         /* 畑のサイズ */
+    RectStr         m_MapCount;         /* マップの個数 */
+    float           m_WavePowerCoeff;   /* 電波の伝搬係数 */
+    TimeSettingStr  m_KusakariStart;    /* 草刈り開始時刻情報 */
+    TimeSettingStr  m_YakeiStart;       /* 夜警開始時刻情報 */
+    long            m_ApCount;          /* アクセスポイントの個数 */
+    RectStr*        m_ApAddress;        /* アクセスポイントの座標 */
 
     SettingManager();
     virtual ~SettingManager();

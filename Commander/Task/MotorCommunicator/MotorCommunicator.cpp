@@ -1,12 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 #include "MotorCommunicator.h"
 
-MotorCommunicator::MotorCommunicator()
+MotorCommunicator::MotorCommunicator(AdapterBase* const adapter)
  : LoopThreadBase((char*)"MotorComm", 100, TypeEnum::TIMER_STOP)
  , m_Queue(NULL)
- , m_Serial(NULL)
+ , m_Adapter(adapter)
+ , m_LogFile(NULL)
+ , m_IsOpen(false)
  , m_MotorCommand(MotorCommandEnum::E_COMMAND_STOP)
  , m_CutterMode(CutterDriveEnum::E_CUTTER_STOP)
 {
@@ -21,116 +24,108 @@ MotorCommunicator::~MotorCommunicator()
 ResultEnum MotorCommunicator::initializeCore()
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
-    Serial::SerialInfoStr serialSetting;
-    Queue* queue = NULL;
-    Serial* serial = NULL;
-    char sendBuffer[3] = { 0 };
-    char recvBuffer[8] = { 0 };
-
 
     /* 受信キュー生成 */
-    queue = new Queue((char*)"MotorComm");
-    if (queue == NULL)
+    m_Queue = new Queue((char*)"MotorComm");
+    if (m_Queue == NULL)
     {
         m_Logger->LOG_ERROR("[initializeCore] Queue allocation failed.\n");
         goto FINISH;
     }
 
     /* キューオープン */
-    if (queue->Open() != ResultEnum::NormalEnd)
+    if (m_Queue->Open() != ResultEnum::NormalEnd)
     {
         m_Logger->LOG_ERROR("[initializeCore] Queue Open failed.\n");
         goto FINISH;
     }
 
-    /* シリアルポート設定 */
-    serialSetting.Baudrate = Serial::BaudrateEnum::E_Baudrate_115200;
-    serialSetting.Parity = Serial::ParityEnum::E_Parity_Non;
-    serialSetting.StopBit = Serial::StopBitEnum::E_StopBit_1Bit;
-    serialSetting.DataLength = Serial::DataLengthEnum::E_Data_8bit;
+    /* ログファイル削除 */
+    remove("/home/pi/Commander/MotorLog.txt");
 
-    /* シリアル通信クラス生成 */
-    serial = new Serial((char*)"ttyUSB0", &serialSetting);
-    if (serial == NULL)
+    /* ログファイル生成 */
+    m_LogFile = fopen("/home/pi/Commander/MotorLog.txt", "w");
+    if (m_LogFile == NULL)
     {
-        m_Logger->LOG_ERROR("[initializeCore] Serial allocation failed.\n");
-        goto FINISH;
+        /* ログ出しのみ */
+        snprintf(&m_LogStr[0], sizeof(m_LogFile), "[initializeCore] Log File Open failed. errno[%d]\n", errno);
+        m_Logger->LOG_ERROR(m_LogStr);
     }
-
-    /* ポートオープン */
-    if (serial->Open() != ResultEnum::NormalEnd)
-    {
-        m_Logger->LOG_ERROR("[initializeCore] Serial Open failed.\n");
-        goto FINISH;
-    }
-
-    /* お試しワンショット送信 */
-    createSendData(MotorCommandEnum::E_COMMAND_STOP, CutterDriveEnum::E_CUTTER_STOP, &sendBuffer[0]);
-    if (serial->Send(&sendBuffer[0], sizeof(sendBuffer)) != ResultEnum::NormalEnd)
-    {
-        char log[40] = { 0 };
-        snprintf(&log[0], sizeof(log), "[doMainProc] Send failed. errno[%d]\n", serial->GetLastError());
-        m_Logger->LOG_ERROR(log);
-        goto FINISH;
-    }
-
-    if (serial->Receive(&recvBuffer[0], sizeof(recvBuffer)) != ResultEnum::NormalEnd)
-    {
-        char log[40] = { 0 };
-        snprintf(&log[0], sizeof(log), "[doMainProc] Receive failed. errno[%d]\n", serial->GetLastError());
-        m_Logger->LOG_ERROR(log);
-        goto FINISH;
-    }
-
-    analyze(&recvBuffer[0]);
-
-    m_Queue = queue;
-    m_Serial = serial;
 
     retVal = ResultEnum::NormalEnd;
 
 FINISH:
-
-    if (retVal != ResultEnum::NormalEnd)
-    {
-        if (serial != NULL)
-        {
-            serial->Close();
-            delete serial;
-        }
-
-        if (queue != NULL)
-        {
-            queue->Close();
-            delete queue;
-        }
-    }
-
     return retVal;
 }
 
 ResultEnum MotorCommunicator::doMainProc()
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
+    bool receivable = false;
     char sendBuffer[3] = { 0 };
     char recvBuffer[8] = { 0 };
-    bool receivable = false;
-    char log[80] = { 0 };
     EventInfo ev = { 0 };
     
+    if (m_IsOpen == false)
+    {
+        /* いったんクローズする */
+        m_Adapter->Close();
+
+        /* オープン */
+        if (m_Adapter->Open() != ResultEnum::NormalEnd)
+        {
+            /* 次の周期でリトライ */
+            if (m_Opened == true)
+            {
+                m_Logger->LOG_ERROR("[doMainProc] Open failed.\n");
+            }
+            goto COMM_ERROR;
+        }
+
+        /* お試しワンショット送信 */
+        createSendData(MotorCommandEnum::E_COMMAND_STOP, CutterDriveEnum::E_CUTTER_STOP, &sendBuffer[0]);
+        if (m_Adapter->Send(&sendBuffer[0], sizeof(sendBuffer)) != ResultEnum::NormalEnd)
+        {
+            snprintf(&m_LogStr[0], sizeof(m_LogStr), "[doMainProc] Send failed. errno[%d]\n", m_Adapter->GetLastError());
+            m_Logger->LOG_ERROR(m_LogStr);
+            goto COMM_ERROR;
+        }
+
+        if (m_Adapter->Receive(&recvBuffer[0], sizeof(recvBuffer)) != ResultEnum::NormalEnd)
+        {
+            snprintf(&m_LogStr[0], sizeof(m_LogStr), "[doMainProc] Receive failed. errno[%d]\n", m_Adapter->GetLastError());
+            m_Logger->LOG_ERROR(m_LogStr);
+            goto COMM_ERROR;
+        }
+
+        analyze(&recvBuffer[0]);
+
+        m_IsOpen = true;
+        m_Opened = true;
+    }
+
+    /* イベント受信キュー確認 */
     if (m_Queue->IsReceivable(receivable) != ResultEnum::NormalEnd)
     {
-        snprintf(&log[0], sizeof(log), "[doMainProc] Queue::IsReceivable failed. errno[%d]\n", m_Queue->GetLastError());
-        m_Logger->LOG_ERROR(log);
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[doMainProc] Queue::IsReceivable failed. errno[%d]\n", m_Queue->GetLastError());
+        m_Logger->LOG_ERROR(m_LogStr);
         goto FINISH;
     }
 
-    if (receivable == true)
+    /* イベント無し */
+    if (receivable == false)
     {
+        /* 前回と同じコマンドを投げる */
+        createSendData(m_MotorCommand, m_CutterMode, &sendBuffer[0]);
+    }
+    /* イベント有り */
+    else
+    {
+        /* イベント受信 */
         if (m_Queue->Receive(&ev) != ResultEnum::NormalEnd)
         {
-            snprintf(&log[0], sizeof(log), "[doMainProc] Queue::Receive failed. errno[%d]\n", m_Queue->GetLastError());
-            m_Logger->LOG_ERROR(log);
+            snprintf(&m_LogStr[0], sizeof(m_LogStr), "[doMainProc] Queue::Receive failed. errno[%d]\n", m_Queue->GetLastError());
+            m_Logger->LOG_ERROR(m_LogStr);
             goto FINISH;
         }
 
@@ -159,19 +154,17 @@ ResultEnum MotorCommunicator::doMainProc()
 
         createSendData(m_MotorCommand, m_CutterMode, &sendBuffer[0]);
     }
-    else
-    {
-        createSendData(m_MotorCommand, m_CutterMode, &sendBuffer[0]);
-    }
 
+    /* モータマイコンへの送信 */
     outputLog(&sendBuffer[0], 3, 0);
-    if (m_Serial->Send(&sendBuffer[0], sizeof(sendBuffer)) != ResultEnum::NormalEnd)
+    if (m_Adapter->Send(&sendBuffer[0], sizeof(sendBuffer)) != ResultEnum::NormalEnd)
     {
-        snprintf(&log[0], sizeof(log), "[doMainProc] Send failed. errno[%d]\n", m_Serial->GetLastError());
-        m_Logger->LOG_ERROR(log);
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[doMainProc] Send failed. errno[%d]\n", m_Adapter->GetLastError());
+        m_Logger->LOG_ERROR(m_LogStr);
         goto FINISH;
     }
 
+    /* モータマイコンからの応答受信 */
     if (receiveProc(&recvBuffer[0]) != ResultEnum::NormalEnd)
     {
         m_Logger->LOG_ERROR("[doMainProc] receiveProc failed.\n");
@@ -185,22 +178,44 @@ ResultEnum MotorCommunicator::doMainProc()
 
 FINISH :
     return retVal;
+
+COMM_ERROR :
+    m_IsOpen = false;
+    pShareMemory->Motor.CommunicationError = DetectTypeEnum::DETECTED;
+
+    /* キュー内のメッセージを読み捨て */
+    m_Queue->IsReceivable(receivable);
+    if (receivable == true)
+    {
+        m_Queue->Receive(&ev);
+    }
+
+    return ResultEnum::NormalEnd;
 }
 
 ResultEnum MotorCommunicator::finalizeCore()
 {
     /* モータマイコンに必ず停止を投げておく */
-    char sendBuffer[3] = { 0 };
-    char recvBuffer[8] = { 0 };
-    createSendData(MotorCommandEnum::E_COMMAND_STOP, CutterDriveEnum::E_CUTTER_STOP, &sendBuffer[0]);
-    m_Serial->Send(&sendBuffer[0], sizeof(sendBuffer));
-    m_Serial->Receive(&recvBuffer[0], sizeof(recvBuffer));
-
-    if (m_Serial != NULL)
+    if (m_IsOpen == true)
     {
-        m_Serial->Close();
-        delete m_Serial;
-        m_Serial = NULL;
+        char sendBuffer[3] = { 0 };
+        char recvBuffer[8] = { 0 };
+        createSendData(MotorCommandEnum::E_COMMAND_STOP, CutterDriveEnum::E_CUTTER_STOP, &sendBuffer[0]);
+        m_Adapter->Send(&sendBuffer[0], sizeof(sendBuffer));
+        m_Adapter->Receive(&recvBuffer[0], sizeof(recvBuffer));
+    }
+
+    if (m_LogFile != NULL)
+    {
+        fclose(m_LogFile);
+        m_LogFile = NULL;
+    }
+
+    if (m_Adapter != NULL)
+    {
+        m_Adapter->Close();
+        delete m_Adapter;
+        m_Adapter = NULL;
     }
 
     if (m_Queue != NULL)
@@ -251,6 +266,7 @@ ResultEnum MotorCommunicator::analyze(char* const buffer)
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     long tempCommand = 0;
+    short tempDistance = 0;
 
     if (buffer[0] != 0xFF)
     {
@@ -273,15 +289,19 @@ ResultEnum MotorCommunicator::analyze(char* const buffer)
     tempCommand = (buffer[2] >> 4) & 0x0F;
     pShareMemory->Motor.Cutter = (CutterDriveEnum)tempCommand;
 
-    tempCommand = buffer[3];
-    tempCommand <<= 8;
-    tempCommand |= buffer[4];
-    pShareMemory->Motor.PointX = tempCommand;
+    /* X/Y は基本第三象限にいる */
+    /* ジャイロのデータは cm 単位のため、mm に変換 */
+    /* X は最初に向いている方向が - 側のため、符号を反転する必要あり */
+    tempDistance = buffer[3];
+    tempDistance = (short)(tempDistance << 8);
+    tempDistance |= (short)buffer[4];
+    pShareMemory->Motor.PointX = (tempDistance * -1) * 10;
 
-    tempCommand = buffer[5];
-    tempCommand <<= 8;
-    tempCommand |= buffer[6];
-    pShareMemory->Motor.PointY = tempCommand;
+    /* Y は右ターンで + 方向なので、符号はそのままで OK */
+    tempDistance = buffer[5];
+    tempDistance = (short)(tempDistance << 8);
+    tempDistance |= (short)buffer[6];
+    pShareMemory->Motor.PointY = tempDistance * 10;
 
     if ((buffer[7] & 0x01) != 0)
     {
@@ -310,31 +330,51 @@ ResultEnum MotorCommunicator::receiveProc(char* const buffer)
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     char once = 0;
+    bool receivable = false;
     char log[80] = { 0 };
-
-
+    Stopwatch watch;
+    
+    watch.Start();
     while (1)
     {
-        if (m_Serial->Receive(&once, 1) != ResultEnum::NormalEnd)
+        if (3.0f <= watch.GetSplit())
         {
-            snprintf(&log[0], sizeof(log), "[receiveProc] Receive failed. errno[%d]\n", m_Serial->GetLastError());
-            m_Logger->LOG_ERROR(log);
+            m_Logger->LOG_ERROR("[receiveProc] Receive Timeout.\n");
             goto FINISH;
         }
 
-        if (once == 0xFF)
+        if (m_Adapter->IsReceivable(receivable) != ResultEnum::NormalEnd)
         {
-            buffer[0] = once;
-            if (m_Serial->Receive(&buffer[1], 7) != ResultEnum::NormalEnd)
+            snprintf(&m_LogStr[0], sizeof(m_LogStr), "[receiveProc] IsReceivable failed. errno[%d]\n", m_Adapter->GetLastError());
+            m_Logger->LOG_ERROR(m_LogStr);
+            goto FINISH;
+        }
+
+        if (receivable == true)
+        {
+            if (m_Adapter->Receive(&once, 1) != ResultEnum::NormalEnd)
             {
-                snprintf(&log[0], sizeof(log), "[receiveProc] Receive failed. errno[%d]\n", m_Serial->GetLastError());
+                snprintf(&log[0], sizeof(log), "[receiveProc] Receive failed. errno[%d]\n", m_Adapter->GetLastError());
                 m_Logger->LOG_ERROR(log);
                 goto FINISH;
             }
 
-            outputLog(&buffer[0], 8, 1);
-            break;
+            if (once == 0xFF)
+            {
+                buffer[0] = once;
+                if (m_Adapter->Receive(&buffer[1], 7) != ResultEnum::NormalEnd)
+                {
+                    snprintf(&log[0], sizeof(log), "[receiveProc] Receive failed. errno[%d]\n", m_Adapter->GetLastError());
+                    m_Logger->LOG_ERROR(log);
+                    goto FINISH;
+                }
+
+                outputLog(&buffer[0], 8, 1);
+                break;
+            }
         }
+
+        delay(1);
     }
 
     retVal = ResultEnum::NormalEnd;
@@ -345,9 +385,13 @@ FINISH :
 
 void MotorCommunicator::outputLog(char* const buffer, const long size, const char type)
 {
-#if 0
     char log[80] = { 0 };
     char once[8] = { 0 };
+
+    if (m_LogFile == NULL)
+    {
+        goto FINISH;
+    }
 
     if (type == 0)
     {
@@ -364,7 +408,8 @@ void MotorCommunicator::outputLog(char* const buffer, const long size, const cha
         strncat(&log[0], &once[0], sizeof(log));
     }
 
-    strncat(&log[0], "\n", sizeof(log));
-    m_Logger->LOG_INFO(log);
-#endif
+    fprintf(m_LogFile, "%s\n", &log[0]);
+
+FINISH :
+    return;
 }

@@ -48,7 +48,7 @@
 
 
 /* Melody 1 : ÉJÉGÉãÇÃâÃ */
-const BuzzerController::MelodyLineStr BuzzerController::MELODY_1_TABLE[44]
+const BuzzerController::MelodyLineStr BuzzerController::MELODY_1_TABLE[MELODY_1_TABLE_MAX]
 = {
     { HIGH_DO,  0.5f }, { HIGH_RE,  0.5f }, { HIGH_MI,  0.5f }, { HIGH_FA,  0.5f },
     { HIGH_MI,  0.5f }, { HIGH_RE,  0.5f }, { HIGH_DO,  0.5f }, { OFF,      0.5f },
@@ -63,12 +63,114 @@ const BuzzerController::MelodyLineStr BuzzerController::MELODY_1_TABLE[44]
     { HIGH_MI,  0.5f }, { HIGH_RE,  0.5f }, { HIGH_DO,  0.8f }, { OFF,      1.0f },
 };
 
-#if 0
-const BuzzerController::MelodyLineStr BuzzerController::MELODY_2_TABLE[120]
+/* Melody 2 : é–âÃ */
+const BuzzerController::MelodyLineStr BuzzerController::MELODY_2_TABLE[MELODY_2_TABLE_MAX]
 = {
+    /* 1 è¨êﬂ : 1 (1) */
+    { LOW_SI,   0.2f },
 
+    /* 2 è¨êﬂ : 8 (9) */
+    { RA,  0.6f }, { OFF,   0.1f }, { RA,  0.2f }, { OFF, 0.1f }, { RA,    0.4f }, { OFF,    0.1f }, { MI,  0.2f }, { FA,  0.2f },
+
+    /* 3 è¨êﬂ : 7 (16) */
+    { SO,  0.6f }, { OFF,   0.1f }, { SO,  0.2f }, { OFF, 0.1f }, { SO,    0.4f }, { RA,  0.2f }, { SO,  0.2f },
+
+    /* 4 è¨êﬂ : 6 (22) */
+    { FA,  0.6f }, { OFF,   0.1f }, { FA,  0.2f }, { OFF, 0.1f }, { FA,  0.4f }, { SO,  0.4f },
+
+    /* 5 è¨êﬂ : 2 (24) */
+    { RE_SHARP, 1.6f }, { OFF, 0.1f },
+
+    /* 6 è¨êﬂ : 5 (29) */
+    { RE,  0.4f }, { DO_SHARP, 0.2f }, { RE,  0.2f }, { HIGH_DO,  0.6f }, { RA_SHARP,  0.2f },
+
+    /* 7 è¨êﬂ : 5 (34) */
+    { RA,  1.2f }, { RE,  0.2f }, { OFF,      0.1f }, { RE,  0.2f }, { OFF,      0.1f },
+
+    /* 8 è¨êﬂ : 5 (39) */
+    { RE,  0.4f }, { MI,  0.4f }, { RA,  0.2f }, { SO,  0.4f }, { FA,  0.2f },
+
+    /* 9 è¨êﬂ : 2 (41) */
+    { SO,  1.6f }, { OFF, 0.1f },
+
+    /* 10 è¨êﬂ : 1 (42) */
+    { LOW_SI,   0.2f },
+
+    /* 11 è¨êﬂ : 8 (50) */
+    { RA,  0.6f }, { OFF,   0.1f }, { RA,  0.2f }, { OFF,      0.1f }, { RA,  0.4f }, { OFF,      0.1f }, { MI,  0.2f }, { FA,  0.2f },
+
+    /* 12 è¨êﬂ : 7 (57) */
+    { SO,  0.6f }, { OFF,   0.1f }, { SO,  0.2f }, { OFF,      0.1f }, { SO,  0.4f }, { RA,  0.2f }, { SO,  0.2f },
+
+    /* 13 è¨êﬂ : 6 (63) */
+    { FA,  0.6f }, { OFF,   0.1f }, { FA,  0.2f }, { OFF,      0.1f }, { FA,  0.4f }, { SO,  0.4f },
+
+    /* 14 è¨êﬂ : 2 (65) */
+    { RE_SHARP, 1.6f }, { OFF, 0.1f },
+
+    /* 15 è¨êﬂ :  (72) */
+    { RE,  0.4f }, { DO_SHARP, 0.2f }, { RE,  0.2f }, { HIGH_DO,  0.2f }, { OFF, 0.1f }, { HIGH_DO,  0.4f }, { RA_SHARP,  0.2f },
+
+    /* 16 è¨êﬂ : 5 (77) */
+    { RA,  1.2f }, { RE,    0.2f }, { OFF,      0.1f }, { RE,  0.2f }, { OFF,      0.1f },
+
+    /* 17 è¨êﬂ : 8 (85) */
+    { RE,  0.4f }, { OFF,   0.1f }, { RE,  0.2f }, { RA,  0.2f }, { SO,  0.2f }, { FA,  0.2f }, { MI,  0.2f },{ SO,  0.2f },
+
+    /* 18 è¨êﬂ : 2 (87) */
+    { FA,  1.6f }, { OFF,   0.1f },
+
+    /* 19 è¨êﬂ : 6 (93) */
+    { FA,  0.2f }, { HIGH_RE, 0.6f }, { OFF, 0.1f }, { HIGH_RE, 0.2f }, { HIGH_MI, 0.6f }, { HIGH_RE, 0.2f },
+    
+    /* 20 è¨êﬂ : 4 (97) */
+    { HIGH_DO,  0.8f }, { HIGH_RE,   0.4f }, { HIGH_DO,  0.2f }, { RA, 0.2f },
+
+    /* 21 è¨êﬂ : 4 (101) */
+    { SO,  0.4f }, { RA, 0.4f}, { RA_SHARP, 0.6f }, { SO, 0.2f },
+    
+    /* 22 è¨êﬂ : 2 (103) */
+    { HIGH_DO, 1.6f }, { OFF, 0.1f },
+
+    /* 23 è¨êﬂ : 7 (110) */
+    { FA,  0.2f }, { HIGH_RE, 0.6f }, { OFF, 0.1f }, { HIGH_RE, 0.2f }, { HIGH_MI, 0.2f }, { HIGH_RE, 0.2f }, { HIGH_MI, 0.2f },
+
+    /* 24 è¨êﬂ : 4 (114) */
+    { HIGH_FA, 1.4f }, { OFF, 0.1f }, { HIGH_RE, 0.2f }, { HIGH_FA, 0.2f },
+
+    /* 25 è¨êﬂ : 5 (119) */
+    { HIGH_MI, 0.4f }, { HIGH_DO, 0.4f }, { HIGH_RE, 0.2f }, { HIGH_DO, 0.4f }, { SI, 0.2f },
+
+    /* 26 è¨êﬂ : 2 (121) */
+    { HIGH_DO, 1.6f }, { OFF, 0.1f },
+
+    /* 27 è¨êﬂ : 1 (122) */
+    { LOW_SI,   0.2f },
+
+    /* 28 è¨êﬂ : 8 (130) */
+    { RA,  0.6f }, { OFF,   0.1f }, { RA,  0.2f }, { OFF, 0.1f }, { RA,    0.4f }, { OFF,    0.1f }, { MI,  0.2f }, { FA,  0.2f },
+
+    /* 29 è¨êﬂ : 7 (137) */
+    { SO,  0.6f }, { OFF,   0.1f }, { SO,  0.2f }, { OFF, 0.1f }, { SO,    0.4f }, { RA,  0.2f }, { SO,  0.2f },
+
+    /* 30 è¨êﬂ : 6 (143) */
+    { FA,  0.6f }, { OFF,   0.1f }, { FA,  0.2f }, { OFF, 0.1f }, { FA,  0.4f }, { SO,  0.4f },
+
+    /* 31 è¨êﬂ : 2 (145) */
+    { RE_SHARP, 1.6f }, { OFF, 0.1f },
+
+    /* 32 è¨êﬂ : 5 (150) */
+    { RE,  0.4f }, { DO_SHARP, 0.2f }, { RE,  0.2f }, { HIGH_DO,  0.6f }, { RA_SHARP,  0.2f },
+
+    /* 33 è¨êﬂ : 6 (156) */
+    { RA,  0.3f }, { OFF, 0.1f}, { RA, 0.2f }, { HIGH_DO, 0.2f }, { FA, 1.2f }, { OFF, 0.1f },
+    
+    /* 34 è¨êﬂ : 6 (162) */
+    { RE,  0.2f }, { FA, 0.2f }, { RA, 0.2f }, { SO, 0.2f }, { FA, 0.2f }, { SO, 0.2f },
+
+    /* 35 è¨êﬂ : 2 (164)  */
+    { FA, 1.6f }, { OFF, 1.0f },
 };
-#endif
 
 BuzzerController::BuzzerController()
  : LoopThreadBase((char*)"BuzzerCont", 100, TypeEnum::TIMER_STOP)
@@ -105,7 +207,13 @@ ResultEnum BuzzerController::doMainProc()
         {
             softToneWrite(IO_BUZZER, (int)MELODY_1_TABLE[0].Frequency);
             m_ThreshTime = MELODY_1_TABLE[0].Time;
-            m_IndexMax = 44;
+            m_IndexMax = MELODY_1_TABLE_MAX;
+        }
+        else if (m_Mode == MelodyModeEnum::E_MELODY_SOUND_2)
+        {
+            softToneWrite(IO_BUZZER, (int)MELODY_2_TABLE[0].Frequency);
+            m_ThreshTime = MELODY_2_TABLE[0].Time;
+            m_IndexMax = MELODY_2_TABLE_MAX;
         }
         else if (m_Mode == MelodyModeEnum::E_MELODY_WARNING)
         {
@@ -171,6 +279,11 @@ ResultEnum BuzzerController::doMainProc()
         {
             m_ThreshTime = MELODY_1_TABLE[m_Index].Time;
             softToneWrite(IO_BUZZER, (int)MELODY_1_TABLE[m_Index].Frequency);
+        }
+        else if (m_Mode == E_MELODY_SOUND_2)
+        {
+            m_ThreshTime = MELODY_2_TABLE[m_Index].Time;
+            softToneWrite(IO_BUZZER, (int)MELODY_2_TABLE[m_Index].Frequency);
         }
         else
         {
