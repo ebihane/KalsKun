@@ -1,22 +1,21 @@
 #pragma once
 
 #include "Include/Common.h"
+#include "Logger/Logger.h"
 #include "Parts/ShareMemory/ShareMemory.h"
 #include "Parts/Setting/SettingManager.h"
 #include "Parts/MappingData/AreaMap.h"
 #include "Parts/MappingData/MoveMap.h"
 
-/*!!!!!!!!!!!!!!!!!!!!!!*/
-/*  現状未使用！！！！  */
-/*!!!!!!!!!!!!!!!!!!!!!!*/
-/* 方向と方角を管理するためのクラス */
+/* 方向と方角を管理するためのシングルトンクラス */
 /* 上位層では「前後左右」で指示を出したいが、ロボットの位置は絶対的なデータ (= 方角) で判断したいため、このクラスを噛ませる */
-/* なお、本クラスで取得できる座標は、「畑の範囲内か」「走行禁止か」といった判断は度外視している点に注意が必要 */
 /*  方向：「前後左右」を基準とした、ロボットの向きの情報。ロボットの姿勢によって参照する方角が変わる */
 /*  方角：「東西南北」を基準とした、ロボットが向いている方角の情報。*/
 class PositionData
 {
 public :
+
+    static const int    ERROR_NOTHING = 0;
 
     /* 方角定数 */
     typedef enum
@@ -32,11 +31,14 @@ public :
         E_COMPASS_MAX,          /* 8: 方角数 */
     } CompassEnum;
 
-    PositionData(const CompassEnum compass, RectStr* const position);
-    virtual ~PositionData();
+    /* インスタンスを取得する */
+    static PositionData* const GetInstance();
+
+    /* 現在の座標をセットする */
+    void SetPosition(RectStr* const position);
 
     /* 現在の座標を取得する */
-    void GetPosition(RectStr* const position);
+    RectStr GetPosition(void);
 
     /* 現在向いている方角を取得する */
     CompassEnum GetCompass();
@@ -50,8 +52,23 @@ public :
     /* 向いている方向を変える */
     void SetDirection(DirectionEnum const direction);
 
-    /* 向いている方向に進む */
-    void Move();
+    /*-----------------*/
+    /* 初期化用 処理群 */
+    /*-----------------*/
+    /* ファイルがあるか確認する */
+    bool IsFileExist();
+
+    /* 位置情報と向いている方角をファイルに保存する */
+    ResultEnum Save();
+
+    /* 位置情報と向いている方角を読み込む */
+    ResultEnum Load();
+
+    /* 初期データ生成 */
+    void SetInitialData();
+
+    /* 最後に発生したシステムエラーを取得する */
+    int GetLastError();
 
 protected :
 
@@ -59,10 +76,22 @@ private :
 
     static const RectStr m_ReferenceMap[CompassEnum::E_COMPASS_MAX];    /* 座標移動方向算出マップ */
 
-    RectStr     m_Position;     /* 現在位置 */
-    CompassEnum m_Compass;      /* 現在向いている方角 */
+    static PositionData* const m_This;  /* 自クラスインスタンス */
+
+    Logger      m_Logger;               /* Logger */
+    RectStr     m_Position;             /* 現在位置 */
+    RectStr     m_PrevPosition;         /* 直前の位置 */
+    CompassEnum m_Compass;              /* 現在向いている方角 */
+    int         m_LastErrorNo;          /* 最後に発生したシステムエラー番号 */
+    char        m_LogStr[LOG_OUT_MAX];  /* ログ出力バッファ */
+
+    PositionData();
+    virtual ~PositionData();
 
     /* 指定された方角に向きを加味した新たな方角を返す */
     CompassEnum convertDirectionToCompass(const CompassEnum compass, const DirectionEnum direction);
+
+    /* 文字列を特定の文字で分割する */
+    void parseString(char* const src, char* const dest, const char delimiter, const long maxLen);
 
 };

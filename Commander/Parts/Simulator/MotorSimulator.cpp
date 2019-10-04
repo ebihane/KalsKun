@@ -3,6 +3,9 @@
 
 MotorSimulator::MotorSimulator()
  : AdapterBase()
+ , m_CurrentCommand(MotorCommandEnum::E_COMMAND_STOP)
+ , m_CutterMove(CutterDriveEnum::E_CUTTER_STOP)
+ , m_LastTurnCommand(MotorCommandEnum::E_COMMAND_STOP)
  , m_X_Direciton(1)
  , m_Y_Direction(1)
 {
@@ -122,8 +125,8 @@ ResultEnum MotorSimulator::Receive(void* const bufferPtr, const unsigned long si
 
         /* cm 単位に変換 */
         /* 実際のモータが X 座標を - 方向に進ませるため、符号反転 */
-        tempX = (m_CurrentPosition.X / 10) * -1;
-        tempY = (m_CurrentPosition.Y / 10);
+        tempX = ((m_CurrentPosition.X + 5) / 10) * -1;
+        tempY = ((m_CurrentPosition.Y + 5) / 10);
 
         temp = tempX & 0x0000FF00;
         temp >>= 8;
@@ -189,6 +192,14 @@ void MotorSimulator::r_turnCommand()
     {
         m_RightTurnWatch.Start();
         m_CurrentCommand = MotorCommandEnum::E_COMMAND_R_TURN;
+
+        /* 右ターン → 前進 → 右ターン の場合、Y 座標は下降方向に向かう */
+        if (m_LastTurnCommand == MotorCommandEnum::E_COMMAND_R_TURN)
+        {
+            m_Y_Direction *= -1;
+        }
+
+        m_LastTurnCommand = MotorCommandEnum::E_COMMAND_R_TURN;
     }
 }
 
@@ -198,6 +209,14 @@ void MotorSimulator::l_turnCommand()
     {
         m_LeftTurnWatch.Start();
         m_CurrentCommand = MotorCommandEnum::E_COMMAND_L_TURN;
+
+        /* 左ターン → 前進 → 左ターン の場合、Y 座標は下降方向に向かう */
+        if (m_LastTurnCommand == MotorCommandEnum::E_COMMAND_L_TURN)
+        {
+            m_Y_Direction *= -1;
+        }
+
+        m_LastTurnCommand = MotorCommandEnum::E_COMMAND_L_TURN;
     }
 }
 
@@ -208,7 +227,6 @@ void MotorSimulator::avoidCommand()
         m_AvoidWatch.Start();
         m_CurrentCommand = MotorCommandEnum::E_COMMAND_AVOID;
     }
-
 }
 
 void MotorSimulator::remoteCommand()
@@ -228,8 +246,9 @@ void MotorSimulator::updateStatus()
         if (5.0f <= m_RightTurnWatch.GetSplit())
         {
             m_X_Direciton *= -1;
-            m_Y_Direction += (long)(m_RobotSize.Width / 2);
+            m_CurrentPosition.Y += (long)(((m_RobotSize.Width / 2) + 10)* m_Y_Direction);
             m_RightTurnWatch.Stop();
+            m_CurrentCommand = MotorCommandEnum::E_COMMAND_FRONT;
         }
     }
     else if (m_LeftTurnWatch.IsRunninng() == true)
@@ -237,8 +256,9 @@ void MotorSimulator::updateStatus()
         if (5.0f <= m_LeftTurnWatch.GetSplit())
         {
             m_X_Direciton *= -1;
-            m_Y_Direction += (long)(m_RobotSize.Width / 2);
+            m_CurrentPosition.Y += (long)(((m_RobotSize.Width / 2) + 10) * m_Y_Direction);
             m_LeftTurnWatch.Stop();
+            m_CurrentCommand = MotorCommandEnum::E_COMMAND_FRONT;
         }
     }
     else if (m_AvoidWatch.IsRunninng() == true)
@@ -251,6 +271,6 @@ void MotorSimulator::updateStatus()
     }
     else
     {
-
+        /* nop. */
     }
 }

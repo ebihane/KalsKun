@@ -1,13 +1,11 @@
 #include <stdio.h>
 #include "Logger/Logger.h"
 #include "Parts/CommanderCommon.h"
+#include "Parts/MappingData/MoveMap.h"
 #include "KusakariKun.h"
 
 KusakariKun::KusakariKun()
  : SequencerBase(SequencerBase::SequenceTypeEnum::E_SEQ_KUSAKARI)
- , m_Setting(NULL)
- , m_AreaMap(NULL)
- , m_MoveMap(NULL)
 {
     /* nop. */
 }
@@ -19,19 +17,11 @@ KusakariKun::~KusakariKun()
 
 ResultEnum KusakariKun::initializeCore()
 {
-    /* クラスインスタンス取得 */
-    m_Setting = SettingManager::GetInstance();
-    m_AreaMap = AreaMap::GetInstance();
-    m_MoveMap = MoveMap::GetInstance();
-
     /* 直前の状態情報を初期化 */
     m_PreviewState.MoveType = MoveTypeEnum::NOT_REQUEST;
     m_PreviewState.Animal = DetectTypeEnum::NOT_DETECT;
-    m_PreviewState.Position.X = -1;
-    m_PreviewState.Position.Y = -1;
     m_PreviewState.CurrentMove = MotorCommandEnum::E_COMMAND_MAX;
     m_PreviewState.ControlMode = ControlModeEnum::E_MODE_MANUAL;
-    m_PreviewState.TurnCount = 0;
 
     /* 直前の動作情報を初期化 */
     m_PreviewDrive.Melody = MelodyModeEnum::E_MELODY_SILENT;
@@ -46,6 +36,14 @@ void KusakariKun::destroyCore()
 {
     pShareMemory->Commander.LightMode = LightModeEnum::E_LIGHT_OFF;
     pShareMemory->Commander.MelodyMode = MelodyModeEnum::E_MELODY_SILENT;
+
+    /* 位置情報保存 */
+    PositionData* position = PositionData::GetInstance();
+    position->Save();
+
+    /* 動作マップ情報保存 */
+    MoveMap* moveMap = MoveMap::GetInstance();
+    moveMap->Save();
 }
 
 SequencerBase::SequenceTypeEnum KusakariKun::processCore()
@@ -73,18 +71,6 @@ SequencerBase::SequenceTypeEnum KusakariKun::processCore()
     pShareMemory->Commander.LightMode = drive.Light;
     sendMotorMessage(&drive);
 
-    /* 動作マップ更新 */
-    m_MoveMap->ChangeMoved(&state.Position);
-
-#if 1
-    if ((m_PreviewState.Position.X != state.Position.X) || (m_PreviewState.Position.Y != state.Position.Y))
-    {
-        char log[64] = { 0 };
-        snprintf(&log[0], sizeof(log), "[processCore] Move. Array[%ld, %ld] Real[%f, %f]\n", state.Position.X, state.Position.Y, state.RealPosition.Width, state.RealPosition.Length);
-        m_Logger.LOG_INFO(log);
-    }
-#endif
-
     /* 次の動作を決定 */
     retVal = decideNextSequence(&state);
 
@@ -99,12 +85,8 @@ void KusakariKun::correctCurrentState(StateInfoStr* const state)
 {
     state->MoveType = pShareMemory->FrontCamera.MoveType;
     state->Animal = pShareMemory->AnimalCamera.Animal;
-    state->RealPosition.Width = (double)pShareMemory->Motor.PointX;
-    state->RealPosition.Length = (double)pShareMemory->Motor.PointY;
-    state->Position = convertRealPointToMapPoint(&(state->RealPosition));
     state->CurrentMove = pShareMemory->Motor.Command;
     state->ControlMode = pShareMemory->Motor.RemoteMode;
-    state->TurnCount = m_PreviewState.TurnCount;
 }
 
 MelodyModeEnum KusakariKun::decideMelodyMode(StateInfoStr* const state)
@@ -143,41 +125,20 @@ MotorCommandEnum KusakariKun::decideMotorCommand(StateInfoStr* const state)
 {
     MotorCommandEnum retVal = MotorCommandEnum::E_COMMAND_STOP;
 
-    /* @todo : マップから進行方向を決める部分は未着手 */
-    /* 現状では赤テープ検知まで前進、障害物あれば回避 */
-
+    /* 赤テープ検知 */
     if (state->MoveType == MoveTypeEnum::TURN)
     {
-        if ((m_PreviewDrive.MotorCommand != MotorCommandEnum::E_COMMAND_L_TURN)
-        &&  (m_PreviewDrive.MotorCommand != MotorCommandEnum::E_COMMAND_R_TURN))
-        {
-            state->TurnCount++;
-            char logStr[LOG_OUT_MAX] = { 0 };
-            snprintf(&logStr[0], sizeof(logStr), "[Kusakari] Turn : %ld\n", state->TurnCount);
-            m_Logger.LOG_INFO(logStr);
-        }
-
-        if ((state->TurnCount % 2) == 0)
-        {
-            retVal = MotorCommandEnum::E_COMMAND_L_TURN;
-        }
-        else
-        {
-            retVal = MotorCommandEnum::E_COMMAND_R_TURN;
-        }
+        retVal = m_DriveDecider.DecideForRoadClosed();
     }
+    /* 障害物検知 */
     else if (state->MoveType == MoveTypeEnum::AVOIDANCE)
     {
-        retVal = MotorCommandEnum::E_COMMAND_AVOID;
+        retVal = m_DriveDecider.DecideForAvoidance();
     }
+    /* 何もなし */
     else
     {
-        
-
-
-
-
-        retVal = MotorCommandEnum::E_COMMAND_FRONT;
+        retVal = m_DriveDecider.Decide();
     }
 
     return retVal;
@@ -213,14 +174,7 @@ FINISH:
 SequencerBase::SequenceTypeEnum KusakariKun::decideNextSequence(StateInfoStr* const state)
 {
     SequenceTypeEnum retVal = MY_SEQUENCE_TYPE;
-
-    /* 全網羅完了の場合は IDLE */
-    if (m_MoveMap->IsComplete() == true)
-    {
-        m_Logger.LOG_INFO("[decideNextSequence] Kusakari Finish!!!\n");
-        retVal = SequenceTypeEnum::E_SEQ_IDLE;
-        goto FINISH;
-    }
+    MoveMap* moveMap = MoveMap::GetInstance();
 
     /* Manual モード切替時は IDLE */
     if (state->ControlMode == ControlModeEnum::E_MODE_MANUAL)
@@ -230,38 +184,25 @@ SequencerBase::SequenceTypeEnum KusakariKun::decideNextSequence(StateInfoStr* co
         goto FINISH;
     }
 
+#ifdef TAPE_COUNT_EXECUTE
     /* ターン回数 6 回以上で IDLE */
-    if (6 <= state->TurnCount)
+    if (6 <= m_DriveDecider.GetTurnCount())
     {
         m_Logger.LOG_INFO("[decideNextSequence] Trun Count Arrival.\n");
         retVal = SequenceTypeEnum::E_SEQ_IDLE;
         goto FINISH;
     }
+#else
+    /* 全網羅完了の場合は IDLE */
+    if (moveMap->IsComplete() == true)
+    {
+        m_Logger.LOG_INFO("[decideNextSequence] Kusakari Finish!!!\n");
+        moveMap->UpdateMovedValue();
+        retVal = SequenceTypeEnum::E_SEQ_IDLE;
+        goto FINISH;
+    }
+#endif
 
 FINISH :
-    return retVal;
-}
-
-RectStr KusakariKun::convertRealPointToMapPoint(SizeStr* const pRealPoint)
-{
-    RectStr retVal = { 0 };
-    SettingManager* setting = SettingManager::GetInstance();
-
-    /* ロボットの大きさを取得 */
-    SizeStr robotSize = { 0 };
-    setting->GetRobotSize(&robotSize);
-
-    /* 1 マス分の大きさは、ロボットサイズの半分 */
-    robotSize.Length /= 2;
-    robotSize.Width /= 2;
-
-    /* 座標はロボットサイズで割った値 */
-    retVal.X = (long)(pRealPoint->Width / robotSize.Width);
-    retVal.Y = (long)(pRealPoint->Length / robotSize.Length);
-
-    /* ただし周辺にわざと進入禁止エリアを設けているため、+1 */
-    retVal.X += 1;
-    retVal.Y += 1;
-
     return retVal;
 }

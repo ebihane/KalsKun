@@ -65,6 +65,7 @@ SequencerBase::SequenceTypeEnum HimajinKun::processCore()
     if (pShareMemory->Motor.RemoteMode == E_MODE_AUTO)
     {
         /* 草刈りモードに移行 */
+        m_Logger.LOG_INFO("[processCore] Kusakari Start!! (From Remote Controller)\n");
         retVal = SequenceTypeEnum::E_SEQ_KUSAKARI;
         goto FINISH;
     }
@@ -82,7 +83,7 @@ SequencerBase::SequenceTypeEnum HimajinKun::processCore()
     if (isTimeArrival(&current, &kusakari) == true)
     {
         /* 草刈りモードに移行 */
-        m_Logger.LOG_INFO("[processCore] Kusakari Start!!\n");
+        m_Logger.LOG_INFO("[processCore] Kusakari Start!! (DateTime Arrivaled)\n");
         retVal = SequenceTypeEnum::E_SEQ_KUSAKARI;
         goto FINISH;
     }
@@ -91,7 +92,7 @@ SequencerBase::SequenceTypeEnum HimajinKun::processCore()
     if (isTimeArrival(&current, &yakei) == true)
     {
         /* 夜警モードに移行 */
-        m_Logger.LOG_INFO("[processCore] Yakei Start!!\n");
+        m_Logger.LOG_INFO("[processCore] Yakei Start!! (DateTime Arrivaled)\n");
         retVal = SequenceTypeEnum::E_SEQ_YAKEI;
         goto FINISH;
     }

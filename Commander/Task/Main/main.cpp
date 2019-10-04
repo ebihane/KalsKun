@@ -10,9 +10,16 @@
 #include "Socket/TcpServer/TcpServer.h"
 #include "Parts/Setting/SettingManager.h"
 #include "Parts/ShareMemory/ShareMemory.h"
+#include "Parts/PositionConverter/Gyro/GyroConverter.h"
 #include "Parts/MappingData/AreaMap.h"
 #include "Parts/MappingData/MoveMap.h"
-#include "Parts/MotorSimulator/MotorSimulator.h"
+#include "Parts/PositionData/PositionData.h"
+
+/* Simulator */
+#include "Parts/Simulator/MotorSimulator.h"
+#include "Parts/Simulator/FrontCameraSimulator.h"
+#include "Parts/Simulator/AnimalCameraSimulator.h"
+#include "Parts/Simulator/AroundCameraSimulator.h"
 
 /* Task */
 #include "Task/AroundCamera/AroundCameraReceiver.h"
@@ -47,7 +54,7 @@ static PatrolThread* g_pPatrolThread = NULL;
 /* Sequencer */
 static SequencerBase* g_pSequencer = NULL;
 
-ResultEnum initialize(const char isMotorSimulator);
+ResultEnum initialize(const char isMotorSimulator, const char isFrontCameraSimulator, const char isAnimalCameraSimulator, const char isAroundCameraSimulator, const char isPatrolNotExist);
 void mainProcedure();
 void finalize();
 void signalHandler(int signum);
@@ -57,10 +64,34 @@ int main(int argc, char* argv[])
 {
     bool isMainLoopExit = false;
     char isMotorSimulator = 0;
+    char isFrontCameraSimulator = 0;
+    char isAnimalCameraSimulator = 0;
+    char isAroundCameraSimulator = 0;
+    char isPatrolNotExist = 0;
 
     if (2 <= argc)
     {
         isMotorSimulator = (char)atoi(argv[1]);
+    }
+
+    if (3 <= argc)
+    {
+        isFrontCameraSimulator = (char)atoi(argv[2]);
+    }
+
+    if (4 <= argc)
+    {
+        isAnimalCameraSimulator = (char)atoi(argv[3]);
+    }
+
+    if (5 <= argc)
+    {
+        isAroundCameraSimulator = (char)atoi(argv[4]);
+    }
+
+    if (6 <= argc)
+    {
+        isPatrolNotExist = (char)atoi(argv[5]);
     }
 
     signal(SIGKILL, signalHandler);
@@ -68,7 +99,7 @@ int main(int argc, char* argv[])
     signal(SIGTERM, signalHandler);
     signal(SIGABRT, signalHandler);
 
-    if (initialize(isMotorSimulator) != ResultEnum::NormalEnd)
+    if (initialize(isMotorSimulator, isFrontCameraSimulator, isAnimalCameraSimulator, isAroundCameraSimulator, isPatrolNotExist) != ResultEnum::NormalEnd)
     {
         goto FINISH;
     }
@@ -87,15 +118,16 @@ FINISH :
     return 0;
 }
 
-ResultEnum initialize(const char isMotorSimulator)
+ResultEnum initialize(const char isMotorSimulator, const char isFrontCameraSimulator, const char isAnimalCameraSimulator, const char isAroundCameraSimulator, const char isPatrolNotExist)
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     SettingManager* setting = NULL;
-    TcpServer* server = NULL;
     AdapterBase* adapter = NULL;
+    GyroConverter* converter = NULL;
     Serial::SerialInfoStr serialSetting;
     AreaMap* areaMap = AreaMap::GetInstance();
     MoveMap* moveMap = MoveMap::GetInstance();
+    PositionData* positionData = PositionData::GetInstance();
     long lCnt = 0;
 
     /* I/O 初期化 */
@@ -205,6 +237,17 @@ ResultEnum initialize(const char isMotorSimulator)
         moveMap->Save();
     }
 
+    /* 位置情報 */
+    if (positionData->IsFileExist() == true)
+    {
+        positionData->Load();
+    }
+    else
+    {
+        positionData->SetInitialData();
+        positionData->Save();
+    }
+
     /* Task 生成 */
     /* ハートビート制御スレッド 初期化 */
     g_pHeartBeatManager = new HeartBeatManager();
@@ -214,27 +257,57 @@ ResultEnum initialize(const char isMotorSimulator)
         goto FINISH;
     }
 
+    if (isFrontCameraSimulator == 1)
+    {
+        /* 前方カメラシミュレータ */
+        adapter = new FrontCameraSimulator();
+    }
+    else
+    {
+        /* TCP Server */
+        adapter = new TcpServer(FC1_TO_COMMANDER_PORT);
+    }
+
     /* 前方カメラマイコン状態取得スレッド 初期化 */
-    server = new TcpServer(FC1_TO_COMMANDER_PORT);
-    g_pFrontCameraReceiver = new FrontCameraReceiver(server);
+    g_pFrontCameraReceiver = new FrontCameraReceiver(adapter);
     if (g_pFrontCameraReceiver == NULL)
     {
         g_pLogger->LOG_ERROR("[initialize] FrontCameraReceiver allocation failed.\n");
         goto FINISH;
     }
 
+    if (isAnimalCameraSimulator == 1)
+    {
+        /* 動物カメラシミュレータ */
+        adapter = new AnimalCameraSimulator();
+    }
+    else
+    {
+        /* TCP Server */
+        adapter = new TcpServer(FC2_TO_COMMANDER_PORT);
+    }
+
     /* 動物カメラマイコン状態取得スレッド 初期化 */
-    server = new TcpServer(FC2_TO_COMMANDER_PORT);
-    g_pAnimalCameraReceiver = new AnimalCameraReceiver(server);
+    g_pAnimalCameraReceiver = new AnimalCameraReceiver(adapter);
     if (g_pAnimalCameraReceiver == NULL)
     {
         g_pLogger->LOG_ERROR("[initialize] AnimalCameraReceiver allocation failed.\n");
         goto FINISH;
     }
 
+    if (isAroundCameraSimulator == 1)
+    {
+        /* 周辺カメラシミュレータ */
+        adapter = new AroundCameraSimulator();
+    }
+    else
+    {
+        /* TCP Server */
+        adapter = new TcpServer(AC_TO_COMMANDER_PORT);
+    }
+
     /* 360°カメラマイコン状態取得スレッド 初期化 */
-    server = new TcpServer(AC_TO_COMMANDER_PORT);
-    g_pAroundCameraReceiver = new AroundCameraReceiver(server);
+    g_pAroundCameraReceiver = new AroundCameraReceiver(adapter);
     if (g_pAroundCameraReceiver == NULL)
     {
         g_pLogger->LOG_ERROR("[initialize] AroundCameraReceiver allocation failed.\n");
@@ -280,29 +353,13 @@ ResultEnum initialize(const char isMotorSimulator)
     }
 
     /* モータマイコン通信スレッド 初期化 */
-    g_pMotorCommunicator = new MotorCommunicator(adapter);
+    converter = new GyroConverter();
+    g_pMotorCommunicator = new MotorCommunicator(adapter, converter);
     if (g_pMotorCommunicator == NULL)
     {
         g_pLogger->LOG_ERROR("[initialize] g_pMotorCommunicator allocation failed.\n");
         goto FINISH;
     }
-
-    /* パトロールスレッド 初期化 */
-    g_pPatrolThread = new PatrolThread();
-    if (g_pPatrolThread == NULL)
-    {
-        g_pLogger->LOG_ERROR("[initialize] g_pPatrolThread allocation failed.\n");
-        goto FINISH;
-    }
-
-    /* パトロール対象スレッドを登録 */
-    g_pPatrolThread->AddTarget(g_pHeartBeatManager);
-    g_pPatrolThread->AddTarget(g_pFrontCameraReceiver);
-    g_pPatrolThread->AddTarget(g_pAnimalCameraReceiver);
-    g_pPatrolThread->AddTarget(g_pAroundCameraReceiver);
-    g_pPatrolThread->AddTarget(g_pBuzzerThread);
-    g_pPatrolThread->AddTarget(g_pLightThread);
-    g_pPatrolThread->AddTarget(g_pMotorCommunicator);
 
     /* Task 起動 */
     g_pHeartBeatManager->Run();
@@ -312,7 +369,28 @@ ResultEnum initialize(const char isMotorSimulator)
     g_pBuzzerThread->Run();
     g_pLightThread->Run();
     g_pMotorCommunicator->Run();
-    g_pPatrolThread->Run();
+
+    if (isPatrolNotExist != 1)
+    {
+        /* パトロールスレッド 初期化 */
+        g_pPatrolThread = new PatrolThread();
+        if (g_pPatrolThread == NULL)
+        {
+            g_pLogger->LOG_ERROR("[initialize] g_pPatrolThread allocation failed.\n");
+            goto FINISH;
+        }
+
+        /* パトロール対象スレッドを登録 */
+        g_pPatrolThread->AddTarget(g_pHeartBeatManager);
+        g_pPatrolThread->AddTarget(g_pFrontCameraReceiver);
+        g_pPatrolThread->AddTarget(g_pAnimalCameraReceiver);
+        g_pPatrolThread->AddTarget(g_pAroundCameraReceiver);
+        g_pPatrolThread->AddTarget(g_pBuzzerThread);
+        g_pPatrolThread->AddTarget(g_pLightThread);
+        g_pPatrolThread->AddTarget(g_pMotorCommunicator);
+
+        g_pPatrolThread->Run();
+    }
 
     /* Sequencer 生成 */
     /* 最初は Idle 状態 */

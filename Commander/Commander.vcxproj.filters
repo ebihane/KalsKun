@@ -64,8 +64,32 @@
     <Filter Include="Task\Patrol">
       <UniqueIdentifier>{370bfe0e-a61f-40ad-81b8-7467f6798f77}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Parts\MotorSimulator">
+    <Filter Include="Parts\PositionConverter">
+      <UniqueIdentifier>{52923376-2334-4a25-88db-cbc899109184}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Parts\PositionConverter\Gyro">
+      <UniqueIdentifier>{275c9ac8-012c-4dc8-a169-c59521ab024d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Parts\PositionConverter\TudeLongitude">
+      <UniqueIdentifier>{b0dd8a9f-f888-4533-a9ff-d207ec07703a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Parts\Simulator">
       <UniqueIdentifier>{6329794f-de2c-4e6b-8253-e92d29dbbb68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Parts\Simulator\Motor">
+      <UniqueIdentifier>{874efaa7-d592-446e-8f57-f29070d2708d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Parts\Simulator\FrontCamera">
+      <UniqueIdentifier>{3d94ee8d-b942-4e11-a2ba-488856f77123}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Parts\Simulator\AnimalCamera">
+      <UniqueIdentifier>{e563f8d1-907e-4077-b6a6-0e076377b3dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Parts\Simulator\AroundCamera">
+      <UniqueIdentifier>{b30412d4-7948-41cb-9b6c-0e6bd5894707}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Task\Main\DriveDecider">
+      <UniqueIdentifier>{c3fa2775-865d-4521-bf89-3ad42bfac1f3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -129,8 +153,23 @@
     <ClCompile Include="Task\Patrol\PatrolThread.cpp">
       <Filter>Task\Patrol</Filter>
     </ClCompile>
-    <ClCompile Include="Parts\MotorSimulator\MotorSimulator.cpp">
-      <Filter>Parts\MotorSimulator</Filter>
+    <ClCompile Include="Parts\PositionConverter\Gyro\GyroConverter.cpp">
+      <Filter>Parts\PositionConverter\Gyro</Filter>
+    </ClCompile>
+    <ClCompile Include="Parts\Simulator\FrontCameraSimulator.cpp">
+      <Filter>Parts\Simulator\FrontCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="Parts\Simulator\MotorSimulator.cpp">
+      <Filter>Parts\Simulator\Motor</Filter>
+    </ClCompile>
+    <ClCompile Include="Parts\Simulator\AnimalCameraSimulator.cpp">
+      <Filter>Parts\Simulator\AnimalCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="Parts\Simulator\AroundCameraSimulator.cpp">
+      <Filter>Parts\Simulator\AroundCamera</Filter>
+    </ClCompile>
+    <ClCompile Include="Task\Main\DriveDecider\DriveDecider.cpp">
+      <Filter>Task\Main\DriveDecider</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -197,8 +236,26 @@
     <ClInclude Include="Task\Patrol\PatrolThread.h">
       <Filter>Task\Patrol</Filter>
     </ClInclude>
-    <ClInclude Include="Parts\MotorSimulator\MotorSimulator.h">
-      <Filter>Parts\MotorSimulator</Filter>
+    <ClInclude Include="Parts\PositionConverter\Gyro\GyroConverter.h">
+      <Filter>Parts\PositionConverter\Gyro</Filter>
+    </ClInclude>
+    <ClInclude Include="Parts\PositionConverter\ConverterBase.h">
+      <Filter>Parts\PositionConverter</Filter>
+    </ClInclude>
+    <ClInclude Include="Parts\Simulator\FrontCameraSimulator.h">
+      <Filter>Parts\Simulator\FrontCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="Parts\Simulator\MotorSimulator.h">
+      <Filter>Parts\Simulator\Motor</Filter>
+    </ClInclude>
+    <ClInclude Include="Parts\Simulator\AnimalCameraSimulator.h">
+      <Filter>Parts\Simulator\AnimalCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="Parts\Simulator\AroundCameraSimulator.h">
+      <Filter>Parts\Simulator\AroundCamera</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\Main\DriveDecider\DriveDecider.h">
+      <Filter>Task\Main\DriveDecider</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

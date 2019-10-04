@@ -110,6 +110,23 @@ int MappingData::GetLastError()
     return m_LastErrorNo;
 }
 
+void MappingData::Print()
+{
+    SettingManager* setting = SettingManager::GetInstance();
+    RectStr mapCount = { 0 };
+    setting->GetMapCount(&mapCount);
+
+    for (long y = 0; y < mapCount.Y; y++)
+    {
+        for (long x = 0; x < mapCount.X; x++)
+        {
+            printf("%d", m_MapData[y][x]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
 /*-----------------*/
 /* ‰Šú‰»—p ˆ—ŒQ */
 /*-----------------*/

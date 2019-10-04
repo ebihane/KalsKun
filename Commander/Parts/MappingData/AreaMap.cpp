@@ -47,6 +47,12 @@ void AreaMap::SetInitialData()
 }
 
 /* 指定した座標が移動可能か判断する */
+bool AreaMap::IsMovable(RectStr* const position)
+{
+    return IsMovable(position->X, position->Y);
+}
+
+/* 指定した座標が移動可能か判断する */
 bool AreaMap::IsMovable(const unsigned long x, const unsigned long y)
 {
     bool retVal = false;

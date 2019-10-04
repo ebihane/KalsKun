@@ -18,6 +18,7 @@ public :
     void SetInitialData();
 
     /* w’è‚µ‚½À•W‚ªˆÚ“®‰Â”\‚©”»’f‚·‚é */
+    bool IsMovable(RectStr* const position);
     bool IsMovable(const unsigned long x, const unsigned long y);
 
 protected :
