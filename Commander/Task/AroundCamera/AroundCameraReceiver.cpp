@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 #include "Parts/CommanderCommon.h"
 #include "Parts/ShareMemory/ShareMemory.h"
@@ -5,6 +6,7 @@
 
 AroundCameraReceiver::AroundCameraReceiver(AdapterBase* const adapter)
  : ReceiverThread((char*)"AC_Receiver", adapter, true)
+ , m_PrevDetect(DetectTypeEnum::NOT_DETECT)
 {
     /* nop. */
 }
@@ -45,6 +47,14 @@ ResultEnum AroundCameraReceiver::analyze(char* const buffer)
     pShareMemory->AroundCamera.ReceiveCount = p->lParam[0];
     pShareMemory->AroundCamera.SystemError = p->lParam[1];
     pShareMemory->AroundCamera.Detect = (DetectTypeEnum)p->lParam[2];
+
+    if (pShareMemory->AroundCamera.Detect != m_PrevDetect)
+    {
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[AC_Receiver] Blue Ojcect change. [%d -> %d]\n", m_PrevDetect, pShareMemory->AroundCamera.Detect);
+        m_Logger->LOG_INFO(m_LogStr);
+    }
+
+    m_PrevDetect = pShareMemory->AroundCamera.Detect;
 
     retVal = ResultEnum::NormalEnd;
 

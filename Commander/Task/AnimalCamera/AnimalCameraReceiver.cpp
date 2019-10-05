@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 #include "Parts/CommanderCommon.h"
 #include "Parts/ShareMemory/ShareMemory.h"
@@ -5,6 +6,8 @@
 
 AnimalCameraReceiver::AnimalCameraReceiver(AdapterBase* const adapter)
  : ReceiverThread((char*)"AnimalReceiver", adapter, true)
+ , m_PrevHuman(DetectTypeEnum::NOT_DETECT)
+ , m_PrevAnimal(DetectTypeEnum::NOT_DETECT)
 {
     /* nop. */
 }
@@ -46,6 +49,21 @@ ResultEnum AnimalCameraReceiver::analyze(char* const buffer)
     pShareMemory->AnimalCamera.SystemError = p->lParam[1];
     pShareMemory->AnimalCamera.Human = (DetectTypeEnum)p->lParam[2];
     pShareMemory->AnimalCamera.Animal = (DetectTypeEnum)p->lParam[3];
+
+    if (pShareMemory->AnimalCamera.Human != m_PrevHuman)
+    {
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[Animal_Receiver] Human Detect change. [%d -> %d]\n", m_PrevHuman, pShareMemory->AnimalCamera.Human);
+        m_Logger->LOG_INFO(m_LogStr);
+    }
+
+    if (pShareMemory->AnimalCamera.Animal != m_PrevAnimal)
+    {
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[Animal_Receiver] Animal Detect change. [%d -> %d]\n", m_PrevAnimal, pShareMemory->AnimalCamera.Animal);
+        m_Logger->LOG_INFO(m_LogStr);
+    }
+
+    m_PrevHuman = pShareMemory->AnimalCamera.Human;
+    m_PrevAnimal = pShareMemory->AnimalCamera.Animal;
 
     retVal = ResultEnum::NormalEnd;
 

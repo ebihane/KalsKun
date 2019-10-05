@@ -13,6 +13,9 @@ protected :
 
 private :
 
+    DetectTypeEnum m_PrevHuman;
+    DetectTypeEnum m_PrevAnimal;
+
     ResultEnum initializeCore();
     bool isReceiveComplete(char* const buffer, const unsigned long size);
     ResultEnum analyze(char* const buffer);

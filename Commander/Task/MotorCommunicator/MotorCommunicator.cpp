@@ -157,22 +157,27 @@ ResultEnum MotorCommunicator::doMainProc()
                 {
                     delay(2000);
                 }
+                createSendData(m_MotorCommand, m_CutterMode, &sendBuffer[0]);
                 break;
                 
             case 1 :    /* 1: 草刈り刃動作変更 */
                 m_CutterMode = (CutterDriveEnum)ev.lParam[0];
+                createSendData(m_MotorCommand, m_CutterMode, &sendBuffer[0]);
                 break;
 
             case 2 :    /* 2: 動作・草刈り刃 同時変更 */
                 m_MotorCommand = (MotorCommandEnum)ev.lParam[0];
                 m_CutterMode = (CutterDriveEnum)ev.lParam[1];
+                createSendData(m_MotorCommand, m_CutterMode, &sendBuffer[0]);
+                break;
+
+            case 3:    /* 3: モード変更 */
+                createModeChange((ControlModeEnum)ev.lParam[0], &sendBuffer[0]);
                 break;
 
             default :
                 goto FINISH;
         }
-
-        createSendData(m_MotorCommand, m_CutterMode, &sendBuffer[0]);
     }
 
     /* モータマイコンへの送信 */
@@ -181,14 +186,14 @@ ResultEnum MotorCommunicator::doMainProc()
     {
         snprintf(&m_LogStr[0], sizeof(m_LogStr), "[doMainProc] Send failed. errno[%d]\n", m_Adapter->GetLastError());
         m_Logger->LOG_ERROR(m_LogStr);
-        goto FINISH;
+        goto COMM_ERROR;
     }
 
     /* モータマイコンからの応答受信 */
     if (receiveProc(&recvBuffer[0]) != ResultEnum::NormalEnd)
     {
         m_Logger->LOG_ERROR("[doMainProc] receiveProc failed.\n");
-        goto FINISH;
+        goto COMM_ERROR;
     }
 
     analyze(&recvBuffer[0]);
@@ -286,6 +291,27 @@ FINISH :
     return retVal;
 }
 
+ResultEnum MotorCommunicator::createModeChange(const ControlModeEnum command, char* const buffer)
+{
+    ResultEnum retVal = ResultEnum::AbnormalEnd;
+
+    buffer[0] = 0xFF;
+    buffer[1] = 0x0A;
+
+    if (command == ControlModeEnum::E_MODE_AUTO)
+    {
+        buffer[2] = 0x00;
+    }
+    else
+    {
+        buffer[2] = 0x02;
+    }
+
+    retVal = ResultEnum::NormalEnd;
+
+    return retVal;
+}
+
 ResultEnum MotorCommunicator::analyze(char* const buffer)
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
@@ -371,7 +397,8 @@ ResultEnum MotorCommunicator::receiveProc(char* const buffer)
             goto FINISH;
         }
 
-        if (m_Adapter->IsReceivable(receivable) != ResultEnum::NormalEnd)
+        retVal = m_Adapter->IsReceivable(receivable);
+        if (retVal != ResultEnum::NormalEnd)
         {
             snprintf(&m_LogStr[0], sizeof(m_LogStr), "[receiveProc] IsReceivable failed. errno[%d]\n", m_Adapter->GetLastError());
             m_Logger->LOG_ERROR(m_LogStr);
@@ -380,7 +407,8 @@ ResultEnum MotorCommunicator::receiveProc(char* const buffer)
 
         if (receivable == true)
         {
-            if (m_Adapter->Receive(&once, 1) != ResultEnum::NormalEnd)
+            retVal = m_Adapter->Receive(&once, 1);
+            if (retVal != ResultEnum::NormalEnd)
             {
                 snprintf(&m_LogStr[0], sizeof(m_LogStr), "[receiveProc] Receive failed. errno[%d]\n", m_Adapter->GetLastError());
                 m_Logger->LOG_ERROR(m_LogStr);
@@ -390,7 +418,8 @@ ResultEnum MotorCommunicator::receiveProc(char* const buffer)
             if (once == 0xFF)
             {
                 buffer[0] = once;
-                if (m_Adapter->Receive(&buffer[1], 7) != ResultEnum::NormalEnd)
+                retVal = m_Adapter->Receive(&buffer[1], 7);
+                if (retVal != ResultEnum::NormalEnd)
                 {
                     snprintf(&m_LogStr[0], sizeof(m_LogStr), "[receiveProc] Receive failed. errno[%d]\n", m_Adapter->GetLastError());
                     m_Logger->LOG_ERROR(m_LogStr);

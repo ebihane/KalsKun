@@ -13,6 +13,10 @@ protected :
 
 private :
 
+    MoveTypeEnum m_PrevMoveType;
+    DetectTypeEnum m_PrevRedTape;
+    DetectTypeEnum m_PrevBlueObject;
+
     ResultEnum initializeCore();
     bool isReceiveComplete(char* const buffer, const unsigned long size);
     ResultEnum analyze(char* const buffer);

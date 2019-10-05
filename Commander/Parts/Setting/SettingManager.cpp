@@ -135,15 +135,13 @@ ResultEnum SettingManager::Save()
     fprintf(fp, "RobotWidth,%lf\n", m_RobotSize.Width);
     fprintf(fp, "FarmLength,%lf\n", m_FarmSize.Length);
     fprintf(fp, "FarmWidth,%lf\n", m_FarmSize.Width);
-    fprintf(fp, "MapCount(X),%ld\n", m_MapCount.X);
-    fprintf(fp, "MapCount(Y),%ld\n", m_MapCount.Y);
     fprintf(fp, "WavePowerCoeff,%lf\n", m_WavePowerCoeff);
     fprintf(fp, "KusakariDayOfWeek,%d\n", m_KusakariStart.DayOfWeek);
     fprintf(fp, "KusakariStartHour,%d\n", m_KusakariStart.Hour);
     fprintf(fp, "KusakariStartMinute,%d\n", m_KusakariStart.Minute);
     fprintf(fp, "YakeiDayOfWeek,%d\n", m_YakeiStart.DayOfWeek);
-    fprintf(fp, "YakeiDayOfWeek,%d\n", m_YakeiStart.Hour);
-    fprintf(fp, "YakeiDayOfWeek,%d\n", m_YakeiStart.Minute);
+    fprintf(fp, "YakeiStartHour,%d\n", m_YakeiStart.Hour);
+    fprintf(fp, "YakeiStartMinute,%d\n", m_YakeiStart.Minute);
     fprintf(fp, "APCount,%ld\n", m_ApCount);
     for (size = 0; size < m_ApCount; size++)
     {
@@ -212,6 +210,8 @@ ResultEnum SettingManager::Load()
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     FILE* fp = NULL;
     long index = 0;
+    long xCount = 0;
+    long yCount = 0;
     char buffer[40] = { 0 };
     char once[40] = { 0 };
 
@@ -250,13 +250,12 @@ ResultEnum SettingManager::Load()
     parseString(&buffer[0], &once[0], ',', sizeof(buffer));
     m_FarmSize.Width = atof(&once[0]);
 
-    fgets(&buffer[0], sizeof(buffer), fp);
-    parseString(&buffer[0], &once[0], ',', sizeof(buffer));
-    m_MapCount.X = atol(&once[0]);
+    /* マップの個数 (= 自動計算) */
+    xCount = (long)(m_FarmSize.Width / m_RobotSize.Width);
+    yCount = (long)(m_FarmSize.Length / m_RobotSize.Length);
 
-    fgets(&buffer[0], sizeof(buffer), fp);
-    parseString(&buffer[0], &once[0], ',', sizeof(buffer));
-    m_MapCount.Y = atol(&once[0]);
+    m_MapCount.X = (xCount * 2) + 2;
+    m_MapCount.Y = (yCount * 2) + 2;
 
     fgets(&buffer[0], sizeof(buffer), fp);
     parseString(&buffer[0], &once[0], ',', sizeof(buffer));

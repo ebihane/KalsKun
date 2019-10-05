@@ -159,7 +159,7 @@ MotorCommandEnum DriveDecider::DecideForRoadClosed()
 #else
 
     /* 向いている方向の先のデータをすべて「通行禁止」にする */
-    m_Position->FillAreaMap(AreaMap::NOT_MOVABLE_VALUE);
+/*     m_Position->FillAreaMap(AreaMap::NOT_MOVABLE_VALUE); */
 
     RectStr leftPosition;
     RectStr rightPosition;
@@ -182,12 +182,14 @@ MotorCommandEnum DriveDecider::DecideForRoadClosed()
     {
         /* 左ターン */
         retVal = MotorCommandEnum::E_COMMAND_L_TURN;
+        m_Logger.LOG_INFO("[DecideForRoadClosed] L Turn (L only movable)\n");
     }
     /* 右だけ行ける場合 */
     else if ((leftMovable == false) && (rightMovable == true))
     {
         /* 右ターン */
         retVal = MotorCommandEnum::E_COMMAND_R_TURN;
+        m_Logger.LOG_INFO("[DecideForRoadClosed] R Turn (R only movable)\n");
     }
     /* 両方行ける場合 */
     else
@@ -201,20 +203,30 @@ MotorCommandEnum DriveDecider::DecideForRoadClosed()
         {
             /* 左ターン */
             retVal = MotorCommandEnum::E_COMMAND_L_TURN;
+            m_Logger.LOG_INFO("[DecideForRoadClosed] L Turn (L only not moved)\n");
         }
         /* 右側が未移動 */
         else if ((leftNotMoved == false) && (rightNotMoved == true))
         {
             /* 右ターン */
             retVal = MotorCommandEnum::E_COMMAND_R_TURN;
+            m_Logger.LOG_INFO("[DecideForRoadClosed] R Turn (R only not moved)\n");
         }
         /* 両方とも未移動 */
         /* もしくは、両方とも移動済み */
         else
         {
-            /* とりあえず右ターン */
-            /* @todo : 未移動が多い方を選択 */
-            retVal = MotorCommandEnum::E_COMMAND_R_TURN;
+            /* 未移動エリアが多い方に曲がる */
+            if (m_Position->JudgeNotMoveArea() == DirectionEnum::E_DIR_RIGHT)
+            {
+                m_Logger.LOG_INFO("[DecideForRoadClosed] R Turn (R area)\n");
+                retVal = MotorCommandEnum::E_COMMAND_R_TURN;
+            }
+            else
+            {
+                m_Logger.LOG_INFO("[DecideForRoadClosed] L Turn (L area)\n");
+                retVal = MotorCommandEnum::E_COMMAND_L_TURN;
+            }
         }
     }
 #endif

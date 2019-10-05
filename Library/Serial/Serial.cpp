@@ -8,6 +8,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <errno.h>
+#include "Measure/Stopwatch.h"
 #include "Serial.h"
 
 Serial::Serial(char* const name, SerialInfoStr* const setting)
@@ -297,6 +298,7 @@ ResultEnum Serial::Receive(void* const bufferPtr, const unsigned long size)
     int onceReceive = 0;
     unsigned long rest = size;
     char* ptr = (char*)bufferPtr;
+    Stopwatch watch;
 
     if (m_Device == SERIAL_INVALID)
     {
@@ -304,9 +306,16 @@ ResultEnum Serial::Receive(void* const bufferPtr, const unsigned long size)
         goto FINISH;
     }
 
+    watch.Start();
     m_LastErrorNo = ERROR_NOTHING;
     while (0 < rest)
     {
+        if (10.0f <= watch.GetSplit())
+        {
+            retVal = ResultEnum::Reconnect;
+            goto FINISH;
+        }
+
         onceReceive = read(m_Device, ptr, rest);
         if (onceReceive < 0)
         {

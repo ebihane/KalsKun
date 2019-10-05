@@ -61,6 +61,7 @@ SequencerBase::SequenceTypeEnum HimajinKun::processCore()
     pShareMemory->Commander.MelodyMode = MelodyModeEnum::E_MELODY_SILENT;
     pShareMemory->Commander.LightMode = LightModeEnum::E_LIGHT_BLINK;
 
+#ifdef AUTO_CHANGE_TRIGGER
     /* モータマイコンで Auto モードに切り替わった */
     if (pShareMemory->Motor.RemoteMode == E_MODE_AUTO)
     {
@@ -69,6 +70,7 @@ SequencerBase::SequenceTypeEnum HimajinKun::processCore()
         retVal = SequenceTypeEnum::E_SEQ_KUSAKARI;
         goto FINISH;
     }
+#endif
 
     /* 現在時刻を取得 */
     gettimeofday(&tmVal, 0);
@@ -82,6 +84,12 @@ SequencerBase::SequenceTypeEnum HimajinKun::processCore()
     /* 草刈り指定時刻になった */
     if (isTimeArrival(&current, &kusakari) == true)
     {
+        /* モータマイコンを Auto モードに切り替える */
+        EventInfo ev = { 0 };
+        ev.Code = 3;
+        ev.lParam[0] = (long)ControlModeEnum::E_MODE_AUTO;
+        m_SendQueue.Send((char*)"MotorComm", &ev, sizeof(ev));
+
         /* 草刈りモードに移行 */
         m_Logger.LOG_INFO("[processCore] Kusakari Start!! (DateTime Arrivaled)\n");
         retVal = SequenceTypeEnum::E_SEQ_KUSAKARI;
@@ -91,6 +99,12 @@ SequencerBase::SequenceTypeEnum HimajinKun::processCore()
     /* 夜警指定時刻になった */
     if (isTimeArrival(&current, &yakei) == true)
     {
+        /* モータマイコンを Auto モードに切り替える */
+        EventInfo ev = { 0 };
+        ev.Code = 3;
+        ev.lParam[0] = (long)ControlModeEnum::E_MODE_AUTO;
+        m_SendQueue.Send((char*)"MotorComm", &ev, sizeof(ev));
+
         /* 夜警モードに移行 */
         m_Logger.LOG_INFO("[processCore] Yakei Start!! (DateTime Arrivaled)\n");
         retVal = SequenceTypeEnum::E_SEQ_YAKEI;

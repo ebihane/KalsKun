@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 #include "Parts/CommanderCommon.h"
 #include "Parts/ShareMemory/ShareMemory.h"
@@ -5,6 +6,9 @@
 
 FrontCameraReceiver::FrontCameraReceiver(AdapterBase* const adapter)
  : ReceiverThread((char*)"FC_Receiver", adapter, true)
+ , m_PrevMoveType(MoveTypeEnum::NOT_REQUEST)
+ , m_PrevRedTape(DetectTypeEnum::NOT_DETECT)
+ , m_PrevBlueObject(DetectTypeEnum::NOT_DETECT)
 {
     /* nop. */
 }
@@ -49,6 +53,28 @@ ResultEnum FrontCameraReceiver::analyze(char* const buffer)
     pShareMemory->FrontCamera.BlueObject = (DetectTypeEnum)p->lParam[4];
     pShareMemory->FrontCamera.Distance[0] = p->fParam[0];
     pShareMemory->FrontCamera.Distance[1] = p->fParam[1];
+
+    if (pShareMemory->FrontCamera.MoveType != m_PrevMoveType)
+    {
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[FC_Receiver] Move type change. [%d -> %d]\n", m_PrevMoveType, pShareMemory->FrontCamera.MoveType);
+        m_Logger->LOG_INFO(m_LogStr);
+    }
+
+    if (pShareMemory->FrontCamera.RedTape != m_PrevRedTape)
+    {
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[FC_Receiver] Red Tape change. [%d -> %d]\n", m_PrevRedTape, pShareMemory->FrontCamera.RedTape);
+        m_Logger->LOG_INFO(m_LogStr);
+    }
+
+    if (pShareMemory->FrontCamera.BlueObject != m_PrevBlueObject)
+    {
+        snprintf(&m_LogStr[0], sizeof(m_LogStr), "[FC_Receiver] Blue Ojcect change. [%d -> %d]\n", m_PrevBlueObject, pShareMemory->FrontCamera.BlueObject);
+        m_Logger->LOG_INFO(m_LogStr);
+    }
+
+    m_PrevMoveType = pShareMemory->FrontCamera.MoveType;
+    m_PrevRedTape = pShareMemory->FrontCamera.RedTape;
+    m_PrevBlueObject = pShareMemory->FrontCamera.BlueObject;
 
     retVal = ResultEnum::NormalEnd;
 
