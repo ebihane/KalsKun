@@ -426,7 +426,7 @@ void MotorCommunicator::outputRobotMoveLog(const short realPositionX, const shor
     }
 
     snprintf(&m_LogStr[0], sizeof(m_LogStr), "[Robot] Real[%d/%d] Pos[%ld/%ld]\n", realPositionX, realPositionY, position.X, position.Y);
-    fprintf(m_RobotMoveLogFile, "%s\n", &m_LogStr[0]);
+    fprintf(m_RobotMoveLogFile, "%s", &m_LogStr[0]);
     printf("%s", m_LogStr);
     m_PrevPosition = position;
 

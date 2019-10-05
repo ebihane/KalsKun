@@ -84,14 +84,26 @@ bool MoveMap::IsNotMove(RectStr* const position)
 bool MoveMap::IsNotMove(const unsigned long x, const unsigned long y)
 {
     bool retVal = false;
+    unsigned char value = 0;
 
+    /* 座標が範囲外 */
     if (isInRange(x, y) != true)
     {
-        /* 座標が範囲外の場合は移動させないために「移動済み」を返す */
+        /* 移動させないために「移動済み」を返す */
         goto FINISH;
     }
 
-    if (Get(x, y) != m_NotMoveValue)
+    value = Get(x, y);
+
+    /* 走行禁止エリア */
+    if (value == MOVE_FAILED_NO)
+    {
+        /* 移動させないために「移動済み」を返す */
+        goto FINISH;
+    }
+
+    /* 移動済み */
+    if (value == m_MovedValue)
     {
         goto FINISH;
     }
@@ -126,20 +138,24 @@ FINISH :
 /* 畑の全区画を走行完了したか判定する */
 bool MoveMap::IsComplete()
 {
-    bool retVal = true;
+    bool retVal = false;
     SettingManager* setting = SettingManager::GetInstance();
     AreaMap* areaMap = AreaMap::GetInstance();
     RectStr mapCount = { 0 };
     char areaMapValue = 0;
     char moveMapValue = 0;
+    unsigned long movableCount = 0;
+    unsigned long movedCount = 0;
 
     setting->GetMapCount(&mapCount);
 
-    for (long y = 0; y < mapCount.Y; y++)
+
+    /* 移動可能エリアの末端は判定対象外とする (折り返しの際にその部分を通過しないため) */
+    for (long y = 2; y < mapCount.Y - 2; y++)
     {
-        for (long x = 0; x < mapCount.X; x++)
+        for (long x = 2; x < mapCount.X - 2; x++)
         {
-            /* 走行禁止の場合は未完了にしない */
+            /* 走行禁止の場合はカウントしない */
             if (areaMap->IsMovable(x, y) == false)
             {
                 continue;
@@ -152,16 +168,27 @@ bool MoveMap::IsComplete()
                 continue;
             }
 
+            /* 移動可能エリア数加算 */
+            movableCount++;
+
+            /* 移動完了 */
             moveMapValue = Get(x, y);
-            if (moveMapValue != m_MovedValue)
+            if (moveMapValue == m_MovedValue)
             {
-                retVal = false;
-                goto FINISH;
+                /* 移動完了エリア数加算 */
+                movedCount++;
             }
         }
     }
 
-FINISH :
+    /* 移動可能エリアに対して、移動完了エリアの割合が 95% 以上の場合、完了とする */
+    float rate = (float)movedCount / (float)movableCount;
+    if (0.95f <= rate)
+    {
+        retVal = true;
+    }
+
+
     return retVal;
 }
 
@@ -181,4 +208,43 @@ void MoveMap::UpdateMovedValue()
         m_NotMoveValue = m_MovedValue;
         m_MovedValue = tempValue;
     }
+}
+
+/* 読み込み後の処理 */
+void MoveMap::loadedProc()
+{
+    unsigned char areaMapValue = 0;
+    unsigned char moveMapValue = 0;
+    unsigned char maxValue = 0;
+    SettingManager* setting = SettingManager::GetInstance();
+    AreaMap* areaMap = AreaMap::GetInstance();
+
+    RectStr mapCount = { 0 };
+    setting->GetMapCount(&mapCount);
+
+    /* 周囲に意図的に移動禁止エリアを設定している */
+    for (long y = 1; y < mapCount.Y - 1; y++)
+    {
+        for (long x = 1; x < mapCount.X - 1; x++)
+        {
+            areaMapValue = areaMap->Get(x, y);
+            moveMapValue = Get(x, y);
+
+            /* 移動可能以外 */
+            if (areaMapValue != AreaMap::MOVABLE_VALUE)
+            {
+                continue;
+            }
+
+            if (moveMapValue < maxValue)
+            {
+                continue;
+            }
+
+            maxValue = moveMapValue;
+        }
+    }
+
+    m_MovedValue = maxValue;
+    m_NotMoveValue = (unsigned char)(maxValue - 1);
 }

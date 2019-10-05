@@ -33,3 +33,9 @@ ResultEnum ErrorLedManager::doMainProc()
 
     return ResultEnum::NormalEnd;
 }
+
+ResultEnum ErrorLedManager::finalizeCore()
+{
+    digitalWrite(IO_ERROR_LED, LOW);
+    return ResultEnum::NormalEnd;
+}

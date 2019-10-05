@@ -1,4 +1,6 @@
 #include "Parts/Setting/SettingManager.h"
+#include "Parts/CommanderCommon.h"
+#include "Parts/PositionData/PositionData.h"
 #include "MotorSimulator.h"
 
 MotorSimulator::MotorSimulator()
@@ -8,6 +10,8 @@ MotorSimulator::MotorSimulator()
  , m_LastTurnCommand(MotorCommandEnum::E_COMMAND_STOP)
  , m_X_Direciton(1)
  , m_Y_Direction(1)
+ , m_IsAuto(false)
+ , m_PrevLevel(LOW)
 {
     SettingManager* setting = SettingManager::GetInstance();
     setting->GetRobotSize(&m_RobotSize);
@@ -20,6 +24,27 @@ MotorSimulator::~MotorSimulator()
 
 ResultEnum MotorSimulator::Open()
 {
+    PositionData* position = PositionData::GetInstance();
+    RectStr current = position->GetPosition();
+    m_CurrentPosition.X = (long)(current.X * (m_RobotSize.Length / 2));
+    m_CurrentPosition.Y = (long)(current.Y * (m_RobotSize.Width / 2));
+
+    PositionData::CompassEnum compass = position->GetCompass();
+    switch (compass)
+    {
+        case PositionData::CompassEnum::E_COMPASS_EAST :
+            m_X_Direciton = 1;
+            break;
+
+        case PositionData::CompassEnum::E_COMPASS_WEST :
+            m_X_Direciton = -1;
+            break;
+
+        default :
+            m_X_Direciton = 1;
+            break;
+    }
+
     return ResultEnum::NormalEnd;
 }
 
@@ -139,7 +164,15 @@ ResultEnum MotorSimulator::Receive(void* const bufferPtr, const unsigned long si
         temp &= 0x000000FF;
         buffer[4] = (char)temp;
         buffer[5] = (char)(tempY & 0x000000FF);
-        buffer[6] = 0;
+
+        if (m_IsAuto == true)
+        {
+            buffer[6] = 0;
+        }
+        else
+        {
+            buffer[6] = 0x02;
+        }
     }
 
     return ResultEnum::NormalEnd;
@@ -246,7 +279,7 @@ void MotorSimulator::updateStatus()
         if (5.0f <= m_RightTurnWatch.GetSplit())
         {
             m_X_Direciton *= -1;
-            m_CurrentPosition.Y += (long)(((m_RobotSize.Width / 2) + 10)* m_Y_Direction);
+            m_CurrentPosition.Y += (long)(((m_RobotSize.Width / 2) + 10) * m_Y_Direction);
             m_RightTurnWatch.Stop();
             m_CurrentCommand = MotorCommandEnum::E_COMMAND_FRONT;
         }
@@ -263,7 +296,25 @@ void MotorSimulator::updateStatus()
     }
     else if (m_AvoidWatch.IsRunninng() == true)
     {
-        /* nop. */
+        if (m_AvoidWatch.GetSplit() < 2.0f)
+        {
+            m_CurrentPosition.X += 10 * m_X_Direciton;
+            m_CurrentPosition.Y += (long)(((m_RobotSize.Width / 2) + 10) * m_Y_Direction);
+        }
+        else if (m_AvoidWatch.GetSplit() < 3.0f)
+        {
+            m_CurrentPosition.X += 10 * m_X_Direciton;
+        }
+        else if (m_AvoidWatch.GetSplit() < 5.0f)
+        {
+            m_CurrentPosition.X += 10 * m_X_Direciton;
+            m_CurrentPosition.Y += (long)(((m_RobotSize.Width / 2) + 10) * m_Y_Direction);
+        }
+        else
+        {
+            m_AvoidWatch.Stop();
+            m_CurrentCommand = MotorCommandEnum::E_COMMAND_FRONT;
+        }
     }
     else if (m_CurrentCommand == MotorCommandEnum::E_COMMAND_FRONT)
     {
@@ -273,4 +324,19 @@ void MotorSimulator::updateStatus()
     {
         /* nop. */
     }
+
+    int level = digitalRead(IO_SIMULATOR_MOTOR);
+    if ((level == HIGH) && (m_PrevLevel == LOW))
+    {
+        if (m_IsAuto == true)
+        {
+            m_IsAuto = false;
+        }
+        else
+        {
+            m_IsAuto = true;
+        }
+    }
+
+    m_PrevLevel = level;
 }

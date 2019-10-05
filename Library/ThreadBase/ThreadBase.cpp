@@ -99,7 +99,7 @@ ResultEnum ThreadBase::Stop(const unsigned long timeoutSec)
 
     m_Stop = true;
     snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::Stop] Stop Request set. timeout[%ld sec]\n", m_TaskName, timeoutSec);
-    m_Logger->LOG_INFO(m_Logger);
+    m_Logger->LOG_INFO(m_LogStr);
 
     watch.Start();
     while (1)
@@ -107,14 +107,14 @@ ResultEnum ThreadBase::Stop(const unsigned long timeoutSec)
         if ((float)timeoutSec <= watch.GetSplit())
         {
             snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::Stop] Stop Timeout.\n", m_TaskName);
-            m_Logger->LOG_ERROR(m_Logger);
+            m_Logger->LOG_ERROR(m_LogStr);
             goto FINISH;
         }
 
         if (m_ThreadState != ThreadStateEnum::Executing)
         {
             snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s::Stop] Thread stopped.\n", m_TaskName);
-            m_Logger->LOG_INFO(m_Logger);
+            m_Logger->LOG_INFO(m_LogStr);
             break;
         }
 

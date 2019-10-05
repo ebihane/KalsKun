@@ -194,7 +194,7 @@ SequencerBase::SequenceTypeEnum KusakariKun::decideNextSequence(StateInfoStr* co
     }
 #else
     /* ‘S–Ô—…Š®—¹‚Ìê‡‚Í IDLE */
-    if (moveMap->IsComplete() == true)
+    if (m_DriveDecider.IsComplete() == true)
     {
         m_Logger.LOG_INFO("[decideNextSequence] Kusakari Finish!!!\n");
         moveMap->UpdateMovedValue();

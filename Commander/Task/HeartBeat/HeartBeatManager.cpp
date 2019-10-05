@@ -28,3 +28,9 @@ ResultEnum HeartBeatManager::doMainProc()
 
     return ResultEnum::NormalEnd;
 }
+
+ResultEnum HeartBeatManager::finalizeCore()
+{
+    digitalWrite(IO_HEART_BEAT, LOW);
+    return ResultEnum::NormalEnd;
+}

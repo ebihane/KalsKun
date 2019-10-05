@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include "Parts/Setting/SettingManager.h"
+#include "Parts/PositionData/PositionData.h"
 #include "MappingData.h"
 
 MappingData::MappingData(char* const path)
@@ -110,17 +111,27 @@ int MappingData::GetLastError()
     return m_LastErrorNo;
 }
 
+/* マップの状態を表示する */
 void MappingData::Print()
 {
     SettingManager* setting = SettingManager::GetInstance();
+    PositionData* position = PositionData::GetInstance();
     RectStr mapCount = { 0 };
     setting->GetMapCount(&mapCount);
+    RectStr current = position->GetPosition();
 
     for (long y = 0; y < mapCount.Y; y++)
     {
         for (long x = 0; x < mapCount.X; x++)
         {
-            printf("%d", m_MapData[y][x]);
+            if ((x == current.X) && (y == current.Y))
+            {
+                printf("*");
+            }
+            else
+            {
+                printf("%d", m_MapData[y][x]);
+            }
         }
         printf("\n");
     }
@@ -255,6 +266,8 @@ ResultEnum MappingData::Save()
         }
     }
 
+    savedProc();
+
     retVal = ResultEnum::NormalEnd;
 
     
@@ -314,6 +327,8 @@ ResultEnum MappingData::Load()
             }
         }
     }
+    
+    loadedProc();
 
     retVal = ResultEnum::NormalEnd;
 
@@ -329,6 +344,18 @@ FINISH :
     }
 
     return retVal;
+}
+
+/* 保存後の処理 */
+void MappingData::savedProc()
+{
+    /* nop. */
+}
+
+/* 読み込み後の処理 */
+void MappingData::loadedProc()
+{
+    /* nop. */
 }
 
 /* 指定された座標がマップデータの領域内か確認する */

@@ -25,5 +25,6 @@ protected :
 private :
 
     long m_ReceiveCount;
-
+    int m_AvoidPrevLevel;
+    int m_TapePrevLevel;
 };

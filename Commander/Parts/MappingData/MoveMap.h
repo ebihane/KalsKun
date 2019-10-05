@@ -46,4 +46,6 @@ private:
     MoveMap();
     virtual ~MoveMap();
 
+    /* “Ç‚İ‚İŒã‚Ìˆ— */
+    void loadedProc();
 };

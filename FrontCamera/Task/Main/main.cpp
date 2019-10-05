@@ -59,12 +59,12 @@ int main(int argc, char* argv[])
 
     if (2 <= argc)
     {
-        cameraNo = atoi(argv[1]);
+        cameraNo = (char)atoi(argv[1]);
     }
 
     if (3 <= argc)
     {
-        isShow = atoi(argv[2]);
+        isShow = (char)atoi(argv[2]);
     }
 
     if (initialize(cameraNo) != ResultEnum::NormalEnd)
@@ -172,7 +172,6 @@ ResultEnum initialize(const char cameraNo)
         goto FINISH;
     }
 
-#if ERROR_LED_EXIST
     /* ˆÙíó‘Ô LED §ŒäƒXƒŒƒbƒh ‰Šú‰» */
     g_pErrorLedManager = new ErrorLedManager();
     if (g_pErrorLedManager == NULL)
@@ -180,16 +179,14 @@ ResultEnum initialize(const char cameraNo)
         g_pLogger->LOG_ERROR("[initialize] g_pErrorLedManager allocation failed.\n");
         goto FINISH;
     }
-#endif
 
     g_pHeartBeatManager->Run();
     g_pCameraCapture->Run();
     g_pUltrasoundManager1->Run();
     g_pUltrasoundManager2->Run();
     g_pStateSender->Run();
-#if ERROR_LED_EXIST
     g_pErrorLedManager->Run();
-#endif
+
     retVal = ResultEnum::NormalEnd;
 
 FINISH :
@@ -229,7 +226,7 @@ void mainProcedure(const char isShow)
             pShareMemory->MoveType = MoveTypeEnum::NOT_REQUEST;
         }
 
-        if (isShow == 1)
+        if (isShow != 0)
         {
             if (g_pCameraCapture->IsCaptureStart() == true)
             {
@@ -255,7 +252,7 @@ void mainProcedure(const char isShow)
         delay(10);
     }
 
-    if (isShow == 1)
+    if (isShow != 0)
     {
         cv::destroyAllWindows();
     }

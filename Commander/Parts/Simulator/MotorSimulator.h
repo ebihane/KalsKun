@@ -38,6 +38,9 @@ private :
     long m_Y_Direction;
     SizeStr m_RobotSize;
 
+    bool m_IsAuto;
+    int m_PrevLevel;
+
     void stopCommand();
     void frontCommand();
     void r_turnCommand();

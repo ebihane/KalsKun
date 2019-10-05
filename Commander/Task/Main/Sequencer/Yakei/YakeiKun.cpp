@@ -198,9 +198,10 @@ SequencerBase::SequenceTypeEnum YakeiKun::decideNextSequence(StateInfoStr* const
     }
 #else
     /* ‘S–Ô—…Š®—¹‚Ìê‡‚Í IDLE */
-    if (moveMap->IsComplete() == true)
+    if (m_DriveDecider.IsComplete() == true)
     {
-        m_Logger.LOG_INFO("[decideNextSequence] Kusakari Finish!!!\n");
+        m_Logger.LOG_INFO("[decideNextSequence] Yakei Finish!!!\n");
+        moveMap->UpdateMovedValue();
         retVal = SequenceTypeEnum::E_SEQ_IDLE;
         goto FINISH;
     }

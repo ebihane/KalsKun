@@ -17,5 +17,6 @@ private :
     int m_CurrentLevel;
 
     ResultEnum doMainProc();
+    ResultEnum finalizeCore();
 
 };

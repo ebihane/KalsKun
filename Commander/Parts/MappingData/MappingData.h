@@ -53,6 +53,12 @@ public:
 
 protected :
 
+    /* 保存後の処理 */
+    virtual void savedProc();
+
+    /* 読み込み後の処理 */
+    virtual void loadedProc();
+
     /* 指定された座標がマップデータの領域内か確認する */
     bool isInRange(const long x, const long y);
 

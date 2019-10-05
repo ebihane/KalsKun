@@ -52,6 +52,12 @@ public :
     /* 向いている方向を変える */
     void SetDirection(DirectionEnum const direction);
 
+    /* 向いている方向から先のマップデータを全て変更する */
+    void FillAreaMap(const unsigned char value);
+
+    /* 現在の位置でマップを二分して、どちらの方が未移動エリアが多いか判断する */
+    DirectionEnum JudgeNotMoveArea();
+
     /*-----------------*/
     /* 初期化用 処理群 */
     /*-----------------*/

@@ -7,12 +7,15 @@ DriveDecider::DriveDecider()
  , m_AreaMap(NULL)
  , m_MoveMap(NULL)
  , m_Position(NULL)
+ , m_Setting(NULL)
  , m_Preview(MotorCommandEnum::E_COMMAND_STOP)
  , m_TurnCount(0)
 {
     m_AreaMap = AreaMap::GetInstance();
     m_MoveMap = MoveMap::GetInstance();
     m_Position = PositionData::GetInstance();
+    m_Setting = SettingManager::GetInstance();
+    m_Setting->GetMapCount(&m_MapCount);
 }
 
 DriveDecider::~DriveDecider()
@@ -105,9 +108,15 @@ MotorCommandEnum DriveDecider::Decide()
             /* もしくは、両方とも移動済み */
             else
             {
-                /* とりあえず右ターン */
-                /* @todo : 未移動が多い方を選択 */
-                retVal = MotorCommandEnum::E_COMMAND_R_TURN;
+                /* 未移動エリアが多い方に曲がる */
+                if (m_Position->JudgeNotMoveArea() == DirectionEnum::E_DIR_RIGHT)
+                {
+                    retVal = MotorCommandEnum::E_COMMAND_R_TURN;
+                }
+                else
+                {
+                    retVal = MotorCommandEnum::E_COMMAND_L_TURN;
+                }
             }
         }
     }
@@ -148,6 +157,10 @@ MotorCommandEnum DriveDecider::DecideForRoadClosed()
         retVal = MotorCommandEnum::E_COMMAND_R_TURN;
     }
 #else
+
+    /* 向いている方向の先のデータをすべて「通行禁止」にする */
+    m_Position->FillAreaMap(AreaMap::NOT_MOVABLE_VALUE);
+
     RectStr leftPosition;
     RectStr rightPosition;
 
@@ -222,6 +235,29 @@ MotorCommandEnum DriveDecider::DecideForAvoidance()
 {
     m_Preview = MotorCommandEnum::E_COMMAND_AVOID;
     return MotorCommandEnum::E_COMMAND_AVOID;
+}
+
+/* 網羅完了判定 */
+bool DriveDecider::IsComplete()
+{
+    bool retVal = false;
+    RectStr current = m_Position->GetPosition();
+
+    /* 畑の隅に到達した時 */
+    /* @todo : 正方形の畑 */
+    if (((current.X == 1) && (current.Y == 1))
+    ||  ((current.X == 1) && (current.Y == (m_MapCount.Y - 2)))
+    ||  ((current.X == (m_MapCount.X - 2)) && (current.Y == 1))
+    ||  ((current.X == (m_MapCount.X - 2)) && (current.Y == (m_MapCount.Y - 2))))
+    {
+        /* 全体エリアの 95 % を走破済み */
+        if (m_MoveMap->IsComplete() == true)
+        {
+            retVal = true;
+        }
+    }
+
+    return retVal;
 }
 
 unsigned long DriveDecider::GetTurnCount()

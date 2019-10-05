@@ -481,6 +481,15 @@ void finalize()
         g_pMotorCommunicator = NULL;
     }
 
+    MoveMap* moveMap = MoveMap::GetInstance();
+    moveMap->Save();
+
+    AreaMap* areaMap = AreaMap::GetInstance();
+    areaMap->Save();
+
+    PositionData* position = PositionData::GetInstance();
+    position->Save();
+
     if (g_pLightThread != NULL)
     {
         g_pLightThread->Stop(5);
@@ -515,12 +524,6 @@ void finalize()
         delete g_pFrontCameraReceiver;
         g_pFrontCameraReceiver = NULL;
     }
-
-    MoveMap* moveMap = MoveMap::GetInstance();
-    moveMap->Save();
-
-    AreaMap* areaMap = AreaMap::GetInstance();
-    areaMap->Save();
 
     /* ハートビート制御スレッドは最後に落とす */
     if (g_pHeartBeatManager != NULL)

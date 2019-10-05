@@ -91,6 +91,169 @@ void PositionData::SetDirection(DirectionEnum const direction)
     m_Compass = convertDirectionToCompass(m_Compass, direction);
 }
 
+/* 向いている方向から先のマップデータを全て変更する */
+void PositionData::FillAreaMap(const unsigned char value)
+{
+    AreaMap* areaMap = AreaMap::GetInstance();
+    SettingManager* setting = SettingManager::GetInstance();
+
+    RectStr mapCount;
+    setting->GetMapCount(&mapCount);
+
+    RectStr target = m_Position;
+    while (1)
+    {
+        target.X += m_ReferenceMap[m_Compass].X;
+        target.Y += m_ReferenceMap[m_Compass].Y;
+
+        if ((target.X <= 0) || (mapCount.X <= target.X)
+        ||  (target.Y <= 0) || (mapCount.Y <= target.Y))
+        {
+            break;
+        }
+
+        areaMap->Set(&target, value);
+    }
+}
+
+/* 現在の位置でマップを二分して、右・左 どちらの方が未移動エリアが多いか判断する */
+DirectionEnum PositionData::JudgeNotMoveArea()
+{
+    DirectionEnum retVal = DirectionEnum::E_DIR_RIGHT;
+
+    RectStr startPos1;
+    RectStr startPos2;
+    RectStr endPos1;
+    RectStr endPos2;
+    RectStr mapSize;
+    long x = 0;
+    long y = 0;
+    unsigned long area1NotMovedCount = 0;
+    unsigned long area2NotMovedCount = 0;
+    
+    SettingManager* setting = SettingManager::GetInstance();
+    AreaMap* areaMap = AreaMap::GetInstance();
+    MoveMap* moveMap = MoveMap::GetInstance();
+
+    setting->GetMapCount(&mapSize);
+
+    if ((m_Compass == CompassEnum::E_COMPASS_NORTH) || (m_Compass == CompassEnum::E_COMPASS_SOUTH))
+    {
+        startPos1.X = 1;
+        startPos1.Y = 1;
+        endPos1.X = m_Position.X - 1;
+        endPos1.Y = mapSize.Y - 1;
+
+        startPos2.X = m_Position.X + 1;
+        startPos2.Y = 1;
+        endPos2.X = mapSize.X - 1;
+        endPos2.Y = mapSize.Y - 1;
+    }
+    else if ((m_Compass == CompassEnum::E_COMPASS_WEST) || (m_Compass == CompassEnum::E_COMPASS_EAST))
+    {
+        startPos1.X = 1;
+        startPos1.Y = 1;
+        endPos1.X = mapSize.X - 1;
+        endPos1.Y = m_Position.Y - 1;
+        
+        startPos2.X = 1;
+        startPos2.Y = m_Position.Y + 1;
+        endPos2.X = mapSize.X - 1;
+        endPos2.Y = mapSize.Y - 1;
+    }
+    else
+    {
+        /* @todo : ロボットが斜めを向いている場合はとりあえず右側で返す */
+        goto FINISH;
+    }
+
+    for (y = startPos1.Y; y < endPos1.Y; y++)
+    {
+        for (x = startPos1.X; x < endPos1.X; x++)
+        {
+            if (areaMap->IsMovable(x, y) == false)
+            {
+                continue;
+            }
+
+            if (areaMap->Get(x, y) == AreaMap::OBSTACLE_VALUE)
+            {
+                continue;
+            }
+
+            if (moveMap->IsNotMove(x, y) == true)
+            {
+                area1NotMovedCount++;
+            }
+        }
+    }
+
+    for (y = startPos2.Y; y < endPos2.Y; y++)
+    {
+        for (x = startPos2.X; x < endPos2.X; x++)
+        {
+            if (areaMap->IsMovable(x, y) == false)
+            {
+                continue;
+            }
+
+            if (areaMap->Get(x, y) == AreaMap::OBSTACLE_VALUE)
+            {
+                continue;
+            }
+
+            if (moveMap->IsNotMove(x, y) == true)
+            {
+                area2NotMovedCount++;
+            }
+        }
+    }
+
+    /* エリア 2 の方が多い */
+    if (area1NotMovedCount < area2NotMovedCount)
+    {
+        if (m_Compass == CompassEnum::E_COMPASS_NORTH)
+        {
+            retVal = DirectionEnum::E_DIR_RIGHT;
+        }
+        else if (m_Compass == CompassEnum::E_COMPASS_SOUTH)
+        {
+            retVal = DirectionEnum::E_DIR_LEFT;
+        }
+        else if (m_Compass == CompassEnum::E_COMPASS_WEST)
+        {
+            retVal = DirectionEnum::E_DIR_LEFT;
+        }
+        else
+        {
+            retVal = DirectionEnum::E_DIR_RIGHT;
+        }
+    }
+    else
+    {
+        if (m_Compass == CompassEnum::E_COMPASS_NORTH)
+        {
+            retVal = DirectionEnum::E_DIR_LEFT;
+        }
+        else if (m_Compass == CompassEnum::E_COMPASS_SOUTH)
+        {
+            retVal = DirectionEnum::E_DIR_RIGHT;
+        }
+        else if (m_Compass == CompassEnum::E_COMPASS_WEST)
+        {
+            retVal = DirectionEnum::E_DIR_RIGHT;
+        }
+        else
+        {
+            retVal = DirectionEnum::E_DIR_LEFT;
+        }
+    }
+
+
+FINISH :
+    return retVal;
+}
+
 /*-----------------*/
 /* 初期化用 処理群 */
 /*-----------------*/
