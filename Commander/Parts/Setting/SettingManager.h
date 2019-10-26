@@ -53,6 +53,7 @@ public :
 
     /* ƒ}ƒbƒv‚ÌŒÂ” */
     void GetMapCount(RectStr* const count);     /* æ“¾ */
+    void UpdateMapCount();                      /* ÄŒvZ */
 
     /* “d”g‚Ì“`”ÀŒW” */
     float GetWavePowerCoeff();                  /* æ“¾ */

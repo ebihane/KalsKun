@@ -110,6 +110,7 @@
     <ClCompile Include="Task\Main\Sequencer\Yakei\YakeiKun.cpp" />
     <ClCompile Include="Task\MotorCommunicator\MotorCommunicator.cpp" />
     <ClCompile Include="Task\Patrol\PatrolThread.cpp" />
+    <ClCompile Include="Task\ToolCommunicator\ToolCommunicator.cpp" />
     <ClCompile Include="Task\WavePowerMonitor\WavePowerMonitor.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -140,6 +141,7 @@
     <ClInclude Include="Task\Main\Sequencer\Yakei\YakeiKun.h" />
     <ClInclude Include="Task\MotorCommunicator\MotorCommunicator.h" />
     <ClInclude Include="Task\Patrol\PatrolThread.h" />
+    <ClInclude Include="Task\ToolCommunicator\ToolCommunicator.h" />
     <ClInclude Include="Task\WavePowerMonitor\WavePowerMonitor.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">

@@ -30,6 +30,7 @@
 #include "Task/BuzzerController/BuzzerController.h"
 #include "Task/LightController/LightController.h"
 #include "Task/Patrol/PatrolThread.h"
+#include "Task/ToolCommunicator/ToolCommunicator.h"
 
 /* Sequencer */
 #include "Task/Main/Sequencer/SequencerBase.h"
@@ -50,13 +51,14 @@ static HeartBeatManager* g_pHeartBeatManager = NULL;
 static BuzzerController* g_pBuzzerThread = NULL;
 static LightController* g_pLightThread = NULL;
 static PatrolThread* g_pPatrolThread = NULL;
+static ToolCommunicator* g_pToolCommunicator = NULL;
 
 /* Sequencer */
 static SequencerBase* g_pSequencer = NULL;
 
 ResultEnum initialize(const char isMotorSimulator, const char isFrontCameraSimulator, const char isAnimalCameraSimulator, const char isAroundCameraSimulator, const char isPatrolNotExist);
 void mainProcedure();
-void finalize();
+void finalize(const bool isShutdown);
 void signalHandler(int signum);
 
 
@@ -108,7 +110,7 @@ int main(int argc, char* argv[])
     isMainLoopExit = true;
 
 FINISH :
-    finalize();
+    finalize(isMainLoopExit);
 
     if (isMainLoopExit == true)
     {
@@ -361,6 +363,14 @@ ResultEnum initialize(const char isMotorSimulator, const char isFrontCameraSimul
         goto FINISH;
     }
 
+    /* ツール通信スレッド 初期化 */
+    g_pToolCommunicator = new ToolCommunicator();
+    if (g_pToolCommunicator == NULL)
+    {
+        g_pLogger->LOG_ERROR("[initialize] g_pToolCommunicator allocation failed.\n");
+        goto FINISH;
+    }
+
     /* Task 起動 */
     g_pHeartBeatManager->Run();
     g_pFrontCameraReceiver->Run();
@@ -369,6 +379,7 @@ ResultEnum initialize(const char isMotorSimulator, const char isFrontCameraSimul
     g_pBuzzerThread->Run();
     g_pLightThread->Run();
     g_pMotorCommunicator->Run();
+    g_pToolCommunicator->Run();
 
     if (isPatrolNotExist != 1)
     {
@@ -392,6 +403,9 @@ ResultEnum initialize(const char isMotorSimulator, const char isFrontCameraSimul
         g_pPatrolThread->Run();
     }
 
+    /* エラー状態出力を OFF */
+    digitalWrite(IO_FAILURE_STATE, LOW);
+
     /* Sequencer 生成 */
     /* 最初は Idle 状態 */
     g_pSequencer = new HimajinKun();
@@ -402,6 +416,7 @@ ResultEnum initialize(const char isMotorSimulator, const char isFrontCameraSimul
     }
 
     g_pSequencer->Initialize(SequencerBase::SequenceTypeEnum::E_SEQ_IDLE);
+    pShareMemory->Commander.ModeState = g_pSequencer->GetSequence();
 
     retVal = ResultEnum::NormalEnd;
 
@@ -421,6 +436,7 @@ void mainProcedure()
     while (1)
     {
         current = g_pSequencer->GetSequence();
+        pShareMemory->Commander.ModeState = current;
         next = g_pSequencer->Process();
         if (next != current)
         {
@@ -465,22 +481,8 @@ void mainProcedure()
     }
 }
 
-void finalize()
+void finalize(const bool isShutdown)
 {
-    if (g_pPatrolThread != NULL)
-    {
-        g_pPatrolThread->Stop(5);
-        delete g_pPatrolThread;
-        g_pPatrolThread = NULL;
-    }
-
-    if (g_pMotorCommunicator != NULL)
-    {
-        g_pMotorCommunicator->Stop(5);
-        delete g_pMotorCommunicator;
-        g_pMotorCommunicator = NULL;
-    }
-
     MoveMap* moveMap = MoveMap::GetInstance();
     moveMap->Save();
 
@@ -490,55 +492,79 @@ void finalize()
     PositionData* position = PositionData::GetInstance();
     position->Save();
 
-    if (g_pLightThread != NULL)
+    if (isShutdown == false)
     {
-        g_pLightThread->Stop(5);
-        delete g_pLightThread;
-        g_pLightThread = NULL;
-    }
+        if (g_pPatrolThread != NULL)
+        {
+            g_pPatrolThread->Stop(5);
+            delete g_pPatrolThread;
+            g_pPatrolThread = NULL;
+        }
 
-    if (g_pBuzzerThread != NULL)
-    {
-        g_pBuzzerThread->Stop(5);
-        delete g_pBuzzerThread;
-        g_pBuzzerThread = NULL;
-    }
+        if (g_pToolCommunicator != NULL)
+        {
+            g_pToolCommunicator->Stop(5);
+            delete g_pToolCommunicator;
+            g_pToolCommunicator = NULL;
+        }
 
-    if (g_pAroundCameraReceiver != NULL)
-    {
-        g_pAroundCameraReceiver->Stop(5);
-        delete g_pAroundCameraReceiver;
-        g_pAroundCameraReceiver = NULL;
-    }
+        if (g_pMotorCommunicator != NULL)
+        {
+            g_pMotorCommunicator->Stop(5);
+            delete g_pMotorCommunicator;
+            g_pMotorCommunicator = NULL;
+        }
 
-    if (g_pAnimalCameraReceiver != NULL)
-    {
-        g_pAnimalCameraReceiver->Stop(5);
-        delete g_pAnimalCameraReceiver;
-        g_pAnimalCameraReceiver = NULL;
-    }
+        if (g_pLightThread != NULL)
+        {
+            g_pLightThread->Stop(5);
+            delete g_pLightThread;
+            g_pLightThread = NULL;
+        }
 
-    if (g_pFrontCameraReceiver != NULL)
-    {
-        g_pFrontCameraReceiver->Stop(5);
-        delete g_pFrontCameraReceiver;
-        g_pFrontCameraReceiver = NULL;
-    }
+        if (g_pBuzzerThread != NULL)
+        {
+            g_pBuzzerThread->Stop(5);
+            delete g_pBuzzerThread;
+            g_pBuzzerThread = NULL;
+        }
 
-    /* ハートビート制御スレッドは最後に落とす */
-    if (g_pHeartBeatManager != NULL)
-    {
-        g_pHeartBeatManager->Stop(5);
-        delete g_pHeartBeatManager;
-        g_pHeartBeatManager = NULL;
-    }
+        if (g_pAroundCameraReceiver != NULL)
+        {
+            g_pAroundCameraReceiver->Stop(5);
+            delete g_pAroundCameraReceiver;
+            g_pAroundCameraReceiver = NULL;
+        }
 
-    StopLoggerProcess();
+        if (g_pAnimalCameraReceiver != NULL)
+        {
+            g_pAnimalCameraReceiver->Stop(5);
+            delete g_pAnimalCameraReceiver;
+            g_pAnimalCameraReceiver = NULL;
+        }
 
-    if (g_pLogger != NULL)
-    {
-        delete g_pLogger;
-        g_pLogger = NULL;
+        if (g_pFrontCameraReceiver != NULL)
+        {
+            g_pFrontCameraReceiver->Stop(5);
+            delete g_pFrontCameraReceiver;
+            g_pFrontCameraReceiver = NULL;
+        }
+
+        /* ハートビート制御スレッドは最後に落とす */
+        if (g_pHeartBeatManager != NULL)
+        {
+            g_pHeartBeatManager->Stop(5);
+            delete g_pHeartBeatManager;
+            g_pHeartBeatManager = NULL;
+        }
+
+        StopLoggerProcess();
+
+        if (g_pLogger != NULL)
+        {
+            delete g_pLogger;
+            g_pLogger = NULL;
+        }
     }
 }
 
@@ -551,7 +577,7 @@ void signalHandler(int signum)
         g_pLogger->LOG_ERROR("[Commander] Signal Catched!!\n");
     }
 
-    finalize();
+    finalize(false);
 
     exit(0);
 }

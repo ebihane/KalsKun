@@ -67,6 +67,7 @@ typedef struct
     BeaconDataStr   Beacon[BEACON_COUNT];
     MelodyModeEnum  MelodyMode;
     LightModeEnum   LightMode;
+    long            ModeState;
     bool            SystemError;
 } CommanderStateStr;
 

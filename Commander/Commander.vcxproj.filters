@@ -91,6 +91,9 @@
     <Filter Include="Task\Main\DriveDecider">
       <UniqueIdentifier>{c3fa2775-865d-4521-bf89-3ad42bfac1f3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Task\ToolCommunicator">
+      <UniqueIdentifier>{522c8e44-b5b2-4f98-ad7b-fb0ae30d3272}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Task\Main\main.cpp">
@@ -170,6 +173,9 @@
     </ClCompile>
     <ClCompile Include="Task\Main\DriveDecider\DriveDecider.cpp">
       <Filter>Task\Main\DriveDecider</Filter>
+    </ClCompile>
+    <ClCompile Include="Task\ToolCommunicator\ToolCommunicator.cpp">
+      <Filter>Task\ToolCommunicator</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -256,6 +262,9 @@
     </ClInclude>
     <ClInclude Include="Task\Main\DriveDecider\DriveDecider.h">
       <Filter>Task\Main\DriveDecider</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\ToolCommunicator\ToolCommunicator.h">
+      <Filter>Task\ToolCommunicator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

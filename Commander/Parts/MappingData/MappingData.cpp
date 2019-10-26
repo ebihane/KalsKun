@@ -75,6 +75,16 @@ void MappingData::Get(const long x, const long y, unsigned char** const value)
     }
 }
 
+/* 全てのマップデータを1次元で取得する */
+void MappingData::Get(char* const buffer)
+{
+    SettingManager* setting = SettingManager::GetInstance();
+    RectStr mapCount = { 0 };
+    setting->GetMapCount(&mapCount);
+
+    memcpy(&buffer[0], &m_MapData[0][0], mapCount.X * mapCount.Y);
+}
+
 /* 指定した座標のデータを変更する */
 ResultEnum MappingData::Set(RectStr* const position, const unsigned char value)
 {

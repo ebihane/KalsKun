@@ -28,6 +28,12 @@ ThreadBase::ThreadBase(char* const taskName)
 ThreadBase::~ThreadBase()
 {
     Stop(10);
+
+    if (m_Logger != NULL)
+    {
+        delete m_Logger;
+        m_Logger = NULL;
+    }
 }
 
 ResultEnum ThreadBase::Run()
@@ -150,12 +156,6 @@ void ThreadBase::MainProcedure()
 
     snprintf(&m_LogStr[0], sizeof(m_LogStr), "[%s] Thread finish.\n", &m_TaskName[0]);
     m_Logger->LOG_INFO(m_LogStr);
-
-    if (m_Logger != NULL)
-    {
-        delete m_Logger;
-        m_Logger = NULL;
-    }
 
     m_ThreadState = ThreadStateEnum::Finished;
 }

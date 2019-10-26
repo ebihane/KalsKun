@@ -20,6 +20,9 @@ public:
     void Get(RectStr* position, unsigned char** const value);
     void Get(const long x, const long y, unsigned char** const value);
 
+    /* 全てのマップデータを1次元で取得する */
+    void Get(char* const buffer);
+
     /* 指定した座標のデータを変更する */
     ResultEnum Set(RectStr* const position, const unsigned char value);
     ResultEnum Set(const long x, const long y, const unsigned char value);

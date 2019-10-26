@@ -46,11 +46,7 @@ void SettingManager::CreateDefaultData()
     m_FarmSize.Width = 3000.0;
 
     /* É}ÉbÉvÇÃå¬êî (= é©ìÆåvéZ) */
-    long xCount = (long)(m_FarmSize.Width / m_RobotSize.Width);
-    long yCount = (long)(m_FarmSize.Length / m_RobotSize.Length);
-
-    m_MapCount.X = (xCount * 2) + 2;
-    m_MapCount.Y = (yCount * 2) + 2;
+    UpdateMapCount();
 
     /*  ìdîgÇÃì`î¿åWêî*/
     m_WavePowerCoeff = 2.0f;
@@ -210,8 +206,6 @@ ResultEnum SettingManager::Load()
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     FILE* fp = NULL;
     long index = 0;
-    long xCount = 0;
-    long yCount = 0;
     char buffer[40] = { 0 };
     char once[40] = { 0 };
 
@@ -251,11 +245,7 @@ ResultEnum SettingManager::Load()
     m_FarmSize.Width = atof(&once[0]);
 
     /* É}ÉbÉvÇÃå¬êî (= é©ìÆåvéZ) */
-    xCount = (long)(m_FarmSize.Width / m_RobotSize.Width);
-    yCount = (long)(m_FarmSize.Length / m_RobotSize.Length);
-
-    m_MapCount.X = (xCount * 2) + 2;
-    m_MapCount.Y = (yCount * 2) + 2;
+    UpdateMapCount();
 
     fgets(&buffer[0], sizeof(buffer), fp);
     parseString(&buffer[0], &once[0], ',', sizeof(buffer));
@@ -402,6 +392,15 @@ void SettingManager::GetMapCount(RectStr* const count)
 {
     count->X = m_MapCount.X;
     count->Y = m_MapCount.Y;
+}
+
+void SettingManager::UpdateMapCount()
+{
+    long xCount = (long)(m_FarmSize.Width / m_RobotSize.Width);
+    long yCount = (long)(m_FarmSize.Length / m_RobotSize.Length);
+
+    m_MapCount.X = (xCount * 2) + 2;
+    m_MapCount.Y = (yCount * 2) + 2;
 }
 
 /* ìdîgÇÃì`î¿åWêî */
