@@ -41,7 +41,7 @@ static ErrorLedManager* g_pErrorLedManager = NULL;
 
 ResultEnum initialize(const char controllerType);
 void mainProcedure(const char isShow);
-void finalize();
+void finalize(const bool isShutdown);
 void signalHandler(int signum);
 
 /* ./FrontCamera.out (カメラ番号) (表示有無) */
@@ -77,11 +77,10 @@ int main(int argc, char* argv[])
     isMainLoopExit = true;
 
 FINISH:
-    finalize();
+    finalize(isMainLoopExit);
 
     if (isMainLoopExit == true)
     {
-        printf("shutdown execute.");
         system("sudo shutdown -h now &");
     }
 
@@ -258,63 +257,67 @@ void mainProcedure(const char isShow)
     }
 }
 
-void finalize()
+void finalize(const bool isShutdown)
 {
-    if (g_pErrorLedManager != NULL)
+    /* シャットダウン実施時はどうせシステム終了で落ちるので意図的な終了処理は無し */
+    if (isShutdown == false)
     {
-        g_pErrorLedManager->Stop(5);
-        delete g_pErrorLedManager;
-        g_pErrorLedManager = NULL;
-    }
+        if (g_pErrorLedManager != NULL)
+        {
+            g_pErrorLedManager->Stop(5);
+            delete g_pErrorLedManager;
+            g_pErrorLedManager = NULL;
+        }
 
-    if (g_pStateSender != NULL)
-    {
-        g_pStateSender->Stop(5);
-        delete g_pStateSender;
-        g_pStateSender = NULL;
-    }
+        if (g_pStateSender != NULL)
+        {
+            g_pStateSender->Stop(5);
+            delete g_pStateSender;
+            g_pStateSender = NULL;
+        }
 
-    if (g_pUltrasoundManager2 != NULL)
-    {
-        g_pUltrasoundManager2->Stop(5);
-        delete g_pUltrasoundManager2;
-        g_pUltrasoundManager2 = NULL;
-    }
+        if (g_pUltrasoundManager2 != NULL)
+        {
+            g_pUltrasoundManager2->Stop(5);
+            delete g_pUltrasoundManager2;
+            g_pUltrasoundManager2 = NULL;
+        }
 
-    if (g_pUltrasoundManager1 != NULL)
-    {
-        g_pUltrasoundManager1->Stop(5);
-        delete g_pUltrasoundManager1;
-        g_pUltrasoundManager1 = NULL;
-    }
+        if (g_pUltrasoundManager1 != NULL)
+        {
+            g_pUltrasoundManager1->Stop(5);
+            delete g_pUltrasoundManager1;
+            g_pUltrasoundManager1 = NULL;
+        }
 
-    if (g_pCameraCapture != NULL)
-    {
-        g_pCameraCapture->Stop(5);
-        delete g_pCameraCapture;
-        g_pCameraCapture = NULL;
-    }
+        if (g_pCameraCapture != NULL)
+        {
+            g_pCameraCapture->Stop(5);
+            delete g_pCameraCapture;
+            g_pCameraCapture = NULL;
+        }
 
-    if (g_pHeartBeatManager != NULL)
-    {
-        g_pHeartBeatManager->Stop(5);
-        delete g_pHeartBeatManager;
-        g_pHeartBeatManager = NULL;
-    }
+        if (g_pHeartBeatManager != NULL)
+        {
+            g_pHeartBeatManager->Stop(5);
+            delete g_pHeartBeatManager;
+            g_pHeartBeatManager = NULL;
+        }
 
-    if (g_pLogger != NULL)
-    {
-        delete g_pLogger;
-        g_pLogger = NULL;
-    }
+        if (g_pLogger != NULL)
+        {
+            delete g_pLogger;
+            g_pLogger = NULL;
+        }
 
-    if (pShareMemory != NULL)
-    {
-        delete pShareMemory;
-        pShareMemory = NULL;
-    }
+        if (pShareMemory != NULL)
+        {
+            delete pShareMemory;
+            pShareMemory = NULL;
+        }
 
-    StopLoggerProcess();
+        StopLoggerProcess();
+    }
 }
 
 void signalHandler(int signum)
@@ -326,7 +329,7 @@ void signalHandler(int signum)
         g_pLogger->LOG_ERROR("[FrontCamera] Signal Catched!!\n");
     }
 
-    finalize();
+    finalize(false);
 
     exit(0);
 }

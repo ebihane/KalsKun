@@ -1,18 +1,11 @@
-﻿using DetailTool.Components.Setting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DetailTool.Command
+﻿namespace DetailTool.Command
 {
-    public class GetSettingCommand : CommandBase
+    public class DisconnectCommand : CommandBase
     {
         /// <summary>
-        /// コンストラクタ
+        /// デフォルトコンストラクタ
         /// </summary>
-        public GetSettingCommand()
+        public DisconnectCommand()
         {
         }
 
@@ -20,14 +13,13 @@ namespace DetailTool.Command
         /// イベント生成
         /// </summary>
         /// <param name="expectedSize">期待する応答データサイズ</param>
-        /// <returns></returns>
+        /// <returns>送信イベント</returns>
         protected override EventInfo createEvent(out int expectedSize)
         {
             EventInfo retVal = new EventInfo();
-            expectedSize = SettingData.GetInstance().GetSize();
 
-            retVal.Code = 1000;
-
+            retVal.Code = 9999;
+            expectedSize = sizeof(int);
             return retVal;
         }
 
@@ -37,9 +29,6 @@ namespace DetailTool.Command
         /// <param name="data">解析対象データ</param>
         protected override void analyzeCore(byte[] data)
         {
-            SettingData setting = SettingData.GetInstance();
-
-            setting.Analyze(data);
         }
     }
 }

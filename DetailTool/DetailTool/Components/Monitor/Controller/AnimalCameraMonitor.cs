@@ -1,6 +1,7 @@
-﻿using System;
+﻿using DetailTool.Components.Monitor.Items;
+using System;
 
-namespace DetailTool.Components.Monitor
+namespace DetailTool.Components.Monitor.Controller
 {
     public class AnimalCameraMonitor
     {
@@ -10,16 +11,23 @@ namespace DetailTool.Components.Monitor
 
         public int ReceiveCount { get; private set; }
         public int SystemError { get; private set; }
-        public DetectTypeEnum Human { get; private set; }
-        public DetectTypeEnum Animal { get; private set; }
+        public DetectType Human { get; private set; }
+        public DetectType Animal { get; private set; }
 
         /// <summary>
-        /// 検知状態定数
+        /// サイズ取得
         /// </summary>
-        public enum DetectTypeEnum
+        /// <returns>サイズ</returns>
+        public int GetSize()
         {
-            NOT_DETECT = 0,     // 未検知
-            DETECTED,           // 検知
+            int retVal = 0;
+
+            retVal += sizeof(int);
+            retVal += sizeof(int);
+            retVal += this.Human.GetSize();
+            retVal += this.Animal.GetSize();
+
+            return retVal;
         }
 
         /// <summary>
@@ -45,14 +53,10 @@ namespace DetailTool.Components.Monitor
             dataIndex += sizeof(int);
 
             // 人間検知状態
-            intValue = BitConverter.ToInt32(data, dataIndex);
-            this.Human = (DetectTypeEnum)intValue;
-            dataIndex += sizeof(int);
+            dataIndex = this.Human.Analyze(data, dataIndex);
 
             // 動物検知状態
-            intValue = BitConverter.ToInt32(data, dataIndex);
-            this.Animal = (DetectTypeEnum)intValue;
-            dataIndex += sizeof(int);
+            dataIndex = this.Animal.Analyze(data, dataIndex);
 
             retVal = dataIndex;
 

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\OpenCvSharp4.runtime.win.4.1.0.20190416\build\net\OpenCvSharp4.runtime.win.props" Condition="Exists('..\packages\OpenCvSharp4.runtime.win.4.1.0.20190416\build\net\OpenCvSharp4.runtime.win.props')" />
+  <Import Project="..\packages\OpenCvSharp4.runtime.win.4.1.1.20191025\build\net\OpenCvSharp4.runtime.win.props" Condition="Exists('..\packages\OpenCvSharp4.runtime.win.4.1.1.20191025\build\net\OpenCvSharp4.runtime.win.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -39,16 +39,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="OpenCvSharp, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenCvSharp4.4.1.0.20190416\lib\net461\OpenCvSharp.dll</HintPath>
+      <HintPath>..\packages\OpenCvSharp4.4.1.1.20191025\lib\net461\OpenCvSharp.dll</HintPath>
     </Reference>
     <Reference Include="OpenCvSharp.Blob, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenCvSharp4.4.1.0.20190416\lib\net461\OpenCvSharp.Blob.dll</HintPath>
+      <HintPath>..\packages\OpenCvSharp4.4.1.1.20191025\lib\net461\OpenCvSharp.Blob.dll</HintPath>
     </Reference>
     <Reference Include="OpenCvSharp.Extensions, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenCvSharp4.4.1.0.20190416\lib\net461\OpenCvSharp.Extensions.dll</HintPath>
+      <HintPath>..\packages\OpenCvSharp4.4.1.1.20191025\lib\net461\OpenCvSharp.Extensions.dll</HintPath>
     </Reference>
     <Reference Include="OpenCvSharp.UserInterface, Version=1.0.0.0, Culture=neutral, PublicKeyToken=6adad1e807fea099, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpenCvSharp4.4.1.0.20190416\lib\net461\OpenCvSharp.UserInterface.dll</HintPath>
+      <HintPath>..\packages\OpenCvSharp4.4.1.1.20191025\lib\net461\OpenCvSharp.UserInterface.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -64,14 +64,26 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Command\CommandBase.cs" />
+    <Compile Include="Command\DisconnectCommand.cs" />
     <Compile Include="Command\EventInfo.cs" />
-    <Compile Include="Command\GetSettingCommand.cs" />
+    <Compile Include="Command\Monitor\StateMonitorCommand.cs" />
+    <Compile Include="Command\Setting\GetSettingCommand.cs" />
+    <Compile Include="Command\Setting\SetFarmSizeSettingCommand.cs" />
+    <Compile Include="Command\Setting\SetStartTimeSettingCommand.cs" />
+    <Compile Include="Command\Setting\SetRobotSizeSettingCommand.cs" />
+    <Compile Include="Components\Monitor\Items\BeaconData.cs" />
+    <Compile Include="Components\Monitor\Items\DetectType.cs" />
+    <Compile Include="Components\Monitor\Items\LightMode.cs" />
+    <Compile Include="Components\Monitor\Items\MelodyMode.cs" />
+    <Compile Include="Components\Monitor\Items\StatusItemBase.cs" />
     <Compile Include="Components\Monitor\MonitorData.cs" />
-    <Compile Include="Components\Monitor\AnimalCameraMonitor.cs" />
-    <Compile Include="Components\Monitor\AroundCameraMonitor.cs" />
-    <Compile Include="Components\Monitor\CommanderMonitor.cs" />
-    <Compile Include="Components\Monitor\FrontCameraMonitor.cs" />
-    <Compile Include="Components\Monitor\MotorMonitor.cs" />
+    <Compile Include="Components\Monitor\Controller\AnimalCameraMonitor.cs" />
+    <Compile Include="Components\Monitor\Controller\AroundCameraMonitor.cs" />
+    <Compile Include="Components\Monitor\Controller\CommanderMonitor.cs" />
+    <Compile Include="Components\Monitor\Controller\FrontCameraMonitor.cs" />
+    <Compile Include="Components\Monitor\Controller\MotorMonitor.cs" />
+    <Compile Include="Components\Monitor\Items\MotorMoveType.cs" />
+    <Compile Include="Components\Monitor\Items\SequenceType.cs" />
     <Compile Include="Components\Setting\DateTimeSetting.cs" />
     <Compile Include="Components\Setting\SizeData.cs" />
     <Compile Include="Controls\CommControl.cs">
@@ -85,6 +97,12 @@
     </Compile>
     <Compile Include="Controls\DateTimeInputControl.Designer.cs">
       <DependentUpon>DateTimeInputControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DoubleText.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\DoubleText.Designer.cs">
+      <DependentUpon>DoubleText.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\FloatText.cs">
       <SubType>UserControl</SubType>
@@ -119,6 +137,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\DateTimeInputControl.resx">
       <DependentUpon>DateTimeInputControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\DoubleText.resx">
+      <DependentUpon>DoubleText.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\FloatText.resx">
       <DependentUpon>FloatText.cs</DependentUpon>
@@ -161,6 +182,6 @@
     <PropertyGroup>
       <ErrorText>このプロジェクトは、このコンピューター上にない NuGet パッケージを参照しています。それらのパッケージをダウンロードするには、[NuGet パッケージの復元] を使用します。詳細については、http://go.microsoft.com/fwlink/?LinkID=322105 を参照してください。見つからないファイルは {0} です。</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\OpenCvSharp4.runtime.win.4.1.0.20190416\build\net\OpenCvSharp4.runtime.win.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenCvSharp4.runtime.win.4.1.0.20190416\build\net\OpenCvSharp4.runtime.win.props'))" />
+    <Error Condition="!Exists('..\packages\OpenCvSharp4.runtime.win.4.1.1.20191025\build\net\OpenCvSharp4.runtime.win.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\OpenCvSharp4.runtime.win.4.1.1.20191025\build\net\OpenCvSharp4.runtime.win.props'))" />
   </Target>
 </Project>

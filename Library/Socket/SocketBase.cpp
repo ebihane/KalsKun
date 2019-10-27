@@ -73,14 +73,29 @@ FINISH:
 ResultEnum SocketBase::sendCore(const int sock, void* const bufferPtr, const unsigned long size)
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
+    int onceSend = 0;
+    unsigned long rest = size;
+    char* ptr = (char*)bufferPtr;
 
-
-    m_LastErrorNo = ERROR_NOTHING;
-    if (send(sock, bufferPtr, size, 0) < 0)
+    if (sock == SOCKET_INVALID)
     {
-        m_LastErrorNo = errno;
         retVal = ResultEnum::Reconnect;
         goto FINISH;
+    }
+
+    m_LastErrorNo = ERROR_NOTHING;
+    while (0 < rest)
+    {
+        onceSend = send(sock, ptr, rest, 0);
+        if (onceSend < 0)
+        {
+            m_LastErrorNo = errno;
+            retVal = ResultEnum::Reconnect;
+            goto FINISH;
+        }
+
+        ptr += onceSend;
+        rest -= onceSend;
     }
 
     retVal = ResultEnum::NormalEnd;

@@ -29,13 +29,13 @@
         private void InitializeComponent()
         {
             this.grpFrame = new System.Windows.Forms.GroupBox();
-            this.cboDayOfWeek = new System.Windows.Forms.ComboBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.cboHour = new System.Windows.Forms.ComboBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.cboMinute = new System.Windows.Forms.ComboBox();
             this.label4 = new System.Windows.Forms.Label();
+            this.cboMinute = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.cboHour = new System.Windows.Forms.ComboBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.cboDayOfWeek = new System.Windows.Forms.ComboBox();
             this.grpFrame.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -56,6 +56,62 @@
             this.grpFrame.TabStop = false;
             this.grpFrame.Text = "groupBox1";
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(244, 62);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(24, 16);
+            this.label4.TabIndex = 7;
+            this.label4.Text = "分";
+            // 
+            // cboMinute
+            // 
+            this.cboMinute.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboMinute.FormattingEnabled = true;
+            this.cboMinute.Location = new System.Drawing.Point(188, 59);
+            this.cboMinute.Name = "cboMinute";
+            this.cboMinute.Size = new System.Drawing.Size(50, 24);
+            this.cboMinute.TabIndex = 6;
+            this.cboMinute.SelectedIndexChanged += new System.EventHandler(this.cboMinute_SelectedIndexChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(158, 62);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(24, 16);
+            this.label3.TabIndex = 5;
+            this.label3.Text = "時";
+            // 
+            // cboHour
+            // 
+            this.cboHour.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cboHour.FormattingEnabled = true;
+            this.cboHour.Location = new System.Drawing.Point(102, 59);
+            this.cboHour.Name = "cboHour";
+            this.cboHour.Size = new System.Drawing.Size(50, 24);
+            this.cboHour.TabIndex = 4;
+            this.cboHour.SelectedIndexChanged += new System.EventHandler(this.cboHour_SelectedIndexChanged);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(10, 62);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(72, 16);
+            this.label2.TabIndex = 3;
+            this.label2.Text = "開始時刻";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(7, 23);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(40, 16);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "曜日";
+            // 
             // cboDayOfWeek
             // 
             this.cboDayOfWeek.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
@@ -74,60 +130,7 @@
             this.cboDayOfWeek.Name = "cboDayOfWeek";
             this.cboDayOfWeek.Size = new System.Drawing.Size(166, 24);
             this.cboDayOfWeek.TabIndex = 1;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(7, 23);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(40, 16);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "曜日";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(10, 62);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(72, 16);
-            this.label2.TabIndex = 3;
-            this.label2.Text = "開始時刻";
-            // 
-            // cboHour
-            // 
-            this.cboHour.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cboHour.FormattingEnabled = true;
-            this.cboHour.Location = new System.Drawing.Point(102, 59);
-            this.cboHour.Name = "cboHour";
-            this.cboHour.Size = new System.Drawing.Size(50, 24);
-            this.cboHour.TabIndex = 4;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(158, 62);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(24, 16);
-            this.label3.TabIndex = 5;
-            this.label3.Text = "時";
-            // 
-            // cboMinute
-            // 
-            this.cboMinute.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cboMinute.FormattingEnabled = true;
-            this.cboMinute.Location = new System.Drawing.Point(188, 59);
-            this.cboMinute.Name = "cboMinute";
-            this.cboMinute.Size = new System.Drawing.Size(50, 24);
-            this.cboMinute.TabIndex = 6;
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(244, 62);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(24, 16);
-            this.label4.TabIndex = 7;
-            this.label4.Text = "分";
+            this.cboDayOfWeek.SelectedIndexChanged += new System.EventHandler(this.cboDayOfWeek_SelectedIndexChanged);
             // 
             // DateTimeInputControl
             // 
@@ -136,7 +139,6 @@
             this.Controls.Add(this.grpFrame);
             this.Name = "DateTimeInputControl";
             this.Size = new System.Drawing.Size(299, 111);
-            this.Load += new System.EventHandler(this.dateTimeInputControl_Load);
             this.grpFrame.ResumeLayout(false);
             this.grpFrame.PerformLayout();
             this.ResumeLayout(false);

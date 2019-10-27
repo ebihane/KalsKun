@@ -1,4 +1,5 @@
 ﻿using DetailTool.Components.Monitor;
+using DetailTool.Components.Monitor.Controller;
 
 namespace DetailTool.Components
 {
@@ -70,6 +71,23 @@ namespace DetailTool.Components
         }
 
         /// <summary>
+        /// サイズ取得
+        /// </summary>
+        /// <returns>サイズ</returns>
+        public int GetSize()
+        {
+            int retVal = 0;
+
+            retVal += m_CommanderMonitor.GetSize();
+            retVal += m_MotorMonitor.GetSize();
+            retVal += m_AroundCameraMonitor.GetSize();
+            retVal += m_FrontCameraMonitor.GetSize();
+            retVal += m_AnimalCameraMonitor.GetSize();
+
+            return retVal;
+        }
+
+        /// <summary>
         /// 受信データ解析
         /// </summary>
         /// <param name="data">受信データ配列</param>
@@ -81,7 +99,7 @@ namespace DetailTool.Components
             index = m_MotorMonitor.Analyze(data, index);
             index = m_AroundCameraMonitor.Analyze(data, index);
             index = m_FrontCameraMonitor.Analyze(data, index);
-            index = m_AnimalCameraMonitor.Analyze(data, index);
+            m_AnimalCameraMonitor.Analyze(data, index);
         }
 
         #endregion

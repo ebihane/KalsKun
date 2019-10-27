@@ -168,7 +168,7 @@ namespace DetailTool.Controls
                 m_TcpClient = new TcpClient();
                 changeConnectButtonText("中止");
                 changeStateLabel("接続中...");
-                pnlInputField.Enabled = false;
+                changeInputFieldEnable(false);
                 m_StopRequest = new ManualResetEvent(false);
                 m_CommunicationThread = new Thread(new ThreadStart(communicationThread));
                 m_CommunicationThread.Start();
@@ -185,23 +185,41 @@ namespace DetailTool.Controls
                 m_Address = null;
                 changeConnectButtonText("接続");
                 changeStateLabel("接続していません。");
-                pnlInputField.Enabled = true;
+                changeInputFieldEnable(true);
             }
             else
             {
-                m_StopRequest.Set();
-                m_CommunicationThread.Join(10000);
-                m_StopRequest.Dispose();
-                m_CommunicationThread = null;
-                m_StopRequest = null;
-
-                m_TcpClient = null;
-                m_Address = null;
-                changeConnectButtonText("接続");
-                changeStateLabel("接続していません。");
-                pnlInputField.Enabled = true;
+                changeConnectButtonEnable(false);
+                changeStateLabel("切断中");
+                DisconnectCommand command = new DisconnectCommand();
+                command.OnAnalyzed += evDisconnected;
+                m_RequestQueue.Enqueue(command);
             }
         }
+
+        /// <summary>
+        /// 切断コマンド送信後イベント
+        /// </summary>
+        /// <param name="sender">sender</param>
+        /// <param name="e">e</param>
+        private void evDisconnected(object sender, EventArgs e)
+        {
+            m_StopRequest.Set();
+            m_CommunicationThread.Join(10000);
+            m_StopRequest.Dispose();
+            m_CommunicationThread = null;
+            m_StopRequest = null;
+
+            m_TcpClient = null;
+            m_Address = null;
+            changeConnectButtonText("接続");
+            changeStateLabel("接続していません。");
+            changeInputFieldEnable(true);
+        }
+
+        #endregion
+
+        #region Private Methods -----------------------------------------------------
 
         /// <summary>
         /// 接続完了イベント発行
@@ -226,10 +244,6 @@ namespace DetailTool.Controls
                 this.OnDisconnection(this, e);
             }
         }
-
-        #endregion
-
-        #region Private Methods -----------------------------------------------------
 
         /// <summary>
         /// 状態表示更新
@@ -266,7 +280,7 @@ namespace DetailTool.Controls
         /// <summary>
         /// 接続ボタン有効・無効切り替え
         /// </summary>
-        /// <param name="enable"></param>
+        /// <param name="enable">状態</param>
         private void changeConnectButtonEnable(bool enable)
         {
             if (btnConnection.InvokeRequired == true)
@@ -276,6 +290,22 @@ namespace DetailTool.Controls
             else
             {
                 btnConnection.Enabled = enable;
+            }
+        }
+
+        /// <summary>
+        /// アドレス情報入力フィールド 有効・無効 切り替え
+        /// </summary>
+        /// <param name="enable">状態</param>
+        private void changeInputFieldEnable(bool enable)
+        {
+            if (pnlInputField.InvokeRequired == true)
+            {
+                pnlInputField.BeginInvoke(new Action<bool>((state) => { pnlInputField.Enabled = state; }), enable);
+            }
+            else
+            {
+                pnlInputField.Enabled = enable;
             }
         }
 
@@ -335,16 +365,23 @@ namespace DetailTool.Controls
                     continue;
                 }
 
+                m_RequestQueue.Clear();
                 NetworkStream stream = m_TcpClient.GetStream();
                 communicationMain(stream);
 
                 onDisconnection();
             }
 
+            m_RequestQueue.Clear();
+
         FINISH:
             return;
         }
 
+        /// <summary>
+        /// 接続時コールバック
+        /// </summary>
+        /// <param name="ar">非同期結果</param>
         private void connectCallback(IAsyncResult ar)
         {
             try
@@ -358,6 +395,10 @@ namespace DetailTool.Controls
             }
         }
 
+        /// <summary>
+        /// 通信処理本体
+        /// </summary>
+        /// <param name="stream">送受信ストリーム</param>
         private void communicationMain(NetworkStream stream)
         {
             while (true)

@@ -38,7 +38,7 @@ namespace DetailTool.Components.Setting
         /// <returns>サイズ</returns>
         public int GetSize()
         {
-            return sizeof(int) + 1 + 1;
+            return sizeof(int) + sizeof(short) + sizeof(short);
         }
 
         /// <summary>
@@ -58,12 +58,12 @@ namespace DetailTool.Components.Setting
             dataIndex += sizeof(int);
 
             // 時
-            this.Hour = data[dataIndex];
-            dataIndex++;
+            this.Hour = BitConverter.ToInt16(data, dataIndex);
+            dataIndex += sizeof(short);
 
             // 分
-            this.Minulte = data[dataIndex];
-            dataIndex++;
+            this.Minulte = BitConverter.ToInt16(data, dataIndex);
+            dataIndex += sizeof(short);
 
             retVal = dataIndex;
 

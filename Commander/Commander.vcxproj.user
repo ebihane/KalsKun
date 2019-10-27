@@ -6,7 +6,7 @@
     <DebuggerFlavor>LinuxDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <RemoteTarget>-113375772;192.168.3.10 (username=, port=22, authentication=Password)</RemoteTarget>
+    <RemoteTarget>-1814257164;192.168.3.1 (username=, port=22, authentication=Password)</RemoteTarget>
     <RemoteDebuggerCommandArguments>1 1 1 1 1</RemoteDebuggerCommandArguments>
     <DebuggerFlavor>LinuxDebugger</DebuggerFlavor>
   </PropertyGroup>

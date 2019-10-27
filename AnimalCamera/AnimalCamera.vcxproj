@@ -50,7 +50,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <IncludePath>C:\opencv\build\include;$(SolutionDir)\..;$(SolutionDir)\Library;$(MSBuildProjectDirectory);$(IncludePath)</IncludePath>
+    <IncludePath>C:\tsubasa\opencv\build\include;$(SolutionDir)\..;$(SolutionDir)\Library;$(MSBuildProjectDirectory);$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">

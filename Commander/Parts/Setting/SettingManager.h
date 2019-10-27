@@ -24,8 +24,8 @@ public :
     typedef struct
     {
         DayOfWeekEnum   DayOfWeek;
-        unsigned char   Hour;
-        unsigned char   Minute;
+        unsigned short  Hour;
+        unsigned short  Minute;
     } TimeSettingStr;
 
     /* インスタンス取得 */

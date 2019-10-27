@@ -17,8 +17,15 @@ namespace DetailTool.Components.Setting
 
         #region Public Constructor --------------------------------------------------
 
+        /// <summary>
+        /// デフォルトコンストラクタ
+        /// </summary>
         public SettingData()
         {
+            this.RobotSize = new SizeData();
+            this.FarmSize = new SizeData();
+            this.KusakariStart = new DateTimeSetting();
+            this.YakeiStart = new DateTimeSetting();
         }
 
         #endregion

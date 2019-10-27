@@ -12,8 +12,8 @@ namespace DetailTool.Components.Setting
         {
         }
 
-        public float Width { get; set; }
-        public float Length { get; set; }
+        public double Width { get; set; }
+        public double Length { get; set; }
 
         /// <summary>
         /// サイズ取得
@@ -21,7 +21,7 @@ namespace DetailTool.Components.Setting
         /// <returns>サイズ</returns>
         public int GetSize()
         {
-            return sizeof(float) * 2;
+            return sizeof(double) * 2;
         }
 
         /// <summary>
@@ -33,18 +33,18 @@ namespace DetailTool.Components.Setting
         public int Analyze(byte[] data, int startIndex)
         {
             int retVal = 0;
-            float floatValue = 0.0F;
+            double doubleValue = 0.0F;
             int dataIndex = startIndex;
 
             // 幅 (= 横 = X)
-            floatValue = BitConverter.ToSingle(data, dataIndex);
-            this.Width = floatValue;
-            dataIndex += sizeof(float);
+            doubleValue = BitConverter.ToDouble(data, dataIndex);
+            this.Width = doubleValue;
+            dataIndex += sizeof(double);
 
             // 長さ (= 縦 = Y)
-            floatValue = BitConverter.ToSingle(data, dataIndex);
-            this.Length = floatValue;
-            dataIndex += sizeof(float);
+            doubleValue = BitConverter.ToDouble(data, dataIndex);
+            this.Length = doubleValue;
+            dataIndex += sizeof(double);
 
             retVal = dataIndex;
 

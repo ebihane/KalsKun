@@ -5,9 +5,23 @@ namespace DetailTool.Controls
 {
     public partial class DateTimeInputControl : UserControl
     {
+        private int m_DayOfWeek = 0;
+        private int m_Hour = 0;
+        private int m_Minute = 0;
+
         public DateTimeInputControl()
         {
             InitializeComponent();
+
+            for (int hour = 0; hour <= 23; hour++)
+            {
+                cboHour.Items.Add(hour);
+            }
+
+            for (int minute = 0; minute <= 59; minute++)
+            {
+                cboMinute.Items.Add(minute);
+            }
         }
 
         public string Title
@@ -27,7 +41,7 @@ namespace DetailTool.Controls
         {
             get
             {
-                return cboDayOfWeek.SelectedIndex;
+                return m_DayOfWeek;
             }
 
             set
@@ -39,12 +53,19 @@ namespace DetailTool.Controls
 
                 if (cboDayOfWeek.InvokeRequired == true)
                 {
-                    cboDayOfWeek.BeginInvoke(new Action<int>((index) => { cboDayOfWeek.SelectedIndex = index; }), value);
+                    cboDayOfWeek.BeginInvoke(new Action<int>(
+                    (index) =>
+                    {
+                        cboDayOfWeek.SelectedIndex = index;
+                    }),
+                    value);
                 }
                 else
                 {
                     cboDayOfWeek.SelectedIndex = value;
                 }
+
+                m_DayOfWeek = value;
 
             FINISH:
                 return;
@@ -58,7 +79,7 @@ namespace DetailTool.Controls
         {
             get
             {
-                return cboHour.SelectedIndex;
+                return m_Hour;
             }
 
             set
@@ -70,12 +91,19 @@ namespace DetailTool.Controls
 
                 if (cboHour.InvokeRequired == true)
                 {
-                    cboHour.BeginInvoke(new Action<int>((index) => { cboHour.SelectedIndex = index; }), value);
+                    cboHour.BeginInvoke(new Action<int>(
+                    (index) =>
+                    {
+                        cboHour.SelectedIndex = index;
+                    }),
+                    value);
                 }
                 else
                 {
                     cboHour.SelectedIndex = value;
                 }
+
+                m_Hour = value;
 
             FINISH:
                 return;
@@ -89,7 +117,7 @@ namespace DetailTool.Controls
         {
             get
             {
-                return cboMinute.SelectedIndex;
+                return m_Minute;
             }
 
             set
@@ -101,12 +129,19 @@ namespace DetailTool.Controls
 
                 if (cboMinute.InvokeRequired == true)
                 {
-                    cboMinute.BeginInvoke(new Action<int>((index) => { cboMinute.SelectedIndex = index; }), value);
+                    cboMinute.BeginInvoke(new Action<int>(
+                    (index) =>
+                    {
+                        cboMinute.SelectedIndex = index;
+                    }),
+                    value);
                 }
                 else
                 {
                     cboMinute.SelectedIndex = value;
                 }
+
+                m_Minute = value;
 
             FINISH:
                 return;
@@ -114,21 +149,33 @@ namespace DetailTool.Controls
         }
 
         /// <summary>
-        /// ロードイベント
+        /// 曜日リスト 変更イベント
         /// </summary>
         /// <param name="sender">sender</param>
         /// <param name="e">e</param>
-        private void dateTimeInputControl_Load(object sender, EventArgs e)
+        private void cboDayOfWeek_SelectedIndexChanged(object sender, EventArgs e)
         {
-            for (int hour = 0; hour <= 23; hour++)
-            {
-                cboHour.Items.Add(hour);
-            }
+            m_DayOfWeek = cboDayOfWeek.SelectedIndex;
+        }
 
-            for (int minute = 0; minute <= 59; minute++)
-            {
-                cboMinute.Items.Add(minute);
-            }
+        /// <summary>
+        /// 時リスト 変更イベント
+        /// </summary>
+        /// <param name="sender">sender</param>
+        /// <param name="e">e</param>
+        private void cboHour_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            m_Hour = cboHour.SelectedIndex;
+        }
+
+        /// <summary>
+        /// 分リスト 変更イベント
+        /// </summary>
+        /// <param name="sender">sender</param>
+        /// <param name="e">e</param>
+        private void cboMinute_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            m_Minute = cboMinute.SelectedIndex;
         }
     }
 }

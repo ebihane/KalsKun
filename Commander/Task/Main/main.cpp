@@ -492,6 +492,7 @@ void finalize(const bool isShutdown)
     PositionData* position = PositionData::GetInstance();
     position->Save();
 
+    /* シャットダウン実施時はどうせシステム終了で落ちるので意図的な終了処理は無し */
     if (isShutdown == false)
     {
         if (g_pPatrolThread != NULL)

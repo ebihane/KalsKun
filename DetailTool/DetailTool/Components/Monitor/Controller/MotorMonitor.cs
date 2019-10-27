@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DetailTool.Components.Monitor
+namespace DetailTool.Components.Monitor.Controller
 {
     /// <summary>
     /// モータマイコン モニタデータクラス
@@ -61,6 +61,26 @@ namespace DetailTool.Components.Monitor
         {
             NOT_DETECT,         // 未検知
             DETECTED,           // 検知
+        }
+
+        /// <summary>
+        /// サイズ取得
+        /// </summary>
+        /// <returns>サイズ</returns>
+        public int GetSize()
+        {
+            int retVal = 0;
+
+            retVal += sizeof(int);
+            retVal += sizeof(MotorCommandEnum);
+            retVal += sizeof(CutterDriveEnum);
+            retVal += sizeof(int);
+            retVal += sizeof(int);
+            retVal += sizeof(DetectTypeEnum);
+            retVal += sizeof(ControlModeEnum);
+            retVal += sizeof(DetectTypeEnum);
+
+            return retVal;
         }
 
         /// <summary>

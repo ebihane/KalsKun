@@ -38,7 +38,7 @@ static ErrorLedManager* g_pErrorLedManager = NULL;
 
 ResultEnum initialize(const char cameraNo);
 void procMain(const char isShow);
-void finalize();
+void finalize(const bool isShutdown);
 void signalHandler(int signum);
 
 int main(int argc, char* argv[])
@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
     isMainLoopExit = true;
 
 FINISH :
-    finalize();
+    finalize(isMainLoopExit);
 
     if (isMainLoopExit == true)
     {
@@ -164,55 +164,59 @@ FINISH:
     return retVal;
 }
 
-void finalize()
+void finalize(const bool isShutdown)
 {
-    if (g_pErrorLedManager != NULL)
+    /* シャットダウン実施時はどうせシステム終了で落ちるので意図的な終了処理は無し */
+    if (isShutdown == false)
     {
-        g_pErrorLedManager->Stop(5);
-        delete g_pErrorLedManager;
-        g_pErrorLedManager = NULL;
-    }
+        if (g_pErrorLedManager != NULL)
+        {
+            g_pErrorLedManager->Stop(5);
+            delete g_pErrorLedManager;
+            g_pErrorLedManager = NULL;
+        }
 
-    if (g_pRedwavePatrol != NULL)
-    {
-        g_pRedwavePatrol->Stop(10);
-        delete g_pRedwavePatrol;
-        g_pRedwavePatrol = NULL;
-    }
+        if (g_pRedwavePatrol != NULL)
+        {
+            g_pRedwavePatrol->Stop(10);
+            delete g_pRedwavePatrol;
+            g_pRedwavePatrol = NULL;
+        }
 
-    if (g_pStateSender != NULL)
-    {
-        g_pStateSender->Stop(10);
-        delete g_pStateSender;
-        g_pStateSender = NULL;
-    }
+        if (g_pStateSender != NULL)
+        {
+            g_pStateSender->Stop(10);
+            delete g_pStateSender;
+            g_pStateSender = NULL;
+        }
 
-    if (g_pCameraCapture != NULL)
-    {
-        g_pCameraCapture->Stop(10);
-        delete g_pCameraCapture;
-        g_pCameraCapture = NULL;
-    }
+        if (g_pCameraCapture != NULL)
+        {
+            g_pCameraCapture->Stop(10);
+            delete g_pCameraCapture;
+            g_pCameraCapture = NULL;
+        }
 
-    if (g_pHeartBeat != NULL)
-    {
-        g_pHeartBeat->Stop(10);
-        delete g_pHeartBeat;
-        g_pHeartBeat = NULL;
-    }
+        if (g_pHeartBeat != NULL)
+        {
+            g_pHeartBeat->Stop(10);
+            delete g_pHeartBeat;
+            g_pHeartBeat = NULL;
+        }
 
-    if (pShareMemory != NULL)
-    {
-        delete pShareMemory;
-        pShareMemory = NULL;
-    }
+        if (pShareMemory != NULL)
+        {
+            delete pShareMemory;
+            pShareMemory = NULL;
+        }
 
-    StopLoggerProcess();
+        StopLoggerProcess();
 
-    if (g_pLogger != NULL)
-    {
-        delete g_pLogger;
-        g_pLogger = NULL;
+        if (g_pLogger != NULL)
+        {
+            delete g_pLogger;
+            g_pLogger = NULL;
+        }
     }
 }
 
@@ -334,7 +338,7 @@ void signalHandler(int signum)
         g_pLogger->LOG_ERROR("[AroundCamera] Signal Catched!!\n");
     }
 
-    finalize();
+    finalize(false);
 
     exit(0);
 }

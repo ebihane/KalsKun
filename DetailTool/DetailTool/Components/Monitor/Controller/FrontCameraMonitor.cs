@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using DetailTool.Components.Monitor.Items;
 
-namespace DetailTool.Components.Monitor
+namespace DetailTool.Components.Monitor.Controller
 {
     /// <summary>
     /// 前方カメラマイコン モニタデータクラス
@@ -17,32 +18,39 @@ namespace DetailTool.Components.Monitor
                 float value = 0.0f;
                 this.Distance.Add(value);
             }
+
+            this.MoveType = new MotorMoveType();
+            this.RedTape = new DetectType();
+            this.BlueObject = new DetectType();
         }
 
         public int ReceiveCount { get; private set; }
         public int SystemError { get; private set; }
-        public MoveTypeEnum MoveType { get; private set; }
-        public DetectTypeEnum RedTape { get; private set; }
-        public DetectTypeEnum BlueObject { get; private set; }
+        public MotorMoveType MoveType { get; private set; }
+        public DetectType RedTape { get; private set; }
+        public DetectType BlueObject { get; private set; }
         public List<float> Distance { get; private set; }
 
         /// <summary>
-        /// 動作指示定数
+        /// サイズ取得
         /// </summary>
-        public enum MoveTypeEnum
+        /// <returns>サイズ</returns>
+        public int GetSize()
         {
-            NOT_REQUEST = 0,    // 要求無し
-            AVOIDANCE,          // 回避指示
-            TURN,               // ターン指示
-        }
+            int retVal = 0;
 
-        /// <summary>
-        /// 検知状態定数
-        /// </summary>
-        public enum DetectTypeEnum
-        {
-            NOT_DETECT = 0,     // 未検知
-            DETECTED,           // 検知
+            retVal += sizeof(int);
+            retVal += sizeof(int);
+            retVal += this.MoveType.GetSize();
+            retVal += this.RedTape.GetSize();
+            retVal += this.BlueObject.GetSize();
+
+            foreach (float val in this.Distance)
+            {
+                retVal += sizeof(float);
+            }
+
+            return retVal;
         }
 
         /// <summary>
@@ -68,19 +76,13 @@ namespace DetailTool.Components.Monitor
             dataIndex += sizeof(int);
 
             // 回避・転回 指示状態
-            intValue = BitConverter.ToInt32(data, dataIndex);
-            this.MoveType = (MoveTypeEnum)intValue;
-            dataIndex += sizeof(int);
+            dataIndex = this.MoveType.Analyze(data, dataIndex);
 
             // 赤テープ検知状態
-            intValue = BitConverter.ToInt32(data, dataIndex);
-            this.RedTape = (DetectTypeEnum)intValue;
-            dataIndex += sizeof(int);
+            dataIndex = this.RedTape.Analyze(data, dataIndex);
 
             // 障害物検知状態
-            intValue = BitConverter.ToInt32(data, dataIndex);
-            this.BlueObject = (DetectTypeEnum)intValue;
-            dataIndex += sizeof(int);
+            dataIndex = this.BlueObject.Analyze(data, dataIndex);
 
             // 超音波センサ 距離
             for (int index = 0; index < PrivateConstants.SonicSensorCount; index++)

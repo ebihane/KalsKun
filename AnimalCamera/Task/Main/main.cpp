@@ -39,7 +39,7 @@ static ErrorLedManager* g_pErrorLedManager = NULL;
 
 ResultEnum initialize(const char cameraNo);
 void mainProcedure(const char isShow);
-void finalize();
+void finalize(const bool isShutdown);
 void signalHandler(int signum);
 
 /* ./AnimalCamera.out (カメラ番号) */
@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
     isMainLoopExit = true;
 
 FINISH:
-    finalize();
+    finalize(isMainLoopExit);
 
     if (isMainLoopExit == true)
     {
@@ -214,49 +214,53 @@ void mainProcedure(const char isShow)
     }
 }
 
-void finalize()
+void finalize(const bool isShutdown)
 {
-    if (g_pErrorLedManager != NULL)
+    /* シャットダウン実施時はどうせシステム終了で落ちるので意図的な終了処理は無し */
+    if (isShutdown == false)
     {
-        g_pErrorLedManager->Stop(5);
-        delete g_pErrorLedManager;
-        g_pErrorLedManager = NULL;
-    }
+        if (g_pErrorLedManager != NULL)
+        {
+            g_pErrorLedManager->Stop(5);
+            delete g_pErrorLedManager;
+            g_pErrorLedManager = NULL;
+        }
 
-    if (g_pStateSender != NULL)
-    {
-        g_pStateSender->Stop(5);
-        delete g_pStateSender;
-        g_pStateSender = NULL;
-    }
+        if (g_pStateSender != NULL)
+        {
+            g_pStateSender->Stop(5);
+            delete g_pStateSender;
+            g_pStateSender = NULL;
+        }
 
-    if (g_pCameraCapture != NULL)
-    {
-        g_pCameraCapture->Stop(5);
-        delete g_pCameraCapture;
-        g_pCameraCapture = NULL;
-    }
+        if (g_pCameraCapture != NULL)
+        {
+            g_pCameraCapture->Stop(5);
+            delete g_pCameraCapture;
+            g_pCameraCapture = NULL;
+        }
 
-    if (g_pHeartBeatManager != NULL)
-    {
-        g_pHeartBeatManager->Stop(5);
-        delete g_pHeartBeatManager;
-        g_pHeartBeatManager = NULL;
-    }
+        if (g_pHeartBeatManager != NULL)
+        {
+            g_pHeartBeatManager->Stop(5);
+            delete g_pHeartBeatManager;
+            g_pHeartBeatManager = NULL;
+        }
 
-    if (g_pLogger != NULL)
-    {
-        delete g_pLogger;
-        g_pLogger = NULL;
-    }
+        if (g_pLogger != NULL)
+        {
+            delete g_pLogger;
+            g_pLogger = NULL;
+        }
 
-    if (pShareMemory != NULL)
-    {
-        delete pShareMemory;
-        pShareMemory = NULL;
-    }
+        if (pShareMemory != NULL)
+        {
+            delete pShareMemory;
+            pShareMemory = NULL;
+        }
 
-    StopLoggerProcess();
+        StopLoggerProcess();
+    }
 }
 
 void signalHandler(int signum)
@@ -268,7 +272,7 @@ void signalHandler(int signum)
         g_pLogger->LOG_ERROR("[AnimalCamera] Signal Catched!!\n");
     }
 
-    finalize();
+    finalize(false);
 
     exit(0);
 }

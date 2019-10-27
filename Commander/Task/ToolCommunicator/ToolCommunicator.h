@@ -34,6 +34,7 @@ private:
     ResultEnum doAreaMapMonitor();
     ResultEnum doMoveMapMonitor();
     ResultEnum doDateTimeAdjust(EventInfo* const pEv);
+    ResultEnum doDisconnectEvent();
 
     void setRobotSizeSetting(const float length, const float width);
     void setFarmSizeSetting(const float length, const float width);

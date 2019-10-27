@@ -180,6 +180,10 @@ ResultEnum ToolCommunicator::analyzeAndExecuteEvent(EventInfo* const pEv)
             retVal = doDateTimeAdjust(pEv);
             break;
 
+        case 9999 :
+            retVal = doDisconnectEvent();
+            break;
+
         default :
             break;
     }
@@ -189,6 +193,8 @@ ResultEnum ToolCommunicator::analyzeAndExecuteEvent(EventInfo* const pEv)
 
 ResultEnum ToolCommunicator::doSettingRead()
 {
+    m_Logger->LOG_INFO("[doSettingRead]::Enter.\n");
+
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     unsigned long index = 0;
     unsigned long sendLength = 0;
@@ -230,7 +236,7 @@ ResultEnum ToolCommunicator::doSettingRead()
     memcpy(&sendBuffer[index], &kusakariStart, sizeof(kusakariStart));
     index += sizeof(kusakariStart);
 
-    yakeiStart = m_Setting->GetKusakariStartTime();
+    yakeiStart = m_Setting->GetYakeiStartTime();
     memcpy(&sendBuffer[index], &yakeiStart, sizeof(yakeiStart));
     index += sizeof(yakeiStart);
 
@@ -244,6 +250,7 @@ FINISH :
         sendBuffer = NULL;
     }
 
+    m_Logger->LOG_INFO("[doSettingRead]::Exit.\n");
     return retVal;
 }
 
@@ -268,9 +275,11 @@ ResultEnum ToolCommunicator::doSettingChange(EventInfo* const pEv)
             {
                 SettingManager::TimeSettingStr kusakariDate;
                 kusakariDate.DayOfWeek = (SettingManager::DayOfWeekEnum)pEv->lParam[1];
-                kusakariDate.Hour = (unsigned char)pEv->lParam[2];
-                kusakariDate.Minute = (unsigned char)pEv->lParam[3];
+                kusakariDate.Hour = (unsigned short)pEv->lParam[2];
+                kusakariDate.Minute = (unsigned short)pEv->lParam[3];
                 m_Setting->SetKusakariStartTime(&kusakariDate);
+                snprintf(&m_LogStr[0], sizeof(m_LogStr), "[KusakariStartChange] Change. [%d %d:%d]\n", kusakariDate.DayOfWeek, kusakariDate.Hour, kusakariDate.Minute);
+                m_Logger->LOG_INFO(m_LogStr);
             }
             response = 0;
             break;
@@ -279,15 +288,22 @@ ResultEnum ToolCommunicator::doSettingChange(EventInfo* const pEv)
             {
                 SettingManager::TimeSettingStr yakeiDate;
                 yakeiDate.DayOfWeek = (SettingManager::DayOfWeekEnum)pEv->lParam[1];
-                yakeiDate.Hour = (unsigned char)pEv->lParam[2];
-                yakeiDate.Minute = (unsigned char)pEv->lParam[3];
+                yakeiDate.Hour = (unsigned short)pEv->lParam[2];
+                yakeiDate.Minute = (unsigned short)pEv->lParam[3];
                 m_Setting->SetYakeStartTime(&yakeiDate);
+                snprintf(&m_LogStr[0], sizeof(m_LogStr), "[YakeiStartChange] Change. [%d %d:%d]\n", yakeiDate.DayOfWeek, yakeiDate.Hour, yakeiDate.Minute);
+                m_Logger->LOG_INFO(m_LogStr);
             }
             response = 0;
             break;
 
         default :
             break;
+    }
+
+    if (response == 0)
+    {
+        m_Setting->Save();
     }
 
     retVal = m_TcpServer.Send(&response, sizeof(response));
@@ -299,16 +315,24 @@ ResultEnum ToolCommunicator::doStateMonitor()
 {
     ResultEnum retVal = ResultEnum::AbnormalEnd;
 
-    char* sendBuffer = new char[sizeof(ShareMemoryStr)];
+    unsigned long size = 0;
+    
+    size += sizeof(pShareMemory->Commander);
+    size += sizeof(pShareMemory->Motor);
+    size += sizeof(pShareMemory->FrontCamera);
+    size += sizeof(pShareMemory->AnimalCamera);
+    size += sizeof(pShareMemory->AroundCamera);
+
+    char* sendBuffer = new char[size];
     if (sendBuffer == NULL)
     {
         m_Logger->LOG_ERROR("[doStateMonitor] sendBuffer allocation failed.\n");
         goto FINISH;
     }
 
-    memcpy(&sendBuffer, pShareMemory, sizeof(ShareMemoryStr));
+    memcpy(&sendBuffer[0], pShareMemory, size);
 
-    retVal = m_TcpServer.Send(&sendBuffer[0], sizeof(ShareMemoryStr));
+    retVal = m_TcpServer.Send(&sendBuffer[0], size);
 
 FINISH :
 
@@ -392,17 +416,32 @@ ResultEnum ToolCommunicator::doDateTimeAdjust(EventInfo* const pEv)
     long minute = (pEv->lParam[1] % 10000) / 100;
     long second = pEv->lParam[1] % 100;
 
+    snprintf(&m_LogStr[0], sizeof(m_LogStr), "Time Adjust : %04d/%02d/%02d %02d:%02d:%02d\n", year, month, day, hour, minute, second);
+    m_Logger->LOG_INFO(m_LogStr);
+
     char command[120] = { 0 };
     snprintf(&command[0], sizeof(command), "sudo date --set '%04d/%02d/%02d %02d:%02d:%02d'", year, month, day, hour, minute, second);
     int result = system(&command[0]);
     
-    retVal = m_TcpServer.Send(&result, sizeof(result));
+    long retCode = result;
+    retVal = m_TcpServer.Send(&retCode, sizeof(retCode));
 
     return retVal;
 }
 
+ResultEnum ToolCommunicator::doDisconnectEvent()
+{
+    long result = ResultEnum::NormalEnd;
+    m_TcpServer.Send(&result, sizeof(result));
+
+    return ResultEnum::Reconnect;
+}
+
 void ToolCommunicator::setRobotSizeSetting(const float length, const float width)
 {
+    snprintf(&m_LogStr[0], sizeof(m_LogStr), "[setRobotSizeSetting] length[%f] width[%f]\n", length, width);
+    m_Logger->LOG_INFO(m_LogStr);
+
     m_AreaMap->Free();
     m_MoveMap->Free();
 
@@ -425,6 +464,9 @@ void ToolCommunicator::setRobotSizeSetting(const float length, const float width
 
 void ToolCommunicator::setFarmSizeSetting(const float length, const float width)
 {
+    snprintf(&m_LogStr[0], sizeof(m_LogStr), "[setFarmSizeSetting] length[%f] width[%f]\n", length, width);
+    m_Logger->LOG_INFO(m_LogStr);
+
     m_AreaMap->Free();
     m_MoveMap->Free();
 

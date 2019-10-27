@@ -1,24 +1,32 @@
 ﻿using System;
+using DetailTool.Components.Monitor.Items;
 
-namespace DetailTool.Components.Monitor
+namespace DetailTool.Components.Monitor.Controller
 {
     public class AroundCameraMonitor
     {
         public AroundCameraMonitor()
         {
+            this.Detect = new DetectType();
         }
 
         public int ReceiveCount { get; private set; }
         public int SystemError { get; private set; }
-        public DetectTypeEnum Detect { get; private set; }
+        public DetectType Detect { get; private set; }
 
         /// <summary>
-        /// 検知状態定数
+        /// サイズ取得
         /// </summary>
-        public enum DetectTypeEnum
+        /// <returns>サイズ</returns>
+        public int GetSize()
         {
-            NOT_DETECT = 0,     // 未検知
-            DETECTED,           // 検知
+            int retVal = 0;
+
+            retVal += sizeof(int);
+            retVal += sizeof(int);
+            retVal += this.Detect.GetSize();
+
+            return retVal;
         }
 
         /// <summary>
@@ -44,9 +52,7 @@ namespace DetailTool.Components.Monitor
             dataIndex += sizeof(int);
 
             // 動体検知状態
-            intValue = BitConverter.ToInt32(data, dataIndex);
-            this.Detect = (DetectTypeEnum)intValue;
-            dataIndex += sizeof(int);
+            dataIndex = this.Detect.Analyze(data, dataIndex);
 
             retVal = dataIndex;
 
