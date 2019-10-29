@@ -27,6 +27,7 @@ wiringPi; pthread; dl; rt;  opencv_core; opencv_video; opencv_videoio; opencv_hi
 #include "Task/HeartBeat/HeartBeatManager.h"
 #include "Task/Ultrasound/UltrasoundManager.h"
 #include "Task/ErrorLed/ErrorLedManager.h"
+#include "Task/ToolCommunicator/ToolCommunicator.h"
 
 /* Parts */
 static Logger* g_pLogger = NULL;
@@ -38,6 +39,7 @@ static HeartBeatManager* g_pHeartBeatManager = NULL;
 static UltrasoundManager* g_pUltrasoundManager1 = NULL;
 static UltrasoundManager* g_pUltrasoundManager2 = NULL;
 static ErrorLedManager* g_pErrorLedManager = NULL;
+static ToolCommunicator* g_pToolCommunicator = NULL;
 
 ResultEnum initialize(const char controllerType);
 void mainProcedure(const char isShow);
@@ -179,12 +181,21 @@ ResultEnum initialize(const char cameraNo)
         goto FINISH;
     }
 
+    /* ツール通信スレッド 初期化 */
+    g_pToolCommunicator = new ToolCommunicator();
+    if (g_pToolCommunicator == NULL)
+    {
+        g_pLogger->LOG_ERROR("[initialize] g_pToolCommunicator allocation failed.\n");
+        goto FINISH;
+    }
+
     g_pHeartBeatManager->Run();
     g_pCameraCapture->Run();
     g_pUltrasoundManager1->Run();
     g_pUltrasoundManager2->Run();
     g_pStateSender->Run();
     g_pErrorLedManager->Run();
+    g_pToolCommunicator->Run();
 
     retVal = ResultEnum::NormalEnd;
 
@@ -262,6 +273,13 @@ void finalize(const bool isShutdown)
     /* シャットダウン実施時はどうせシステム終了で落ちるので意図的な終了処理は無し */
     if (isShutdown == false)
     {
+        if (g_pToolCommunicator != NULL)
+        {
+            g_pToolCommunicator->Stop(5);
+            delete g_pToolCommunicator;
+            g_pToolCommunicator = NULL;
+        }
+
         if (g_pErrorLedManager != NULL)
         {
             g_pErrorLedManager->Stop(5);

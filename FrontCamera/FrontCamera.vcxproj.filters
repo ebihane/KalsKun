@@ -22,6 +22,9 @@
     <ClCompile Include="Task\ErrorLed\ErrorLedManager.cpp">
       <Filter>Task\ErrorLed</Filter>
     </ClCompile>
+    <ClCompile Include="Task\ToolCommunicator\ToolCommunicator.cpp">
+      <Filter>Task\ToolCommunicator</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Task">
@@ -54,6 +57,9 @@
     <Filter Include="Task\ErrorLed">
       <UniqueIdentifier>{8a3d5ed0-b99e-48ca-b92c-863ab704820f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Task\ToolCommunicator">
+      <UniqueIdentifier>{dabe803b-cd08-4572-905b-6e0505e4ede4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Task\CameraCapture\CameraCapture.h">
@@ -79,6 +85,9 @@
     </ClInclude>
     <ClInclude Include="Task\ErrorLed\ErrorLedManager.h">
       <Filter>Task\ErrorLed</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\ToolCommunicator\ToolCommunicator.h">
+      <Filter>Task\ToolCommunicator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

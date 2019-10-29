@@ -97,6 +97,7 @@
     <ClCompile Include="Task\HeartBeat\HeartBeatManager.cpp" />
     <ClCompile Include="Task\RedwavePatrol\RedwavePatrol.cpp" />
     <ClCompile Include="Task\StateSender\StateSender.cpp" />
+    <ClCompile Include="Task\ToolCommunicator\ToolCommunicator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Parts\AroundCameraCommon.h" />
@@ -106,6 +107,7 @@
     <ClInclude Include="Task\HeartBeat\HeartBeatManager.h" />
     <ClInclude Include="Task\RedwavePatrol\RedwavePatrol.h" />
     <ClInclude Include="Task\StateSender\StateSender.h" />
+    <ClInclude Include="Task\ToolCommunicator\ToolCommunicator.h" />
   </ItemGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <ClCompile>

@@ -17,6 +17,9 @@
     <ClCompile Include="Task\ErrorLed\ErrorLedManager.cpp">
       <Filter>Task\ErrorLed</Filter>
     </ClCompile>
+    <ClCompile Include="Task\ToolCommunicator\ToolCommunicator.cpp">
+      <Filter>Task\ToolCommunicator</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="AroundCameraParts">
@@ -43,6 +46,9 @@
     <Filter Include="Task\ErrorLed">
       <UniqueIdentifier>{bb16a556-019a-41cb-8da2-2fba2130aec2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Task\ToolCommunicator">
+      <UniqueIdentifier>{8a998e3f-6fc1-4a5e-8e65-ed2a8ba6c98b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Parts\ShareMemory\ShareMemory.h">
@@ -65,6 +71,9 @@
     </ClInclude>
     <ClInclude Include="Task\ErrorLed\ErrorLedManager.h">
       <Filter>Task\ErrorLed</Filter>
+    </ClInclude>
+    <ClInclude Include="Task\ToolCommunicator\ToolCommunicator.h">
+      <Filter>Task\ToolCommunicator</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
