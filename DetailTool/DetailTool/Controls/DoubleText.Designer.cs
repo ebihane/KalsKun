@@ -45,6 +45,7 @@
             // 
             // txtValue
             // 
+            this.txtValue.BackColor = System.Drawing.Color.White;
             this.txtValue.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.txtValue.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.txtValue.Location = new System.Drawing.Point(116, 2);
@@ -66,14 +67,14 @@
             this.lblTitle.TabIndex = 3;
             this.lblTitle.Text = "ロボットの長さ";
             // 
-            // FloatText
+            // DoubleText
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.lblUnit);
             this.Controls.Add(this.txtValue);
             this.Controls.Add(this.lblTitle);
-            this.Name = "FloatText";
+            this.Name = "DoubleText";
             this.Size = new System.Drawing.Size(268, 30);
             this.ResumeLayout(false);
             this.PerformLayout();

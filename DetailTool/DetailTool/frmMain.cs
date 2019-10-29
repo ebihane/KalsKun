@@ -4,6 +4,7 @@ using DetailTool.Command.Monitor;
 using DetailTool.Command.Setting;
 using DetailTool.Command.Utility;
 using DetailTool.Components;
+using DetailTool.Components.Map;
 using DetailTool.Components.Monitor;
 using DetailTool.Components.Monitor.Items;
 using DetailTool.Components.Setting;
@@ -40,8 +41,12 @@ namespace DetailTool
         /// <param name="e">e</param>
         private void FrmMain_Load(object sender, EventArgs e)
         {
+            // モニタコマンド送信スレッドインスタンス生成
+            m_MonitorSender = new MonitorSender(this.usrCommControl);
+
             initSettingTab();
             initMonitorTab();
+            initMapTab();
         }
 
         /// <summary>
@@ -69,6 +74,11 @@ namespace DetailTool
                 btnTimeAdjust.Enabled = state;
             }),
             true);
+
+            // 設定取得
+            GetSettingCommand command = new GetSettingCommand();
+            command.OnAnalyzed += evSettingReceived;
+            usrCommControl.Send(command);
         }
 
         /// <summary>
@@ -189,6 +199,9 @@ namespace DetailTool
         {
             if (chkMonitor.Checked == true)
             {
+                // マップ更新
+                usrMapMonitor.CreateMap();
+
                 chkMonitor.Text = "モニター停止";
                 m_MonitorSender.Start(200);
             }
@@ -234,6 +247,14 @@ namespace DetailTool
             usrYakeiStart.DayOfWeek = (int)setting.YakeiStart.DayOfWeek;
             usrYakeiStart.Hour = setting.YakeiStart.Hour;
             usrYakeiStart.Minute = setting.YakeiStart.Minulte;
+
+            // エリアマップ生成
+            AreaMap areaMap = AreaMap.GetInstance();
+            areaMap.Allocate(setting.MapLength, setting.MapWidth);
+
+            // 動作マップ生成
+            MoveMap moveMap = MoveMap.GetInstance();
+            moveMap.Allocate(setting.MapLength, setting.MapWidth);
         }
 
         /// <summary>
@@ -363,7 +384,6 @@ namespace DetailTool
                 MonitorLabel label = (MonitorLabel)control;
                 label.UpdateValue();
             }
-
         }
 
         #endregion
@@ -378,9 +398,8 @@ namespace DetailTool
             MonitorLabel label = null;
             MonitorData monitor = MonitorData.GetInstance();
 
-            // モニタコマンド送信スレッドインスタンス生成
-            m_MonitorSender = new MonitorSender(this.usrCommControl);
-            m_MonitorSender.OnReceived += evStateMonitorReceived;
+            // モニタ更新イベント登録
+            m_MonitorSender.OnMonitorReceived += evStateMonitorReceived;
 
             // システムエラー状態
             label = new MonitorLabel("司令塔", monitor.Commander.SystemError);
@@ -396,6 +415,37 @@ namespace DetailTool
             pnlSystemError.Controls.Add(label);
 
 
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Map Tab -------------------------------------------------------------
+
+        #region Private Methods for Event Handler -----------------------------------
+
+        /// <summary>
+        /// 動作マップモニタコマンド 受信完了イベント
+        /// </summary>
+        /// <param name="sender">sender</param>
+        /// <param name="e">e</param>
+        private void evMoveMapMonitorReceived(object sender, EventArgs e)
+        {
+            usrMapMonitor.UpdateMapColor();
+        }
+
+        #endregion
+
+        #region Private Methods -----------------------------------------------------
+
+        /// <summary>
+        /// マップタブ初期化
+        /// </summary>
+        private void initMapTab()
+        {
+            // マップ更新イベント登録
+            m_MonitorSender.OnMoveMapReceived += evMoveMapMonitorReceived;
         }
 
         #endregion

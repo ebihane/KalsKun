@@ -43,14 +43,13 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.pnlSystemError = new System.Windows.Forms.FlowLayoutPanel();
             this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.usrMapMonitor = new DetailTool.Controls.MapGrid();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.pnlSettingMain.SuspendLayout();
             this.tabPage2.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.tabPage3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // tabControl1
@@ -206,24 +205,20 @@
             // tabPage3
             // 
             this.tabPage3.BackColor = System.Drawing.SystemColors.Control;
-            this.tabPage3.Controls.Add(this.dataGridView1);
+            this.tabPage3.Controls.Add(this.usrMapMonitor);
             this.tabPage3.Location = new System.Drawing.Point(4, 26);
             this.tabPage3.Name = "tabPage3";
             this.tabPage3.Size = new System.Drawing.Size(770, 434);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "マップ";
             // 
-            // dataGridView1
+            // usrMapMonitor
             // 
-            this.dataGridView1.AllowUserToAddRows = false;
-            this.dataGridView1.AllowUserToDeleteRows = false;
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(3, 3);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.ReadOnly = true;
-            this.dataGridView1.RowTemplate.Height = 21;
-            this.dataGridView1.Size = new System.Drawing.Size(663, 428);
-            this.dataGridView1.TabIndex = 0;
+            this.usrMapMonitor.Location = new System.Drawing.Point(0, 0);
+            this.usrMapMonitor.Margin = new System.Windows.Forms.Padding(4);
+            this.usrMapMonitor.Name = "usrMapMonitor";
+            this.usrMapMonitor.Size = new System.Drawing.Size(500, 434);
+            this.usrMapMonitor.TabIndex = 0;
             // 
             // frmMain
             // 
@@ -243,7 +238,6 @@
             this.tabPage2.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.tabPage3.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -263,9 +257,9 @@
         private System.Windows.Forms.Button btnSettingChange;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.FlowLayoutPanel pnlSystemError;
-        private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.CheckBox chkMonitor;
         private System.Windows.Forms.Button btnTimeAdjust;
+        private Controls.MapGrid usrMapMonitor;
     }
 }
 

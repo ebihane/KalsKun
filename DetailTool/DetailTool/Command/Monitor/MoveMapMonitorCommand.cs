@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using DetailTool.Components.Map;
+using DetailTool.Components.Setting;
 
 namespace DetailTool.Command.Monitor
 {
@@ -14,12 +11,20 @@ namespace DetailTool.Command.Monitor
 
         protected override EventInfo createEvent(out int expectedSize)
         {
-            expectedSize = 0;
-            return null;
+            EventInfo retVal = new EventInfo();
+
+            retVal.Code = 2003;
+
+            SettingData setting = SettingData.GetInstance();
+            expectedSize = setting.MapLength * setting.MapWidth;
+
+            return retVal;
         }
 
         protected override void analyzeCore(byte[] data)
         {
+            MoveMap moveMap = MoveMap.GetInstance();
+            moveMap.Update(data);
         }
     }
 }

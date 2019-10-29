@@ -355,6 +355,7 @@ namespace DetailTool.Controls
 
                     m_Connected.Dispose();
                     m_Connected = null;
+                    m_RequestQueue.Clear();
                     onConnected();
                     changeStateLabel("接続しました。");
                     changeConnectButtonText("切断");
@@ -366,7 +367,6 @@ namespace DetailTool.Controls
                     continue;
                 }
 
-                m_RequestQueue.Clear();
                 NetworkStream stream = m_TcpClient.GetStream();
                 communicationMain(stream);
 

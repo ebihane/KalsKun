@@ -37,9 +37,14 @@ namespace DetailTool.Components.Monitor
         public bool IsExecute { get { return m_IsExecute; } }
 
         /// <summary>
-        /// 受信完了イベント
+        /// モニタ受信完了イベント
         /// </summary>
-        public event EventHandler<EventArgs> OnReceived;
+        public event EventHandler<EventArgs> OnMonitorReceived;
+
+        /// <summary>
+        /// 動作マップ受信完了イベント
+        /// </summary>
+        public event EventHandler<EventArgs> OnMoveMapReceived;
 
         /// <summary>
         /// スレッド起動
@@ -156,11 +161,11 @@ namespace DetailTool.Components.Monitor
             bool retVal = false;
 
             // モニタコマンド生成・送信
-            StateMonitorCommand command = new StateMonitorCommand();
-            command.OnAnalyzed += evStateMonitorReceived;
+            StateMonitorCommand monitor = new StateMonitorCommand();
+            monitor.OnAnalyzed += evStateMonitorReceived;
 
             m_IsReceived = false;
-            m_CommControl.Send(command);
+            m_CommControl.Send(monitor);
 
             // 受信完了待ち
             while (true)
@@ -177,10 +182,38 @@ namespace DetailTool.Components.Monitor
             }
 
             // 受信完了イベント発行
-            if (this.OnReceived != null)
+            if (this.OnMonitorReceived != null)
             {
                 EventArgs e = new EventArgs();
-                this.OnReceived(this, e);
+                this.OnMonitorReceived(this, e);
+            }
+
+            // 動作マップ取得コマンド生成・送信
+            MoveMapMonitorCommand moveMap = new MoveMapMonitorCommand();
+            moveMap.OnAnalyzed += evStateMonitorReceived;
+
+            m_IsReceived = false;
+            m_CommControl.Send(moveMap);
+
+            // 受信完了待ち
+            while (true)
+            {
+                if (m_IsReceived == true)
+                {
+                    break;
+                }
+
+                if (m_IsConnected == false)
+                {
+                    goto FINISH;
+                }
+            }
+
+            // マップ受信完了イベント発行
+            if (this.OnMoveMapReceived != null)
+            {
+                EventArgs e = new EventArgs();
+                this.OnMoveMapReceived(this, e);
             }
 
             retVal = true;

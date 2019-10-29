@@ -3,12 +3,12 @@ using System.Collections.Generic;
 
 namespace DetailTool.Components.Map
 {
-    public class MapData
+    public abstract class MapData
     {
         /// <summary>
         /// マップデータ
         /// </summary>
-        List<List<int>> m_Map = null;
+        List<List<byte>> m_Map = null;
 
         /// <summary>
         /// コンストラクタ
@@ -20,7 +20,7 @@ namespace DetailTool.Components.Map
         /// <summary>
         /// Gets マップデータ
         /// </summary>
-        public List<List<int>> Map { get { return m_Map; } }
+        public List<List<byte>> Map { get { return m_Map; } }
 
         /// <summary>
         /// 領域確保
@@ -29,14 +29,14 @@ namespace DetailTool.Components.Map
         /// <param name="width">幅 (横軸 : X)</param>
         public void Allocate(int length, int width)
         {
-            m_Map = new List<List<int>>();
+            m_Map = new List<List<byte>>();
 
             for (int y = 0; y < length; y++)
             {
-                List<int> temp = new List<int>();
+                List<byte> temp = new List<byte>();
                 for (int x = 0; x < width; x++)
                 {
-                    int value = 0;
+                    byte value = 0;
                     temp.Add(value);
                 }
 
@@ -44,5 +44,28 @@ namespace DetailTool.Components.Map
             }
         }
 
+        /// <summary>
+        /// 値更新
+        /// </summary>
+        /// <param name="data">更新データ</param>
+        public virtual void Update(byte[] data)
+        {
+            for (int y = 0; y < m_Map.Count; y++)
+            {
+                for (int x = 0; x < m_Map[y].Count; x++)
+                {
+                    int index = y * m_Map[y].Count + x;
+                    m_Map[y][x] = data[index];
+                }
+            }
+        }
+
+        /// <summary>
+        /// モニタ表示色取得
+        /// </summary>
+        /// <param name="x">対象位置 X 座標</param>
+        /// <param name="y">対象位置 Y 座標</param>
+        /// <returns>表示色</returns>
+        public abstract System.Drawing.Color GetColor(int x, int y);
     }
 }

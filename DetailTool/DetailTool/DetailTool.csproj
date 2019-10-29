@@ -73,7 +73,9 @@
     <Compile Include="Command\Setting\SetStartTimeSettingCommand.cs" />
     <Compile Include="Command\Setting\SetRobotSizeSettingCommand.cs" />
     <Compile Include="Command\Utility\TimeAdjustCommand.cs" />
+    <Compile Include="Components\Map\AreaMap.cs" />
     <Compile Include="Components\Map\MapData.cs" />
+    <Compile Include="Components\Map\MoveMap.cs" />
     <Compile Include="Components\Monitor\Items\BeaconData.cs" />
     <Compile Include="Components\Monitor\Items\ControlMode.cs" />
     <Compile Include="Components\Monitor\Items\CutterMoveState.cs" />
@@ -126,6 +128,12 @@
     <Compile Include="Controls\IntText.Designer.cs">
       <DependentUpon>IntText.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\MapGrid.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\MapGrid.Designer.cs">
+      <DependentUpon>MapGrid.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\MonitorLabel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -162,6 +170,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\IntText.resx">
       <DependentUpon>IntText.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\MapGrid.resx">
+      <DependentUpon>MapGrid.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\MonitorLabel.resx">
       <DependentUpon>MonitorLabel.cs</DependentUpon>
