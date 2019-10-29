@@ -24,13 +24,14 @@ namespace DetailTool.Components.Monitor.Controller
             this.MelodyMode = new MelodyMode();
             this.LightMode = new LightMode();
             this.CurrentSequence = new SequenceType();
+            this.SystemError = new ErrorState();
         }
 
         public List<BeaconData> Beacon { get; private set; }
         public MelodyMode MelodyMode { get; private set; }
         public LightMode LightMode { get; private set; }
         public SequenceType CurrentSequence { get; private set; }
-        public bool SystemError { get; private set; }
+        public ErrorState SystemError { get; private set; }
 
         /// <summary>
         /// サイズ取得
@@ -48,7 +49,7 @@ namespace DetailTool.Components.Monitor.Controller
             retVal += this.MelodyMode.GetSize();
             retVal += this.LightMode.GetSize();
             retVal += this.CurrentSequence.GetSize();
-            retVal += sizeof(int);
+            retVal += this.SystemError.GetSize();
 
             return retVal;
         }
@@ -81,16 +82,7 @@ namespace DetailTool.Components.Monitor.Controller
             dataIndex = this.CurrentSequence.Analyze(data, dataIndex);
 
             // システムエラー
-            int systemError = BitConverter.ToInt32(data, dataIndex);
-            if (systemError != 0)
-            {
-                this.SystemError = true;
-            }
-            else
-            {
-                this.SystemError = false;
-            }
-            dataIndex += sizeof(int);
+            dataIndex = this.SystemError.Analyze(data, dataIndex);
 
             retVal = dataIndex;
 

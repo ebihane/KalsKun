@@ -41,7 +41,7 @@ namespace DetailTool.Components
         #region Public Propaties ----------------------------------------------------
 
         public CommanderMonitor Commander { get { return m_CommanderMonitor; } }
-        public MotorMonitor Monitor { get { return m_MotorMonitor; } }
+        public MotorMonitor Motor { get { return m_MotorMonitor; } }
         public FrontCameraMonitor FrontCamera { get { return m_FrontCameraMonitor; } }
         public AnimalCameraMonitor AnimalCamera { get { return m_AnimalCameraMonitor; } }
         public AroundCameraMonitor AroundCamera { get { return m_AroundCameraMonitor; } }

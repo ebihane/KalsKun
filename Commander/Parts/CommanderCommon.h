@@ -3,6 +3,8 @@
 #include <wiringPi.h>
 #include <softTone.h>
 
+#define AUTO_CHANGE_TRIGGER
+
 /* GPIO 定義 */
 #define GPIO_USE_PIN_COUNT  (13)
 #define IO_SIMULATOR_ANIMAL (4)     /* IN  : シミュレーション : 動物カメラ 検知 */

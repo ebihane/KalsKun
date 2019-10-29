@@ -3,34 +3,33 @@ using System.Drawing;
 
 namespace DetailTool.Components.Monitor.Items
 {
-    public class MotorMoveType : StatusItemBase
+    public class ControlMode : StatusItemBase
     {
         /// <summary>
-        /// コンストラクタ
+        /// デフォルトコンストラクタ
         /// </summary>
-        public MotorMoveType()
+        public ControlMode()
         {
         }
 
         /// <summary>
-        /// Gets or sets 動作指示
+        /// Gets or sets 遠隔操作状態
         /// </summary>
-        public MoveTypeEnum MoveType { get; set; }
+        public ControlModeEnum State { get; set; }
 
         /// <summary>
-        /// 動作指示定数
+        /// 遠隔操作モード
         /// </summary>
-        public enum MoveTypeEnum
+        public enum ControlModeEnum
         {
-            NOT_REQUEST = 0,    // 要求無し
-            AVOIDANCE,          // 回避指示
-            TURN,               // ターン指示
+            E_MODE_MANUAL,      // 手動
+            E_MODE_AUTO,        // 自動
         }
 
         /// <summary>
         /// サイズ取得
         /// </summary>
-        /// <returns>サイズ</returns>
+        /// <returns></returns>
         public override int GetSize()
         {
             return sizeof(int);
@@ -48,7 +47,7 @@ namespace DetailTool.Components.Monitor.Items
             int index = startIndex;
 
             int value = BitConverter.ToInt32(data, index);
-            this.MoveType = (MoveTypeEnum)value;
+            this.State = (ControlModeEnum)value;
             index += sizeof(int);
 
             retVal = index;
@@ -64,22 +63,18 @@ namespace DetailTool.Components.Monitor.Items
         {
             string retVal = string.Empty;
 
-            switch (this.MoveType)
+            switch (this.State)
             {
-                case MoveTypeEnum.NOT_REQUEST:
-                    retVal = "－";
+                case ControlModeEnum.E_MODE_MANUAL:
+                    retVal = "手動";
                     break;
 
-                case MoveTypeEnum.AVOIDANCE:
-                    retVal = "障害物";
-                    break;
-
-                case MoveTypeEnum.TURN:
-                    retVal = "赤テープ";
+                case ControlModeEnum.E_MODE_AUTO:
+                    retVal = "自動";
                     break;
 
                 default:
-                    retVal = string.Format("不明 ({0})", this.MoveType);
+                    retVal = string.Format("不明 ({0})", this.State);
                     break;
             }
 
@@ -94,17 +89,9 @@ namespace DetailTool.Components.Monitor.Items
         {
             Color retVal = base.GetBackColor();
 
-            if (this.MoveType == MoveTypeEnum.AVOIDANCE)
+            if (this.State == ControlModeEnum.E_MODE_MANUAL)
             {
-                retVal = Color.Pink;
-            }
-            else if (this.MoveType == MoveTypeEnum.TURN)
-            {
-                retVal = Color.Pink;
-            }
-            else
-            {
-                // nop.
+                retVal = Color.Yellow;
             }
 
             return retVal;

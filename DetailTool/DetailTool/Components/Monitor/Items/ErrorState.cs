@@ -1,30 +1,24 @@
 ﻿using System;
-using System.Drawing;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace DetailTool.Components.Monitor.Items
 {
-    public class DetectType : StatusItemBase
+    public class ErrorState : StatusItemBase
     {
         /// <summary>
-        /// コンストラクタ
+        /// デフォルトコンストラクタ
         /// </summary>
-        public DetectType()
+        public ErrorState()
         {
         }
 
         /// <summary>
-        /// Gets or sets 検知状態
+        /// Gets or sets 異常発生状態
         /// </summary>
-        public DetectTypeEnum Detection { get; set; }
-
-        /// <summary>
-        /// 検知状態定数
-        /// </summary>
-        public enum DetectTypeEnum
-        {
-            NOT_DETECT = 0,     // 未検知
-            DETECTED,           // 検知
-        }
+        public bool IsErrorState { get; set; }
 
         /// <summary>
         /// サイズ取得
@@ -46,8 +40,15 @@ namespace DetailTool.Components.Monitor.Items
             int retVal = 0;
             int index = startIndex;
 
-            int value = BitConverter.ToInt32(data, index);
-            this.Detection = (DetectTypeEnum)value;
+            int systemError = BitConverter.ToInt32(data, index);
+            if (systemError != 0)
+            {
+                this.IsErrorState = true;
+            }
+            else
+            {
+                this.IsErrorState = false;
+            }
             index += sizeof(int);
 
             retVal = index;
@@ -63,19 +64,13 @@ namespace DetailTool.Components.Monitor.Items
         {
             string retVal = string.Empty;
 
-            switch (this.Detection)
+            if (this.IsErrorState != false)
             {
-                case DetectTypeEnum.NOT_DETECT:
-                    retVal = "未検知";
-                    break;
-
-                case DetectTypeEnum.DETECTED:
-                    retVal = "検知";
-                    break;
-
-                default:
-                    retVal = string.Format("不明 ({0})", this.Detection);
-                    break;
+                retVal = "異常発生";
+            }
+            else
+            {
+                retVal = "正常";
             }
 
             return retVal;
@@ -85,13 +80,13 @@ namespace DetailTool.Components.Monitor.Items
         /// 背景色取得
         /// </summary>
         /// <returns>背景色</returns>
-        public override Color GetBackColor()
+        public override System.Drawing.Color GetBackColor()
         {
-            Color retVal = base.GetBackColor();
+            System.Drawing.Color retVal = base.GetBackColor();
 
-            if (this.Detection == DetectTypeEnum.DETECTED)
+            if (this.IsErrorState == true)
             {
-                retVal = Color.Yellow;
+                retVal = System.Drawing.Color.Pink;
             }
 
             return retVal;

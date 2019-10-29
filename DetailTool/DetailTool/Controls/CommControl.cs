@@ -215,6 +215,7 @@ namespace DetailTool.Controls
             changeConnectButtonText("接続");
             changeStateLabel("接続していません。");
             changeInputFieldEnable(true);
+            changeConnectButtonEnable(true);
         }
 
         #endregion

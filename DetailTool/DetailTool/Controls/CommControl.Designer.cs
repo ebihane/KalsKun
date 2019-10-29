@@ -157,8 +157,7 @@
             // 
             // CommControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.Controls.Add(this.pnlInputField);
             this.Controls.Add(this.lblState);
             this.Controls.Add(this.label2);

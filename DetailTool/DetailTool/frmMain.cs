@@ -2,7 +2,10 @@
 using System.Windows.Forms;
 using DetailTool.Command.Monitor;
 using DetailTool.Command.Setting;
+using DetailTool.Command.Utility;
 using DetailTool.Components;
+using DetailTool.Components.Monitor;
+using DetailTool.Components.Monitor.Items;
 using DetailTool.Components.Setting;
 using DetailTool.Controls;
 
@@ -10,6 +13,15 @@ namespace DetailTool
 {
     public partial class frmMain : Form
     {
+        #region Public Constructor --------------------------------------------------
+
+        /// <summary>
+        /// モニタ送信スレッド
+        /// </summary>
+        private MonitorSender m_MonitorSender = null;
+
+        #endregion
+
         #region Public Constructor --------------------------------------------------
 
         public frmMain()
@@ -49,7 +61,14 @@ namespace DetailTool
         /// <param name="e">e</param>
         private void onConnected(object sender, EventArgs e)
         {
-            changePanelEnable(true);
+            this.BeginInvoke(new Action<bool>(
+            (state) =>
+            {
+                pnlSettingMain.Enabled = state;
+                chkMonitor.Enabled = state;
+                btnTimeAdjust.Enabled = state;
+            }),
+            true);
         }
 
         /// <summary>
@@ -59,7 +78,14 @@ namespace DetailTool
         /// <param name="e">e</param>
         private void onDisconnection(object sender, EventArgs e)
         {
-            changePanelEnable(false);
+            this.BeginInvoke(new Action<bool>(
+            (state) =>
+            {
+                pnlSettingMain.Enabled = state;
+                chkMonitor.Enabled = state;
+                btnTimeAdjust.Enabled = state;
+            }),
+            false);
         }
 
         #endregion
@@ -77,7 +103,7 @@ namespace DetailTool
         {
             // 設定取得
             GetSettingCommand command = new GetSettingCommand();
-            command.OnAnalyzed += onSettingReceived;
+            command.OnAnalyzed += evSettingReceived;
             usrCommControl.Send(command);
         }
 
@@ -100,7 +126,7 @@ namespace DetailTool
                 size.Length = lengthText.Value;
                 size.Width = widthText.Value;
                 SetRobotSizeSettingCommand command = new SetRobotSizeSettingCommand(size);
-                command.OnAnalyzed += onRobotSizeSettingChanged;
+                command.OnAnalyzed += evRobotSizeSettingChanged;
                 usrCommControl.Send(command);
             }
 
@@ -112,7 +138,7 @@ namespace DetailTool
                 size.Length = lengthText.Value;
                 size.Width = widthText.Value;
                 SetFarmSizeSettingCommand command = new SetFarmSizeSettingCommand(size);
-                command.OnAnalyzed += onFarmSizeSettingChanged;
+                command.OnAnalyzed += evFarmSizeSettingChanged;
                 usrCommControl.Send(command);
             }
 
@@ -125,7 +151,7 @@ namespace DetailTool
                 dt.Hour = usrKusakariStart.Hour;
                 dt.Minulte = usrKusakariStart.Minute;
                 SetStartTimeSettingCommand command = new SetStartTimeSettingCommand(SetStartTimeSettingCommand.ModeEnum.Kusakari, dt);
-                command.OnAnalyzed += onKusakariStartSettingChanged;
+                command.OnAnalyzed += evKusakariStartSettingChanged;
                 usrCommControl.Send(command);
             }
 
@@ -138,8 +164,38 @@ namespace DetailTool
                 dt.Hour = usrYakeiStart.Hour;
                 dt.Minulte = usrYakeiStart.Minute;
                 SetStartTimeSettingCommand command = new SetStartTimeSettingCommand(SetStartTimeSettingCommand.ModeEnum.Yakei, dt);
-                command.OnAnalyzed += onYakeiStartSettingChanged;
+                command.OnAnalyzed += evYakeiStartSettingChanged;
                 usrCommControl.Send(command);
+            }
+        }
+
+        /// <summary>
+        /// 時刻合わせボタンクリックイベント
+        /// </summary>
+        /// <param name="sender">sender</param>
+        /// <param name="e">e</param>
+        private void btnTimeAdjust_Click(object sender, EventArgs e)
+        {
+            TimeAdjustCommand command = new TimeAdjustCommand();
+            usrCommControl.Send(command);
+        }
+
+        /// <summary>
+        /// モニタボタン状態変化イベント
+        /// </summary>
+        /// <param name="sender">sender</param>
+        /// <param name="e">e</param>
+        private void chkMonitor_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkMonitor.Checked == true)
+            {
+                chkMonitor.Text = "モニター停止";
+                m_MonitorSender.Start(200);
+            }
+            else
+            {
+                m_MonitorSender.Stop();
+                chkMonitor.Text = "モニター開始";
             }
         }
 
@@ -148,7 +204,7 @@ namespace DetailTool
         /// </summary>
         /// <param name="sender">sender</param>
         /// <param name="e">e</param>
-        private void onSettingReceived(object sender, EventArgs e)
+        private void evSettingReceived(object sender, EventArgs e)
         {
             SettingData setting = SettingData.GetInstance();
             DoubleText doubleText = null;
@@ -185,7 +241,7 @@ namespace DetailTool
         /// </summary>
         /// <param name="sender">sender</param>
         /// <param name="e">e</param>
-        private void onRobotSizeSettingChanged(object sender, EventArgs e)
+        private void evRobotSizeSettingChanged(object sender, EventArgs e)
         {
             DoubleText doubleText = null;
             SettingData setting = SettingData.GetInstance();
@@ -204,7 +260,7 @@ namespace DetailTool
         /// </summary>
         /// <param name="sender">sender</param>
         /// <param name="e">e</param>
-        private void onFarmSizeSettingChanged(object sender, EventArgs e)
+        private void evFarmSizeSettingChanged(object sender, EventArgs e)
         {
             DoubleText doubleText = null;
             SettingData setting = SettingData.GetInstance();
@@ -223,7 +279,7 @@ namespace DetailTool
         /// </summary>
         /// <param name="sender">sender</param>
         /// <param name="e">e</param>
-        private void onKusakariStartSettingChanged(object sender, EventArgs e)
+        private void evKusakariStartSettingChanged(object sender, EventArgs e)
         {
             SettingData setting = SettingData.GetInstance();
             setting.KusakariStart.DayOfWeek = (DateTimeSetting.DayOfWeekEnum)usrKusakariStart.DayOfWeek;
@@ -236,7 +292,7 @@ namespace DetailTool
         /// </summary>
         /// <param name="sender">sender</param>
         /// <param name="e">e</param>
-        private void onYakeiStartSettingChanged(object sender, EventArgs e)
+        private void evYakeiStartSettingChanged(object sender, EventArgs e)
         {
             SettingData setting = SettingData.GetInstance();
             setting.YakeiStart.DayOfWeek = (DateTimeSetting.DayOfWeekEnum)usrYakeiStart.DayOfWeek;
@@ -287,22 +343,6 @@ namespace DetailTool
             pnlSetting.Controls.SetChildIndex(doubleText, 1);
         }
 
-        /// <summary>
-        /// 設定パネル有効状態変更
-        /// </summary>
-        /// <param name="state">true:有効、false:無効</param>
-        private void changePanelEnable(bool state)
-        {
-            if (pnlSettingMain.InvokeRequired == true)
-            {
-                pnlSettingMain.BeginInvoke(new Action<bool>((enable) => { pnlSettingMain.Enabled = enable; }), state);
-            }
-            else
-            {
-                pnlSettingMain.Enabled = state;
-            }
-        }
-
         #endregion
 
         #endregion
@@ -312,23 +352,18 @@ namespace DetailTool
         #region Private Methods for Event Handler -----------------------------------
 
         /// <summary>
-        /// モニタボタン状態変化イベント
+        /// モニタコマンド 受信完了イベント
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void chkMonitor_CheckedChanged(object sender, EventArgs e)
-        {
-            if (chkMonitor.Checked == true)
-            {
-                StateMonitorCommand command = new StateMonitorCommand();
-                command.OnAnalyzed += evStateMonitorReceived;
-                usrCommControl.Send(command);
-            }
-        }
-
+        /// <param name="sender">sender</param>
+        /// <param name="e">e</param>
         private void evStateMonitorReceived(object sender, EventArgs e)
         {
-            MonitorData monitor = MonitorData.GetInstance();
+            foreach (Control control in pnlSystemError.Controls)
+            {
+                MonitorLabel label = (MonitorLabel)control;
+                label.UpdateValue();
+            }
+
         }
 
         #endregion
@@ -340,9 +375,29 @@ namespace DetailTool
         /// </summary>
         private void initMonitorTab()
         {
-            
+            MonitorLabel label = null;
+            MonitorData monitor = MonitorData.GetInstance();
+
+            // モニタコマンド送信スレッドインスタンス生成
+            m_MonitorSender = new MonitorSender(this.usrCommControl);
+            m_MonitorSender.OnReceived += evStateMonitorReceived;
+
+            // システムエラー状態
+            label = new MonitorLabel("司令塔", monitor.Commander.SystemError);
+            pnlSystemError.Controls.Add(label);
+            label = new MonitorLabel("モータ", monitor.Motor.ErrorStatus);
+            pnlSystemError.Controls.Add(label);
+            pnlSystemError.Controls.Add(label);
+            label = new MonitorLabel("前方", monitor.FrontCamera.SystemError);
+            pnlSystemError.Controls.Add(label);
+            label = new MonitorLabel("動物", monitor.AnimalCamera.SystemError);
+            pnlSystemError.Controls.Add(label);
+            label = new MonitorLabel("周辺", monitor.AroundCamera.SystemError);
+            pnlSystemError.Controls.Add(label);
+
+
         }
-        
+
         #endregion
 
         #endregion

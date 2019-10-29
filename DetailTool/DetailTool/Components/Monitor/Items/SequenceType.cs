@@ -85,5 +85,29 @@ namespace DetailTool.Components.Monitor.Items
 
             return retVal;
         }
+
+        /// <summary>
+        /// 背景色取得
+        /// </summary>
+        /// <returns>背景色</returns>
+        public override System.Drawing.Color GetBackColor()
+        {
+            System.Drawing.Color retVal = base.GetBackColor();
+
+            if (this.Sequence == SequenceTypeEnum.E_SEQ_KUSAKARI)
+            {
+                retVal = System.Drawing.Color.LightGreen;
+            }
+            else if (this.Sequence == SequenceTypeEnum.E_SEQ_YAKEI)
+            {
+                retVal = System.Drawing.Color.Cyan;
+            }
+            else
+            {
+                // nop.
+            }
+
+            return retVal;
+        }
     }
 }

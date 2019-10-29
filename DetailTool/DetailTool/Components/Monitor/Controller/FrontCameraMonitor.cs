@@ -11,25 +11,25 @@ namespace DetailTool.Components.Monitor.Controller
     {
         public FrontCameraMonitor()
         {
-            this.Distance = new List<float>();
-
-            for (int index = 0; index < PrivateConstants.SonicSensorCount; index++)
-            {
-                float value = 0.0f;
-                this.Distance.Add(value);
-            }
-
+            this.ReceiveCount = new IntStatus();
+            this.SystemError = new ErrorState();
             this.MoveType = new MotorMoveType();
             this.RedTape = new DetectType();
             this.BlueObject = new DetectType();
+            this.Distance = new List<FloatStatus>();
+            for (int index = 0; index < PrivateConstants.SonicSensorCount; index++)
+            {
+                FloatStatus value = new FloatStatus();
+                this.Distance.Add(value);
+            }
         }
 
-        public int ReceiveCount { get; private set; }
-        public int SystemError { get; private set; }
+        public IntStatus ReceiveCount { get; private set; }
+        public ErrorState SystemError { get; private set; }
         public MotorMoveType MoveType { get; private set; }
         public DetectType RedTape { get; private set; }
         public DetectType BlueObject { get; private set; }
-        public List<float> Distance { get; private set; }
+        public List<FloatStatus> Distance { get; private set; }
 
         /// <summary>
         /// サイズ取得
@@ -39,15 +39,15 @@ namespace DetailTool.Components.Monitor.Controller
         {
             int retVal = 0;
 
-            retVal += sizeof(int);
-            retVal += sizeof(int);
+            retVal += this.ReceiveCount.GetSize();
+            retVal += this.SystemError.GetSize();
             retVal += this.MoveType.GetSize();
             retVal += this.RedTape.GetSize();
             retVal += this.BlueObject.GetSize();
 
-            foreach (float val in this.Distance)
+            foreach (FloatStatus val in this.Distance)
             {
-                retVal += sizeof(float);
+                retVal += val.GetSize();
             }
 
             return retVal;
@@ -62,18 +62,13 @@ namespace DetailTool.Components.Monitor.Controller
         public int Analyze(byte[] data, int startIndex)
         {
             int retVal = 0;
-            int intValue = 0;
             int dataIndex = startIndex;
 
             // 受信回数
-            intValue = BitConverter.ToInt32(data, dataIndex);
-            this.ReceiveCount = intValue;
-            dataIndex += sizeof(int);
+            dataIndex = this.ReceiveCount.Analyze(data, dataIndex);
 
-            // システムエラー状態
-            intValue = BitConverter.ToInt32(data, dataIndex);
-            this.SystemError = intValue;
-            dataIndex += sizeof(int);
+            // エラー状態
+            dataIndex = this.SystemError.Analyze(data, dataIndex);
 
             // 回避・転回 指示状態
             dataIndex = this.MoveType.Analyze(data, dataIndex);
@@ -87,9 +82,7 @@ namespace DetailTool.Components.Monitor.Controller
             // 超音波センサ 距離
             for (int index = 0; index < PrivateConstants.SonicSensorCount; index++)
             {
-                float floatValue = BitConverter.ToSingle(data, dataIndex);
-                this.Distance[index] = floatValue;
-                dataIndex += sizeof(float);
+                dataIndex = this.Distance[index].Analyze(data, dataIndex);
             }
 
             retVal = dataIndex;
@@ -97,6 +90,9 @@ namespace DetailTool.Components.Monitor.Controller
             return retVal;
         }
 
+        /// <summary>
+        /// クラス内定数
+        /// </summary>
         private static class PrivateConstants
         {
             /// <summary>

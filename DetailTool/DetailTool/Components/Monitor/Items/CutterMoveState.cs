@@ -3,28 +3,27 @@ using System.Drawing;
 
 namespace DetailTool.Components.Monitor.Items
 {
-    public class MotorMoveType : StatusItemBase
+    public class CutterMoveState : StatusItemBase
     {
         /// <summary>
-        /// コンストラクタ
+        /// デフォルトコンストラクタ
         /// </summary>
-        public MotorMoveType()
+        public CutterMoveState()
         {
         }
 
         /// <summary>
-        /// Gets or sets 動作指示
+        /// Gets or sets 草刈り刃動作指示
         /// </summary>
-        public MoveTypeEnum MoveType { get; set; }
+        public CutterDriveEnum MoveState { get; set; }
 
         /// <summary>
-        /// 動作指示定数
+        /// 草刈り刃動作指示
         /// </summary>
-        public enum MoveTypeEnum
+        public enum CutterDriveEnum
         {
-            NOT_REQUEST = 0,    // 要求無し
-            AVOIDANCE,          // 回避指示
-            TURN,               // ターン指示
+            E_CUTTER_STOP,      // 停止
+            E_CUTTER_DRIVE,     // 駆動
         }
 
         /// <summary>
@@ -48,7 +47,7 @@ namespace DetailTool.Components.Monitor.Items
             int index = startIndex;
 
             int value = BitConverter.ToInt32(data, index);
-            this.MoveType = (MoveTypeEnum)value;
+            this.MoveState = (CutterDriveEnum)value;
             index += sizeof(int);
 
             retVal = index;
@@ -64,22 +63,18 @@ namespace DetailTool.Components.Monitor.Items
         {
             string retVal = string.Empty;
 
-            switch (this.MoveType)
+            switch (this.MoveState)
             {
-                case MoveTypeEnum.NOT_REQUEST:
-                    retVal = "－";
+                case CutterDriveEnum.E_CUTTER_STOP:
+                    retVal = "停止中";
                     break;
 
-                case MoveTypeEnum.AVOIDANCE:
-                    retVal = "障害物";
-                    break;
-
-                case MoveTypeEnum.TURN:
-                    retVal = "赤テープ";
+                case CutterDriveEnum.E_CUTTER_DRIVE:
+                    retVal = "回転中";
                     break;
 
                 default:
-                    retVal = string.Format("不明 ({0})", this.MoveType);
+                    retVal = string.Format("不明 ({0})", this.MoveState);
                     break;
             }
 
@@ -94,17 +89,9 @@ namespace DetailTool.Components.Monitor.Items
         {
             Color retVal = base.GetBackColor();
 
-            if (this.MoveType == MoveTypeEnum.AVOIDANCE)
+            if (this.MoveState == CutterDriveEnum.E_CUTTER_DRIVE)
             {
-                retVal = Color.Pink;
-            }
-            else if (this.MoveType == MoveTypeEnum.TURN)
-            {
-                retVal = Color.Pink;
-            }
-            else
-            {
-                // nop.
+                retVal = Color.Yellow;
             }
 
             return retVal;

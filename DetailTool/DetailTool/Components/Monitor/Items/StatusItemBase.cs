@@ -15,5 +15,14 @@
         /// <param name="startIndex">解析開始インデックス</param>
         /// <returns>解析済みインデックス</returns>
         public abstract int Analyze(byte[] data, int startIndex);
+
+        /// <summary>
+        /// 背景色取得
+        /// </summary>
+        /// <returns>背景色</returns>
+        public virtual System.Drawing.Color GetBackColor()
+        {
+            return System.Drawing.SystemColors.Control;
+        }
     }
 }

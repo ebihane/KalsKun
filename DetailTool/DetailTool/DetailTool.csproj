@@ -66,15 +66,24 @@
     <Compile Include="Command\CommandBase.cs" />
     <Compile Include="Command\DisconnectCommand.cs" />
     <Compile Include="Command\EventInfo.cs" />
+    <Compile Include="Command\Monitor\MoveMapMonitorCommand.cs" />
     <Compile Include="Command\Monitor\StateMonitorCommand.cs" />
     <Compile Include="Command\Setting\GetSettingCommand.cs" />
     <Compile Include="Command\Setting\SetFarmSizeSettingCommand.cs" />
     <Compile Include="Command\Setting\SetStartTimeSettingCommand.cs" />
     <Compile Include="Command\Setting\SetRobotSizeSettingCommand.cs" />
+    <Compile Include="Command\Utility\TimeAdjustCommand.cs" />
+    <Compile Include="Components\Map\MapData.cs" />
     <Compile Include="Components\Monitor\Items\BeaconData.cs" />
+    <Compile Include="Components\Monitor\Items\ControlMode.cs" />
+    <Compile Include="Components\Monitor\Items\CutterMoveState.cs" />
     <Compile Include="Components\Monitor\Items\DetectType.cs" />
+    <Compile Include="Components\Monitor\Items\ErrorState.cs" />
+    <Compile Include="Components\Monitor\Items\FloatStatus.cs" />
+    <Compile Include="Components\Monitor\Items\IntStatus.cs" />
     <Compile Include="Components\Monitor\Items\LightMode.cs" />
     <Compile Include="Components\Monitor\Items\MelodyMode.cs" />
+    <Compile Include="Components\Monitor\Items\MotorMoveState.cs" />
     <Compile Include="Components\Monitor\Items\StatusItemBase.cs" />
     <Compile Include="Components\Monitor\MonitorData.cs" />
     <Compile Include="Components\Monitor\Controller\AnimalCameraMonitor.cs" />
@@ -84,6 +93,7 @@
     <Compile Include="Components\Monitor\Controller\MotorMonitor.cs" />
     <Compile Include="Components\Monitor\Items\MotorMoveType.cs" />
     <Compile Include="Components\Monitor\Items\SequenceType.cs" />
+    <Compile Include="Components\Monitor\MonitorSender.cs" />
     <Compile Include="Components\Setting\DateTimeSetting.cs" />
     <Compile Include="Components\Setting\SizeData.cs" />
     <Compile Include="Controls\CommControl.cs">
@@ -116,6 +126,12 @@
     <Compile Include="Controls\IntText.Designer.cs">
       <DependentUpon>IntText.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\MonitorLabel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\MonitorLabel.Designer.cs">
+      <DependentUpon>MonitorLabel.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmMain.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -146,6 +162,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\IntText.resx">
       <DependentUpon>IntText.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\MonitorLabel.resx">
+      <DependentUpon>MonitorLabel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>

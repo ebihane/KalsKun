@@ -180,6 +180,7 @@ SequencerBase::SequenceTypeEnum YakeiKun::decideNextSequence(StateInfoStr* const
     SequenceTypeEnum retVal = MY_SEQUENCE_TYPE;
     MoveMap* moveMap = MoveMap::GetInstance();
 
+#ifdef AUTO_CHANGE_TRIGGER
     /* Manual モード切替時は IDLE */
     if (state->ControlMode == ControlModeEnum::E_MODE_MANUAL)
     {
@@ -187,6 +188,7 @@ SequencerBase::SequenceTypeEnum YakeiKun::decideNextSequence(StateInfoStr* const
         retVal = SequenceTypeEnum::E_SEQ_IDLE;
         goto FINISH;
     }
+#endif
 
 #ifdef TAPE_COUNT_EXECUTE
     /* ターン回数 6 回以上で IDLE */

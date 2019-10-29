@@ -5,12 +5,19 @@ namespace DetailTool.Components.Monitor.Controller
 {
     public class AnimalCameraMonitor
     {
+        /// <summary>
+        /// デフォルトコンストラクタ
+        /// </summary>
         public AnimalCameraMonitor()
         {
+            this.ReceiveCount = new IntStatus();
+            this.SystemError = new ErrorState();
+            this.Human = new DetectType();
+            this.Animal = new DetectType();
         }
 
-        public int ReceiveCount { get; private set; }
-        public int SystemError { get; private set; }
+        public IntStatus ReceiveCount { get; private set; }
+        public ErrorState SystemError { get; private set; }
         public DetectType Human { get; private set; }
         public DetectType Animal { get; private set; }
 
@@ -22,8 +29,8 @@ namespace DetailTool.Components.Monitor.Controller
         {
             int retVal = 0;
 
-            retVal += sizeof(int);
-            retVal += sizeof(int);
+            retVal += this.ReceiveCount.GetSize();
+            retVal += this.SystemError.GetSize();
             retVal += this.Human.GetSize();
             retVal += this.Animal.GetSize();
 
@@ -39,18 +46,13 @@ namespace DetailTool.Components.Monitor.Controller
         public int Analyze(byte[] data, int startIndex)
         {
             int retVal = 0;
-            int intValue = 0;
             int dataIndex = startIndex;
 
             // 受信回数
-            intValue = BitConverter.ToInt32(data, dataIndex);
-            this.ReceiveCount = intValue;
-            dataIndex += sizeof(int);
+            dataIndex = this.ReceiveCount.Analyze(data, dataIndex);
 
             // システムエラー状態
-            intValue = BitConverter.ToInt32(data, dataIndex);
-            this.SystemError = intValue;
-            dataIndex += sizeof(int);
+            dataIndex = this.SystemError.Analyze(data, dataIndex);
 
             // 人間検知状態
             dataIndex = this.Human.Analyze(data, dataIndex);
