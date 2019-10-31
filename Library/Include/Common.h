@@ -29,8 +29,8 @@ typedef struct
 /* サイズ構造体 */
 typedef struct
 {
-    double Width;       /* 幅 */
-    double Length;      /* 高さ */
+    double Horizontal;  /* 横 */
+    double Vertical;    /* 縦 */
 } SizeStr;
 
 /* ログ出力プロセス 関連定義 */

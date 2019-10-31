@@ -70,6 +70,7 @@
     <Compile Include="Command\Monitor\StateMonitorCommand.cs" />
     <Compile Include="Command\Setting\GetSettingCommand.cs" />
     <Compile Include="Command\Setting\SetFarmSizeSettingCommand.cs" />
+    <Compile Include="Command\Setting\SetMoveEndRateCommand.cs" />
     <Compile Include="Command\Setting\SetStartTimeSettingCommand.cs" />
     <Compile Include="Command\Setting\SetRobotSizeSettingCommand.cs" />
     <Compile Include="Command\Utility\TimeAdjustCommand.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Components\Monitor\Items\BeaconData.cs" />
     <Compile Include="Components\Monitor\Items\ControlMode.cs" />
     <Compile Include="Components\Monitor\Items\CutterMoveState.cs" />
+    <Compile Include="Components\Monitor\Items\DateTimeData.cs" />
     <Compile Include="Components\Monitor\Items\DetectType.cs" />
     <Compile Include="Components\Monitor\Items\ErrorState.cs" />
     <Compile Include="Components\Monitor\Items\FloatStatus.cs" />

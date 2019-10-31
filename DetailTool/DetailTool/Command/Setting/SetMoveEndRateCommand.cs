@@ -1,21 +1,25 @@
-﻿using DetailTool.Components.Setting;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace DetailTool.Command.Setting
 {
-    public class SetFarmSizeSettingCommand : CommandBase
+    public class SetMoveEndRateCommand : CommandBase
     {
         /// <summary>
-        /// 畑のサイズ
+        /// 動作完了判定閾値
         /// </summary>
-        private SizeData m_FarmSize = null;
+        private float m_MoveEndRate = 0.0F;
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        /// <param name="size">畑のサイズ</param>
-        public SetFarmSizeSettingCommand(SizeData size)
+        /// <param name="moveEndRate">動作完了判定閾値</param>
+        public SetMoveEndRateCommand(float moveEndRate)
         {
-            m_FarmSize = size;
+            m_MoveEndRate = moveEndRate;
         }
 
         /// <summary>
@@ -29,9 +33,7 @@ namespace DetailTool.Command.Setting
             expectedSize = sizeof(int);
 
             retVal.Code = 1001;
-            retVal.LParam[0] = 1;
-            retVal.FParam[0] = (float)m_FarmSize.Vertical;
-            retVal.FParam[1] = (float)m_FarmSize.Horizontal;
+            retVal.FParam[0] = m_MoveEndRate;
 
             return retVal;
         }

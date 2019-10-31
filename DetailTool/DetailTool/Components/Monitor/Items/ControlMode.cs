@@ -29,7 +29,7 @@ namespace DetailTool.Components.Monitor.Items
         /// <summary>
         /// サイズ取得
         /// </summary>
-        /// <returns></returns>
+        /// <returns>サイズ</returns>
         public override int GetSize()
         {
             return sizeof(int);

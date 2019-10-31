@@ -1,3 +1,5 @@
+#include <time.h>
+#include <sys/time.h>
 #include "Parts/CommanderCommon.h"
 #include "YakeiKun.h"
 
@@ -28,6 +30,17 @@ ResultEnum YakeiKun::initializeCore()
     m_PreviewDrive.MotorCommand = MotorCommandEnum::E_COMMAND_STOP;
     m_PreviewDrive.Cutter = CutterDriveEnum::E_CUTTER_DRIVE;
 
+    /* 開始日時記録 */
+    struct timeval tmVal;
+    gettimeofday(&tmVal, 0);
+    struct tm* tmPtr = localtime(&tmVal.tv_sec);
+    pShareMemory->Commander.LastStartDateTime.Year = tmPtr->tm_year + 1900;
+    pShareMemory->Commander.LastStartDateTime.Month = tmPtr->tm_mon + 1;
+    pShareMemory->Commander.LastStartDateTime.Day = tmPtr->tm_mday;
+    pShareMemory->Commander.LastStartDateTime.Hour = tmPtr->tm_hour;
+    pShareMemory->Commander.LastStartDateTime.Minute = tmPtr->tm_min;
+    pShareMemory->Commander.LastStartDateTime.Second = tmPtr->tm_sec;
+
     return ResultEnum::NormalEnd;
 }
 
@@ -43,6 +56,12 @@ void YakeiKun::destroyCore()
     /* 動作マップ情報保存 */
     MoveMap* moveMap = MoveMap::GetInstance();
     moveMap->Save();
+
+    /* モータマイコンを Manual モードに切り替える */
+    EventInfo ev = { 0 };
+    ev.Code = 3;
+    ev.lParam[0] = (long)ControlModeEnum::E_MODE_MANUAL;
+    m_SendQueue.Send((char*)"MotorComm", &ev, sizeof(ev));
 }
 
 SequencerBase::SequenceTypeEnum YakeiKun::processCore()

@@ -30,8 +30,8 @@ namespace DetailTool.Command.Setting
 
             retVal.Code = 1001;
             retVal.LParam[0] = 0;
-            retVal.FParam[0] = (float)m_RobotSize.Length;
-            retVal.FParam[1] = (float)m_RobotSize.Width;
+            retVal.FParam[0] = (float)m_RobotSize.Vertical;
+            retVal.FParam[1] = (float)m_RobotSize.Horizontal;
 
             return retVal;
         }

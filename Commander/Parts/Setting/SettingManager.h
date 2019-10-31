@@ -67,6 +67,10 @@ public :
     TimeSettingStr GetYakeiStartTime();                     /* 取得 */
     void SetYakeStartTime(TimeSettingStr* const date);      /* 設定 */
 
+    /* 網羅完了判定割合 */
+    float GetMoveEndRate();                     /* 取得 */
+    void SetMoveEndRate(const float rate);      /* 設定 */
+
     /* アクセスポイント */
     long GetApCount();                          /* 個数 取得 */
     void GetApAddress(RectStr* data);           /* 座標 取得 */
@@ -87,6 +91,7 @@ private :
     float           m_WavePowerCoeff;   /* 電波の伝搬係数 */
     TimeSettingStr  m_KusakariStart;    /* 草刈り開始時刻情報 */
     TimeSettingStr  m_YakeiStart;       /* 夜警開始時刻情報 */
+    float           m_MoveEndRate;      /* 網羅完了判定割合 */
     long            m_ApCount;          /* アクセスポイントの個数 */
     RectStr*        m_ApAddress;        /* アクセスポイントの座標 */
 

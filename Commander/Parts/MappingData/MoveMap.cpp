@@ -141,19 +141,20 @@ bool MoveMap::IsComplete()
     bool retVal = false;
     SettingManager* setting = SettingManager::GetInstance();
     AreaMap* areaMap = AreaMap::GetInstance();
+    float moveEndRate = 0;
     RectStr mapCount = { 0 };
     char areaMapValue = 0;
     char moveMapValue = 0;
+
     unsigned long movableCount = 0;
     unsigned long movedCount = 0;
 
     setting->GetMapCount(&mapCount);
+    moveEndRate = setting->GetMoveEndRate();
 
-
-    /* 移動可能エリアの末端は判定対象外とする (折り返しの際にその部分を通過しないため) */
-    for (long y = 2; y < mapCount.Y - 2; y++)
+    for (long y = 0; y < mapCount.Y; y++)
     {
-        for (long x = 2; x < mapCount.X - 2; x++)
+        for (long x = 0; x < mapCount.X; x++)
         {
             /* 走行禁止の場合はカウントしない */
             if (areaMap->IsMovable(x, y) == false)
@@ -181,9 +182,9 @@ bool MoveMap::IsComplete()
         }
     }
 
-    /* 移動可能エリアに対して、移動完了エリアの割合が 95% 以上の場合、完了とする */
+    /* 移動可能エリアに対して、移動完了エリアの割合が設定値以上の場合、完了とする */
     float rate = (float)movedCount / (float)movableCount;
-    if (0.95f <= rate)
+    if (moveEndRate <= rate)
     {
         retVal = true;
     }

@@ -9,6 +9,7 @@ namespace DetailTool.Components.Map
 
         private static MoveMap m_This = null;
         private static object m_Lock = new object();
+        private static float m_MovedRate = 0.0F;
 
         #endregion
 
@@ -34,6 +35,15 @@ namespace DetailTool.Components.Map
         private MoveMap()
         {
         }
+
+        #endregion
+
+        #region Public Propaties ----------------------------------------------------
+
+        /// <summary>
+        /// Gets 走行済みの割合
+        /// </summary>
+        public float MovedRate { get { return m_MovedRate; } }
 
         #endregion
 
@@ -68,11 +78,42 @@ namespace DetailTool.Components.Map
             base.Update(data);
 
             Array.Sort(data);
-            byte min = data[0];
             byte max = data[data.Length - 1];
 
             m_MovedValue = max;
             m_NotMoveValue = (byte)(max - 1);
+
+            int notMovedIndex = -1;
+            int movedIndex = 0;
+            for (int i = 0; i < data.Length; i++)
+            {
+                if (data[i] == m_NotMoveValue)
+                {
+                    if (notMovedIndex < 0)
+                    {
+                        notMovedIndex = i;
+                    }
+                }
+
+                if (data[i] == m_MovedValue)
+                {
+                    movedIndex = i;
+                    break;
+                }
+            }
+
+            int movableAreaCount = data.Length - notMovedIndex;
+            int movedCount = data.Length - movedIndex;
+            if (data.Length <= 0)
+            {
+                m_MovedRate = 0;
+            }
+            else
+            {
+                float temp1 = (float)movedCount;
+                float temp2 = (float)movableAreaCount;
+                m_MovedRate = (temp1 / temp2) * 100;
+            }
         }
 
         /// <summary>
@@ -84,9 +125,15 @@ namespace DetailTool.Components.Map
         public override Color GetColor(int x, int y)
         {
             Color retVal = Color.DarkGray;
+            MonitorData monitor = MonitorData.GetInstance();
             byte value = this.Map[y][x];
 
-            if (value == m_NotMoveValue)
+            if ((x == monitor.Motor.PointX.Value)
+            &&  (y == monitor.Motor.PointY.Value))
+            {
+                retVal = Color.Orange;
+            }
+            else if (value == m_NotMoveValue)
             {
                 retVal = Color.LightGreen;
             }

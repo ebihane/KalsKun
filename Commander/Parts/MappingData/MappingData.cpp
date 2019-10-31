@@ -82,7 +82,15 @@ void MappingData::Get(char* const buffer)
     RectStr mapCount = { 0 };
     setting->GetMapCount(&mapCount);
 
-    memcpy(&buffer[0], &m_MapData[0][0], mapCount.X * mapCount.Y);
+    long index = 0;
+    for (long y = 0; y < mapCount.Y; y++)
+    {
+        for (long x = 0; x < mapCount.X; x++)
+        {
+            buffer[index] = m_MapData[y][x];
+            index++;
+        }
+    }
 }
 
 /* 指定した座標のデータを変更する */

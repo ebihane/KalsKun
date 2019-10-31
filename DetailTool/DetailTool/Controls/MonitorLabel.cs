@@ -38,24 +38,8 @@ namespace DetailTool.Controls
         /// </summary>
         public void UpdateValue()
         {
-            string text = m_StatusItem.ToString();
-            System.Drawing.Color backColor = m_StatusItem.GetBackColor();
-
-            if (lblValue.InvokeRequired == true)
-            {
-                lblTitle.BeginInvoke(new Action<string, System.Drawing.Color>(
-                (str, color) =>
-                {
-                    lblValue.Text = str;
-                    lblValue.BackColor = color;
-                }),
-                text, backColor);
-            }
-            else
-            {
-                lblTitle.Text = text;
-                lblTitle.BackColor = backColor;
-            }
+            lblValue.Text = m_StatusItem.ToString();
+            lblValue.BackColor = m_StatusItem.GetBackColor();
         }
     }
 }

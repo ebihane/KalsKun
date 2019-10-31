@@ -23,6 +23,7 @@ namespace DetailTool.Components.Monitor.Controller
 
             this.MelodyMode = new MelodyMode();
             this.LightMode = new LightMode();
+            this.LastStartDate = new DateTimeData();
             this.CurrentSequence = new SequenceType();
             this.SystemError = new ErrorState();
         }
@@ -30,6 +31,7 @@ namespace DetailTool.Components.Monitor.Controller
         public List<BeaconData> Beacon { get; private set; }
         public MelodyMode MelodyMode { get; private set; }
         public LightMode LightMode { get; private set; }
+        public DateTimeData LastStartDate { get; private set; }
         public SequenceType CurrentSequence { get; private set; }
         public ErrorState SystemError { get; private set; }
 
@@ -48,6 +50,7 @@ namespace DetailTool.Components.Monitor.Controller
 
             retVal += this.MelodyMode.GetSize();
             retVal += this.LightMode.GetSize();
+            retVal += this.LastStartDate.GetSize();
             retVal += this.CurrentSequence.GetSize();
             retVal += this.SystemError.GetSize();
 
@@ -77,6 +80,9 @@ namespace DetailTool.Components.Monitor.Controller
 
             // 指向性ライト
             dataIndex = this.LightMode.Analyze(data, dataIndex);
+
+            // 採集開始日時
+            dataIndex = this.LastStartDate.Analyze(data, dataIndex);
 
             // シーケンス
             dataIndex = this.CurrentSequence.Analyze(data, dataIndex);

@@ -46,7 +46,7 @@ namespace DetailTool
 
             initSettingTab();
             initMonitorTab();
-            initMapTab();
+            initDetailTab();
         }
 
         /// <summary>
@@ -125,28 +125,28 @@ namespace DetailTool
         private void btnSettingChange_Click(object sender, EventArgs e)
         {
             SettingData setting = SettingData.GetInstance();
-            DoubleText lengthText = null;
-            DoubleText widthText = null;
+            DoubleText verticalText = null;
+            DoubleText horizontalText = null;
 
-            lengthText = (DoubleText)pnlSetting.Controls[0];
-            widthText = (DoubleText)pnlSetting.Controls[1];
-            if ((lengthText.Value != setting.RobotSize.Length) || (widthText.Value != setting.RobotSize.Width))
+            verticalText = (DoubleText)pnlSetting.Controls[0];
+            horizontalText = (DoubleText)pnlSetting.Controls[1];
+            if ((verticalText.Value != setting.RobotSize.Vertical) || (horizontalText.Value != setting.RobotSize.Horizontal))
             {
                 SizeData size = new SizeData();
-                size.Length = lengthText.Value;
-                size.Width = widthText.Value;
+                size.Vertical = verticalText.Value;
+                size.Horizontal = horizontalText.Value;
                 SetRobotSizeSettingCommand command = new SetRobotSizeSettingCommand(size);
                 command.OnAnalyzed += evRobotSizeSettingChanged;
                 usrCommControl.Send(command);
             }
 
-            lengthText = (DoubleText)pnlSetting.Controls[2];
-            widthText = (DoubleText)pnlSetting.Controls[3];
-            if ((lengthText.Value != setting.FarmSize.Length) || (widthText.Value != setting.FarmSize.Width))
+            verticalText = (DoubleText)pnlSetting.Controls[2];
+            horizontalText = (DoubleText)pnlSetting.Controls[3];
+            if ((verticalText.Value != setting.FarmSize.Vertical) || (horizontalText.Value != setting.FarmSize.Horizontal))
             {
                 SizeData size = new SizeData();
-                size.Length = lengthText.Value;
-                size.Width = widthText.Value;
+                size.Vertical = verticalText.Value;
+                size.Horizontal = horizontalText.Value;
                 SetFarmSizeSettingCommand command = new SetFarmSizeSettingCommand(size);
                 command.OnAnalyzed += evFarmSizeSettingChanged;
                 usrCommControl.Send(command);
@@ -177,6 +177,14 @@ namespace DetailTool
                 command.OnAnalyzed += evYakeiStartSettingChanged;
                 usrCommControl.Send(command);
             }
+
+            FloatText moveEndRateText = (FloatText)pnlSetting.Controls[4];
+            if (setting.MoveEndRate != moveEndRateText.Value)
+            {
+                SetMoveEndRateCommand command = new SetMoveEndRateCommand(moveEndRateText.Value);
+                command.OnAnalyzed += evMoveEndRateSettingChanged;
+                usrCommControl.Send(command);
+            }
         }
 
         /// <summary>
@@ -191,28 +199,6 @@ namespace DetailTool
         }
 
         /// <summary>
-        /// モニタボタン状態変化イベント
-        /// </summary>
-        /// <param name="sender">sender</param>
-        /// <param name="e">e</param>
-        private void chkMonitor_CheckedChanged(object sender, EventArgs e)
-        {
-            if (chkMonitor.Checked == true)
-            {
-                // マップ更新
-                usrMapMonitor.CreateMap();
-
-                chkMonitor.Text = "モニター停止";
-                m_MonitorSender.Start(200);
-            }
-            else
-            {
-                m_MonitorSender.Stop();
-                chkMonitor.Text = "モニター開始";
-            }
-        }
-
-        /// <summary>
         /// 設定受信完了時処理
         /// </summary>
         /// <param name="sender">sender</param>
@@ -222,21 +208,21 @@ namespace DetailTool
             SettingData setting = SettingData.GetInstance();
             DoubleText doubleText = null;
 
-            // ロボットの長さ
+            // ロボットの縦
             doubleText = (DoubleText)pnlSetting.Controls[0];
-            doubleText.Value = setting.RobotSize.Length;
+            doubleText.Value = setting.RobotSize.Vertical;
 
-            // ロボットの幅
+            // ロボットの横
             doubleText = (DoubleText)pnlSetting.Controls[1];
-            doubleText.Value = setting.RobotSize.Width;
+            doubleText.Value = setting.RobotSize.Horizontal;
 
-            // 畑の長さ
+            // 畑の縦
             doubleText = (DoubleText)pnlSetting.Controls[2];
-            doubleText.Value = setting.FarmSize.Length;
+            doubleText.Value = setting.FarmSize.Vertical;
 
-            // 畑の幅
+            // 畑の横
             doubleText = (DoubleText)pnlSetting.Controls[3];
-            doubleText.Value = setting.FarmSize.Width;
+            doubleText.Value = setting.FarmSize.Horizontal;
 
             // 草刈り開始時刻
             usrKusakariStart.DayOfWeek = (int)setting.KusakariStart.DayOfWeek;
@@ -247,6 +233,10 @@ namespace DetailTool
             usrYakeiStart.DayOfWeek = (int)setting.YakeiStart.DayOfWeek;
             usrYakeiStart.Hour = setting.YakeiStart.Hour;
             usrYakeiStart.Minute = setting.YakeiStart.Minulte;
+
+            // 動作完了判定閾値
+            FloatText floatText = (FloatText)pnlSetting.Controls[4];
+            floatText.Value = setting.MoveEndRate;
 
             // エリアマップ生成
             AreaMap areaMap = AreaMap.GetInstance();
@@ -267,13 +257,13 @@ namespace DetailTool
             DoubleText doubleText = null;
             SettingData setting = SettingData.GetInstance();
 
-            // ロボットの長さ
+            // ロボットの縦
             doubleText = (DoubleText)pnlSetting.Controls[0];
-            setting.RobotSize.Length = doubleText.Value;
+            setting.RobotSize.Vertical = doubleText.Value;
 
-            // ロボットの幅
+            // ロボットの横
             doubleText = (DoubleText)pnlSetting.Controls[1];
-            setting.RobotSize.Width = doubleText.Value;
+            setting.RobotSize.Horizontal = doubleText.Value;
         }
 
         /// <summary>
@@ -286,13 +276,13 @@ namespace DetailTool
             DoubleText doubleText = null;
             SettingData setting = SettingData.GetInstance();
 
-            // 畑の長さ
+            // 畑の縦
             doubleText = (DoubleText)pnlSetting.Controls[2];
-            setting.FarmSize.Length = doubleText.Value;
+            setting.FarmSize.Vertical = doubleText.Value;
 
-            // 畑の幅
+            // 畑の横
             doubleText = (DoubleText)pnlSetting.Controls[3];
-            setting.FarmSize.Width = doubleText.Value;
+            setting.FarmSize.Horizontal = doubleText.Value;
         }
 
         /// <summary>
@@ -321,6 +311,18 @@ namespace DetailTool
             setting.YakeiStart.Minulte = usrYakeiStart.Minute;
         }
 
+        /// <summary>
+        /// 動作完了判定閾値 設定変更後イベント
+        /// </summary>
+        /// <param name="sender">sender</param>
+        /// <param name="e">e</param>
+        private void evMoveEndRateSettingChanged(object sender, EventArgs e)
+        {
+            SettingData setting = SettingData.GetInstance();
+            FloatText moveEndRateText = (FloatText)pnlSetting.Controls[4];
+            setting.MoveEndRate = moveEndRateText.Value;
+        }
+
         #endregion
 
         #region Private Methods -----------------------------------------------------
@@ -337,31 +339,38 @@ namespace DetailTool
 
             // ロボットの長さ
             doubleText = new DoubleText(0.1, 10000);
-            doubleText.Title = "ロボットの長さ";
+            doubleText.Title = "ロボットサイズ(縦)";
             doubleText.Unit = "mm";
             pnlSetting.Controls.Add(doubleText);
             pnlSetting.Controls.SetChildIndex(doubleText, 0);
 
             // ロボットの幅
             doubleText = new DoubleText(0.1, 10000);
-            doubleText.Title = "ロボットの幅";
+            doubleText.Title = "ロボットサイズ(横)";
             doubleText.Unit = "mm";
             pnlSetting.Controls.Add(doubleText);
             pnlSetting.Controls.SetChildIndex(doubleText, 1);
 
             // 畑の長さ
             doubleText = new DoubleText(0.1, 10000);
-            doubleText.Title = "畑の長さ";
+            doubleText.Title = "畑サイズ(縦)";
             doubleText.Unit = "mm";
             pnlSetting.Controls.Add(doubleText);
             pnlSetting.Controls.SetChildIndex(doubleText, 2);
 
             // 畑の幅
             doubleText = new DoubleText(0.1, 10000);
-            doubleText.Title = "ロボットの幅";
+            doubleText.Title = "畑サイズ(横)";
             doubleText.Unit = "mm";
             pnlSetting.Controls.Add(doubleText);
-            pnlSetting.Controls.SetChildIndex(doubleText, 1);
+            pnlSetting.Controls.SetChildIndex(doubleText, 3);
+
+            // 動作完了判定閾値
+            FloatText floatText = new FloatText(0.0F, 100.0F);
+            floatText.Title = "動作完了判定割合";
+            floatText.Unit = "％";
+            pnlSetting.Controls.Add(floatText);
+            pnlSetting.Controls.SetChildIndex(floatText, 4);
         }
 
         #endregion
@@ -373,57 +382,26 @@ namespace DetailTool
         #region Private Methods for Event Handler -----------------------------------
 
         /// <summary>
-        /// モニタコマンド 受信完了イベント
+        /// モニタボタン状態変化イベント
         /// </summary>
         /// <param name="sender">sender</param>
         /// <param name="e">e</param>
-        private void evStateMonitorReceived(object sender, EventArgs e)
+        private void chkMonitor_CheckedChanged(object sender, EventArgs e)
         {
-            foreach (Control control in pnlSystemError.Controls)
+            if (chkMonitor.Checked == true)
             {
-                MonitorLabel label = (MonitorLabel)control;
-                label.UpdateValue();
+                // マップ更新
+                usrMapMonitor.CreateMap();
+
+                chkMonitor.Text = "モニター停止";
+                m_MonitorSender.Start(200);
+            }
+            else
+            {
+                m_MonitorSender.Stop();
+                chkMonitor.Text = "モニター開始";
             }
         }
-
-        #endregion
-
-        #region Private Methods -----------------------------------------------------
-
-        /// <summary>
-        /// モニタタブ初期化
-        /// </summary>
-        private void initMonitorTab()
-        {
-            MonitorLabel label = null;
-            MonitorData monitor = MonitorData.GetInstance();
-
-            // モニタ更新イベント登録
-            m_MonitorSender.OnMonitorReceived += evStateMonitorReceived;
-
-            // システムエラー状態
-            label = new MonitorLabel("司令塔", monitor.Commander.SystemError);
-            pnlSystemError.Controls.Add(label);
-            label = new MonitorLabel("モータ", monitor.Motor.ErrorStatus);
-            pnlSystemError.Controls.Add(label);
-            pnlSystemError.Controls.Add(label);
-            label = new MonitorLabel("前方", monitor.FrontCamera.SystemError);
-            pnlSystemError.Controls.Add(label);
-            label = new MonitorLabel("動物", monitor.AnimalCamera.SystemError);
-            pnlSystemError.Controls.Add(label);
-            label = new MonitorLabel("周辺", monitor.AroundCamera.SystemError);
-            pnlSystemError.Controls.Add(label);
-
-
-        }
-
-        #endregion
-
-        #endregion
-
-        #region Map Tab -------------------------------------------------------------
-
-        #region Private Methods for Event Handler -----------------------------------
 
         /// <summary>
         /// 動作マップモニタコマンド 受信完了イベント
@@ -432,7 +410,51 @@ namespace DetailTool
         /// <param name="e">e</param>
         private void evMoveMapMonitorReceived(object sender, EventArgs e)
         {
-            usrMapMonitor.UpdateMapColor();
+            if (this.InvokeRequired == true)
+            {
+                this.BeginInvoke(new Action(delegate
+                {
+                    usrMapMonitor.UpdateMapColor();
+                }));
+            }
+            else
+            {
+                usrMapMonitor.UpdateMapColor();
+            }
+        }
+
+        /// <summary>
+        /// モニタ受信イベント
+        /// </summary>
+        /// <param name="sender">sender</param>
+        /// <param name="e">e</param>
+        private void evMonitorReceived(object sender, EventArgs e)
+        {
+            if (this.InvokeRequired == true)
+            {
+                this.BeginInvoke(new Action(delegate
+                {
+                    foreach (Control obj in pnlStatus.Controls)
+                    {
+                        MonitorLabel label = (MonitorLabel)obj;
+                        label.UpdateValue();
+                    }
+
+                    lblMovedRate.Text = string.Format("{0:F1}", MoveMap.GetInstance().MovedRate);
+                    lblStateDateTime.Text = MonitorData.GetInstance().Commander.LastStartDate.ToString();
+                }));
+            }
+            else
+            {
+                foreach (Control obj in pnlStatus.Controls)
+                {
+                    MonitorLabel label = (MonitorLabel)obj;
+                    label.UpdateValue();
+                }
+
+                lblMovedRate.Text = string.Format("{0:F1}", MoveMap.GetInstance().MovedRate);
+                lblStateDateTime.Text = MonitorData.GetInstance().Commander.LastStartDate.ToString();
+            }
         }
 
         #endregion
@@ -440,12 +462,100 @@ namespace DetailTool
         #region Private Methods -----------------------------------------------------
 
         /// <summary>
-        /// マップタブ初期化
+        /// モニタータブ初期化
         /// </summary>
-        private void initMapTab()
+        private void initMonitorTab()
         {
+            MonitorLabel label = null;
+            MonitorData monitor = MonitorData.GetInstance();
+
+            // モニタ更新イベント登録
+            m_MonitorSender.OnMonitorReceived += evMonitorReceived;
+
             // マップ更新イベント登録
             m_MonitorSender.OnMoveMapReceived += evMoveMapMonitorReceived;
+
+            // ステータス
+            label = new MonitorLabel("動作", monitor.Commander.CurrentSequence);
+            pnlStatus.Controls.Add(label);
+            label = new MonitorLabel("草刈り刃", monitor.Motor.Cutter);
+            pnlStatus.Controls.Add(label);
+            label = new MonitorLabel("操作モード", monitor.Motor.RemoteMode);
+            pnlStatus.Controls.Add(label);
+            label = new MonitorLabel("走行禁止エリア", monitor.FrontCamera.RedTape);
+            pnlStatus.Controls.Add(label);
+            label = new MonitorLabel("障害物", monitor.FrontCamera.BlueObject);
+            pnlStatus.Controls.Add(label);
+            label = new MonitorLabel("動物検知", monitor.AnimalCamera.Animal);
+            pnlStatus.Controls.Add(label);
+            label = new MonitorLabel("夜間検知", monitor.AroundCamera.Detect);
+            pnlStatus.Controls.Add(label);
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Detail Tab ----------------------------------------------------------
+
+        #region Private Methods for Event Handler -----------------------------------
+
+        /// <summary>
+        /// モニタコマンド 受信完了イベント
+        /// </summary>
+        /// <param name="sender">sender</param>
+        /// <param name="e">e</param>
+        private void evDetailReceived(object sender, EventArgs e)
+        {
+            if (this.InvokeRequired == true)
+            {
+                this.BeginInvoke(new Action(delegate
+                {
+                    foreach (Control control in pnlSystemError.Controls)
+                    {
+                        MonitorLabel label = (MonitorLabel)control;
+                        label.UpdateValue();
+                    }
+                }));
+            }
+            else
+            {
+                foreach (Control control in pnlSystemError.Controls)
+                {
+                    MonitorLabel label = (MonitorLabel)control;
+                    label.UpdateValue();
+                }
+            }
+        }
+
+        #endregion
+
+        #region Private Methods -----------------------------------------------------
+
+        /// <summary>
+        /// 詳細タブ初期化
+        /// </summary>
+        private void initDetailTab()
+        {
+            MonitorLabel label = null;
+            MonitorData monitor = MonitorData.GetInstance();
+
+            // 詳細更新イベント登録
+            m_MonitorSender.OnMonitorReceived += evDetailReceived;
+
+            // システムエラー状態
+            label = new MonitorLabel("司令塔", monitor.Commander.SystemError);
+            pnlSystemError.Controls.Add(label);
+            label = new MonitorLabel("モータ", monitor.Motor.ErrorStatus);
+            pnlSystemError.Controls.Add(label);
+            label = new MonitorLabel("前方", monitor.FrontCamera.SystemError);
+            pnlSystemError.Controls.Add(label);
+            label = new MonitorLabel("動物", monitor.AnimalCamera.SystemError);
+            pnlSystemError.Controls.Add(label);
+            label = new MonitorLabel("周辺", monitor.AroundCamera.SystemError);
+            pnlSystemError.Controls.Add(label);
+
+            // ジャイロデータ
         }
 
         #endregion

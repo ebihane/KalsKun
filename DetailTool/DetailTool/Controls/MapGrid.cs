@@ -39,6 +39,8 @@ namespace DetailTool.Controls
                 dgvMap.Rows.Add();
                 dgvMap.Rows[y].Height = rowHeight;
             }
+
+            dgvMap.CurrentCell = null;
         }
 
         /// <summary>
@@ -46,34 +48,14 @@ namespace DetailTool.Controls
         /// </summary>
         public void UpdateMapColor()
         {
-            if (dgvMap.InvokeRequired == true)
-            {
-                dgvMap.BeginInvoke(new Action<object>(
-                (obj) =>
-                {
-                    MonitorData monitor = MonitorData.GetInstance();
-                    MoveMap moveMap = MoveMap.GetInstance();
+            MonitorData monitor = MonitorData.GetInstance();
+            MoveMap moveMap = MoveMap.GetInstance();
 
-                    for (int y = 0; y < dgvMap.Rows.Count; y++)
-                    {
-                        for (int x = 0; x < dgvMap.Columns.Count; x++)
-                        {
-                            dgvMap[x, y].Style.BackColor = moveMap.GetColor(x, y);
-                        }
-                    }
-                }), null);
-            }
-            else
+            for (int y = 0; y < dgvMap.Rows.Count; y++)
             {
-                MonitorData monitor = MonitorData.GetInstance();
-                MoveMap moveMap = MoveMap.GetInstance();
-
-                for (int y = 0; y < dgvMap.Rows.Count; y++)
+                for (int x = 0; x < dgvMap.Columns.Count; x++)
                 {
-                    for (int x = 0; x < dgvMap.Columns.Count; x++)
-                    {
-                        dgvMap[x, y].Style.BackColor = moveMap.GetColor(x, y);
-                    }
+                    dgvMap[x, y].Style.BackColor = moveMap.GetColor(x, y);
                 }
             }
         }

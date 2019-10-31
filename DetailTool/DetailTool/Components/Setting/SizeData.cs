@@ -12,8 +12,8 @@ namespace DetailTool.Components.Setting
         {
         }
 
-        public double Width { get; set; }
-        public double Length { get; set; }
+        public double Vertical { get; set; }
+        public double Horizontal { get; set; }
 
         /// <summary>
         /// サイズ取得
@@ -38,12 +38,12 @@ namespace DetailTool.Components.Setting
 
             // 幅 (= 横 = X)
             doubleValue = BitConverter.ToDouble(data, dataIndex);
-            this.Width = doubleValue;
+            this.Horizontal = doubleValue;
             dataIndex += sizeof(double);
 
             // 長さ (= 縦 = Y)
             doubleValue = BitConverter.ToDouble(data, dataIndex);
-            this.Length = doubleValue;
+            this.Vertical = doubleValue;
             dataIndex += sizeof(double);
 
             retVal = dataIndex;

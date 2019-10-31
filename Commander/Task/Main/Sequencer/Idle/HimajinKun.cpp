@@ -120,6 +120,14 @@ FINISH :
 bool HimajinKun::isTimeArrival(SettingManager::TimeSettingStr* current, SettingManager::TimeSettingStr* target)
 {
     bool retVal = false;
+    struct timeval tmVal;
+    struct tm* tmPtr = NULL;
+    long year = 0;
+    long month = 0;
+    long day = 0;
+    long hour = 0;
+    long minute = 0;
+    long second = 0;
 
     /* 動作無し */
     if (target->DayOfWeek == SettingManager::DayOfWeekEnum::Nothing)
@@ -148,6 +156,27 @@ bool HimajinKun::isTimeArrival(SettingManager::TimeSettingStr* current, SettingM
     {
         goto FINISH;
     }
+
+    /* 直近の開始時刻と一緒の場合は開始しない */
+    gettimeofday(&tmVal, 0);
+    tmPtr = localtime(&tmVal.tv_sec);
+    year = tmPtr->tm_year + 1900;
+    month = tmPtr->tm_mon + 1;
+    day = tmPtr->tm_mday;
+    hour = tmPtr->tm_hour;
+    minute = tmPtr->tm_min;
+    second = tmPtr->tm_sec;
+
+    if ((year == pShareMemory->Commander.LastStartDateTime.Year)
+    &&  (month == pShareMemory->Commander.LastStartDateTime.Month)
+    &&  (day == pShareMemory->Commander.LastStartDateTime.Day)
+    &&  (hour == pShareMemory->Commander.LastStartDateTime.Hour)
+    &&  (minute == pShareMemory->Commander.LastStartDateTime.Minute)
+    &&  (second == pShareMemory->Commander.LastStartDateTime.Second))
+    {
+        goto FINISH;
+    }
+
 
     retVal = true;
 

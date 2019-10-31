@@ -38,6 +38,7 @@ namespace DetailTool.Components.Setting
         public int MapLength { get; private set; }
         public DateTimeSetting KusakariStart { get; set; }
         public DateTimeSetting YakeiStart { get; set; }
+        public float MoveEndRate { get; set; }
 
         #endregion
 
@@ -77,6 +78,7 @@ namespace DetailTool.Components.Setting
             retVal += sizeof(int);
             retVal += this.KusakariStart.GetSize();
             retVal += this.YakeiStart.GetSize();
+            retVal += sizeof(float);
 
             return retVal;
         }
@@ -107,6 +109,10 @@ namespace DetailTool.Components.Setting
 
             dataIndex = this.KusakariStart.Analyze(data, dataIndex);
             dataIndex = this.YakeiStart.Analyze(data, dataIndex);
+
+            // 動作完了判定閾値
+            float floatValue = BitConverter.ToSingle(data, dataIndex);
+            this.MoveEndRate = floatValue;
         }
 
         #endregion

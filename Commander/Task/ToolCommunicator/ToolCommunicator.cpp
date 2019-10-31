@@ -203,6 +203,7 @@ ResultEnum ToolCommunicator::doSettingRead()
     RectStr mapCount;
     SettingManager::TimeSettingStr kusakariStart;
     SettingManager::TimeSettingStr yakeiStart;
+    float moveEndRate = 0.0f;
     char* sendBuffer = NULL;
 
     sendLength += sizeof(robotSize);
@@ -210,6 +211,7 @@ ResultEnum ToolCommunicator::doSettingRead()
     sendLength += sizeof(mapCount);
     sendLength += sizeof(kusakariStart);
     sendLength += sizeof(yakeiStart);
+    sendLength += sizeof(moveEndRate);
 
     sendBuffer = new char[sendLength];
     if (sendBuffer == NULL)
@@ -239,6 +241,10 @@ ResultEnum ToolCommunicator::doSettingRead()
     yakeiStart = m_Setting->GetYakeiStartTime();
     memcpy(&sendBuffer[index], &yakeiStart, sizeof(yakeiStart));
     index += sizeof(yakeiStart);
+
+    moveEndRate = m_Setting->GetMoveEndRate();
+    memcpy(&sendBuffer[index], & moveEndRate, sizeof(moveEndRate));
+    index += sizeof(moveEndRate);
 
     retVal = m_TcpServer.Send(&sendBuffer[0], sendLength);
 
@@ -278,7 +284,7 @@ ResultEnum ToolCommunicator::doSettingChange(EventInfo* const pEv)
                 kusakariDate.Hour = (unsigned short)pEv->lParam[2];
                 kusakariDate.Minute = (unsigned short)pEv->lParam[3];
                 m_Setting->SetKusakariStartTime(&kusakariDate);
-                snprintf(&m_LogStr[0], sizeof(m_LogStr), "[KusakariStartChange] Change. [%d %d:%d]\n", kusakariDate.DayOfWeek, kusakariDate.Hour, kusakariDate.Minute);
+                snprintf(&m_LogStr[0], sizeof(m_LogStr), "[KusakariStartChange] Change. [%d %02d:%02d]\n", kusakariDate.DayOfWeek, kusakariDate.Hour, kusakariDate.Minute);
                 m_Logger->LOG_INFO(m_LogStr);
             }
             response = 0;
@@ -291,10 +297,16 @@ ResultEnum ToolCommunicator::doSettingChange(EventInfo* const pEv)
                 yakeiDate.Hour = (unsigned short)pEv->lParam[2];
                 yakeiDate.Minute = (unsigned short)pEv->lParam[3];
                 m_Setting->SetYakeStartTime(&yakeiDate);
-                snprintf(&m_LogStr[0], sizeof(m_LogStr), "[YakeiStartChange] Change. [%d %d:%d]\n", yakeiDate.DayOfWeek, yakeiDate.Hour, yakeiDate.Minute);
+                snprintf(&m_LogStr[0], sizeof(m_LogStr), "[YakeiStartChange] Change. [%d %02d:%02d]\n", yakeiDate.DayOfWeek, yakeiDate.Hour, yakeiDate.Minute);
                 m_Logger->LOG_INFO(m_LogStr);
             }
             response = 0;
+            break;
+
+        case 4:
+            m_Setting->SetMoveEndRate(pEv->fParam[0]);
+            snprintf(&m_LogStr[0], sizeof(m_LogStr), "[MoveEndRateChange] Change. [%.1f]\n", pEv->fParam[0]);
+            m_Logger->LOG_INFO(m_LogStr);
             break;
 
         default :
@@ -437,17 +449,17 @@ ResultEnum ToolCommunicator::doDisconnectEvent()
     return ResultEnum::Reconnect;
 }
 
-void ToolCommunicator::setRobotSizeSetting(const float length, const float width)
+void ToolCommunicator::setRobotSizeSetting(const float vertical, const float horizontal)
 {
-    snprintf(&m_LogStr[0], sizeof(m_LogStr), "[setRobotSizeSetting] length[%f] width[%f]\n", length, width);
+    snprintf(&m_LogStr[0], sizeof(m_LogStr), "[setRobotSizeSetting] V[%f] H[%f]\n", vertical, horizontal);
     m_Logger->LOG_INFO(m_LogStr);
 
     m_AreaMap->Free();
     m_MoveMap->Free();
 
     SizeStr robotSize;
-    robotSize.Length = length;
-    robotSize.Width = width;
+    robotSize.Vertical = vertical;
+    robotSize.Horizontal = horizontal;
     m_Setting->SetRobotSize(&robotSize);
     m_Setting->UpdateMapCount();
 
@@ -462,17 +474,17 @@ void ToolCommunicator::setRobotSizeSetting(const float length, const float width
     m_MoveMap->Save();
 }
 
-void ToolCommunicator::setFarmSizeSetting(const float length, const float width)
+void ToolCommunicator::setFarmSizeSetting(const float vertical, const float horizontal)
 {
-    snprintf(&m_LogStr[0], sizeof(m_LogStr), "[setFarmSizeSetting] length[%f] width[%f]\n", length, width);
+    snprintf(&m_LogStr[0], sizeof(m_LogStr), "[setFarmSizeSetting] V[%f] H[%f]\n", vertical, horizontal);
     m_Logger->LOG_INFO(m_LogStr);
 
     m_AreaMap->Free();
     m_MoveMap->Free();
 
     SizeStr farmSize;
-    farmSize.Length = length;
-    farmSize.Width = width;
+    farmSize.Vertical = vertical;
+    farmSize.Horizontal = horizontal;
     m_Setting->SetFarmSize(&farmSize);
     m_Setting->UpdateMapCount();
 

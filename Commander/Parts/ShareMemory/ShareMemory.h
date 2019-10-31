@@ -31,6 +31,17 @@ typedef enum
     E_LIGHT_BLINK,          /* 2: 点滅 */
 } LightModeEnum;
 
+/* 日時情報構造体 */
+typedef struct
+{
+    long Year;             /* 年 */
+    long Month;             /* 月 */
+    long Day;               /* 日 */
+    long Hour;              /* 時 */
+    long Minute;            /* 分 */
+    long Second;            /* 秒 */
+} DateTimeStr;
+
 /*----------------*/
 /*  位置情報関連  */
 /*----------------*/
@@ -67,6 +78,7 @@ typedef struct
     BeaconDataStr   Beacon[BEACON_COUNT];
     MelodyModeEnum  MelodyMode;
     LightModeEnum   LightMode;
+    DateTimeStr     LastStartDateTime;
     long            ModeState;
     bool            SystemError;
 } CommanderStateStr;
@@ -77,14 +89,14 @@ typedef struct
 /* モータマイコン向け 動作指示 */
 typedef enum
 {
-    E_COMMAND_STOP = 0, /* 0: 停止 */
-    E_COMMAND_FRONT,    /* 1: 前進 */
-    E_COMMAND_R_TURN,   /* 2: 右ターン */
-    E_COMMAND_AVOID,    /* 3: 回避 */
-    E_COMMAND_REMOTE,   /* 4: 遠隔動作 */
-    E_COMMAND_MONITOR,  /* 5: モニタ */
-    E_COMMAND_L_TURN,   /* 6: 左ターン */
-    E_COMMAND_MAX,      /* 7: コマンド数 */
+    E_COMMAND_STOP = 0,     /* 0: 停止 */
+    E_COMMAND_FRONT,        /* 1: 前進 */
+    E_COMMAND_R_TURN,       /* 2: 右ターン */
+    E_COMMAND_AVOID,        /* 3: 回避 */
+    E_COMMAND_REMOTE,       /* 4: 遠隔動作 */
+    E_COMMAND_MONITOR,      /* 5: モニタ */
+    E_COMMAND_L_TURN,       /* 6: 左ターン */
+    E_COMMAND_MAX,          /* 7: コマンド数 */
 } MotorCommandEnum;
 
 /* モータマイコン向け 草刈り刃動作指示 */

@@ -26,8 +26,8 @@ ResultEnum MotorSimulator::Open()
 {
     PositionData* position = PositionData::GetInstance();
     RectStr current = position->GetPosition();
-    m_CurrentPosition.X = (long)(current.X * (m_RobotSize.Length / 2));
-    m_CurrentPosition.Y = (long)(current.Y * (m_RobotSize.Width / 2));
+    m_CurrentPosition.X = (long)(current.X * (m_RobotSize.Horizontal / 2));
+    m_CurrentPosition.Y = (long)(current.Y * (m_RobotSize.Vertical / 2));
 
     PositionData::CompassEnum compass = position->GetCompass();
     switch (compass)
@@ -74,45 +74,59 @@ ResultEnum MotorSimulator::Send(void* const bufferPtr, const unsigned long size)
     char* buffer = (char*)bufferPtr;
     long temp = 0;
 
-    MotorCommandEnum command = (MotorCommandEnum)(buffer[2] & 0x0F);
-
-    temp = buffer[2] & 0xF0;
-    temp >>= 4;
-    temp &= 0x0F;
-    m_CutterMove = (CutterDriveEnum)temp;
-
-    switch (command)
+    if (buffer[1] == 0x0A)
     {
-        case MotorCommandEnum::E_COMMAND_STOP :
+        if (buffer[2] == 0x00)
+        {
+            m_IsAuto = true;
+        }
+        else
+        {
+            m_IsAuto = false;
+        }
+    }
+    else
+    {
+        MotorCommandEnum command = (MotorCommandEnum)(buffer[2] & 0x0F);
+
+        temp = buffer[2] & 0xF0;
+        temp >>= 4;
+        temp &= 0x0F;
+        m_CutterMove = (CutterDriveEnum)temp;
+
+        switch (command)
+        {
+        case MotorCommandEnum::E_COMMAND_STOP:
             stopCommand();
             break;
 
-        case MotorCommandEnum::E_COMMAND_FRONT :
+        case MotorCommandEnum::E_COMMAND_FRONT:
             frontCommand();
             break;
 
-        case MotorCommandEnum::E_COMMAND_R_TURN :
+        case MotorCommandEnum::E_COMMAND_R_TURN:
             r_turnCommand();
             break;
 
-        case MotorCommandEnum::E_COMMAND_L_TURN :
+        case MotorCommandEnum::E_COMMAND_L_TURN:
             l_turnCommand();
             break;
 
-        case MotorCommandEnum::E_COMMAND_AVOID :
+        case MotorCommandEnum::E_COMMAND_AVOID:
             avoidCommand();
             break;
 
-        case MotorCommandEnum::E_COMMAND_REMOTE :
+        case MotorCommandEnum::E_COMMAND_REMOTE:
             remoteCommand();
             break;
 
-        case MotorCommandEnum::E_COMMAND_MONITOR :
+        case MotorCommandEnum::E_COMMAND_MONITOR:
             monitorCommand();
             break;
 
-        default :
+        default:
             break;
+        }
     }
 
     return ResultEnum::NormalEnd;
@@ -276,20 +290,20 @@ void MotorSimulator::updateStatus()
 {
     if (m_RightTurnWatch.IsRunninng() == true)
     {
-        if (5.0f <= m_RightTurnWatch.GetSplit())
+        if (3.0f <= m_RightTurnWatch.GetSplit())
         {
             m_X_Direciton *= -1;
-            m_CurrentPosition.Y += (long)(((m_RobotSize.Width / 2) + 10) * m_Y_Direction);
+            m_CurrentPosition.Y += (long)(((m_RobotSize.Vertical / 2) + 10) * m_Y_Direction);
             m_RightTurnWatch.Stop();
             m_CurrentCommand = MotorCommandEnum::E_COMMAND_FRONT;
         }
     }
     else if (m_LeftTurnWatch.IsRunninng() == true)
     {
-        if (5.0f <= m_LeftTurnWatch.GetSplit())
+        if (3.0f <= m_LeftTurnWatch.GetSplit())
         {
             m_X_Direciton *= -1;
-            m_CurrentPosition.Y += (long)(((m_RobotSize.Width / 2) + 10) * m_Y_Direction);
+            m_CurrentPosition.Y += (long)(((m_RobotSize.Vertical / 2) + 10) * m_Y_Direction);
             m_LeftTurnWatch.Stop();
             m_CurrentCommand = MotorCommandEnum::E_COMMAND_FRONT;
         }
@@ -299,7 +313,7 @@ void MotorSimulator::updateStatus()
         if (m_AvoidWatch.GetSplit() < 2.0f)
         {
             m_CurrentPosition.X += 10 * m_X_Direciton;
-            m_CurrentPosition.Y += (long)(((m_RobotSize.Width / 2) + 10) * m_Y_Direction);
+            m_CurrentPosition.Y += (long)(((m_RobotSize.Vertical / 2) + 10) * m_Y_Direction);
         }
         else if (m_AvoidWatch.GetSplit() < 3.0f)
         {
@@ -308,7 +322,7 @@ void MotorSimulator::updateStatus()
         else if (m_AvoidWatch.GetSplit() < 5.0f)
         {
             m_CurrentPosition.X += 10 * m_X_Direciton;
-            m_CurrentPosition.Y += (long)(((m_RobotSize.Width / 2) + 10) * m_Y_Direction);
+            m_CurrentPosition.Y += (long)(((m_RobotSize.Vertical / 2) + 10) * m_Y_Direction);
         }
         else
         {

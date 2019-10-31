@@ -1,16 +1,10 @@
-#define FILETYPE_TEXT
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
 #include "SettingManager.h"
 
-#ifdef FILETYPE_TEXT
-    #define FILE_PATH   ("/home/pi/Information/Setting.txt")
-#else
-    #define FILE_PATH   ("/home/pi/Information/Setting.dat")
-#endif
+#define FILE_PATH   ("/home/pi/Information/Setting.txt")
 
 SettingManager* SettingManager::m_This = new SettingManager();
 
@@ -37,19 +31,32 @@ SettingManager* const SettingManager::GetInstance()
 
 void SettingManager::CreateDefaultData()
 {
-    /* ロボットサイズ (全長/全幅/全高) : 600mm * 463mm * 418mm */
-    m_RobotSize.Length = 600.0;
-    m_RobotSize.Width = 463.0;
+    /* ロボットサイズ (横/縦/全高) : 600mm * 463mm * 418mm */
+    m_RobotSize.Horizontal = 600.0;
+    m_RobotSize.Vertical = 463.0;
 
     /* 畑の大きさ */
-    m_FarmSize.Length = 3000.0;
-    m_FarmSize.Width = 3000.0;
+    m_FarmSize.Horizontal = 3000.0;
+    m_FarmSize.Vertical = 3000.0;
 
     /* マップの個数 (= 自動計算) */
     UpdateMapCount();
 
     /*  電波の伝搬係数*/
     m_WavePowerCoeff = 2.0f;
+
+    /* 草刈り開始時刻 */
+    m_KusakariStart.DayOfWeek = DayOfWeekEnum::Nothing;
+    m_KusakariStart.Hour = 0;
+    m_KusakariStart.Minute = 0;
+
+    /* 夜警開始時刻 */
+    m_YakeiStart.DayOfWeek = DayOfWeekEnum::Nothing;
+    m_YakeiStart.Hour = 0;
+    m_YakeiStart.Minute = 0;
+
+    /* 網羅完了判定割合 */
+    m_MoveEndRate = 0.95f;
 
     /* アクセスポイントの個数 */
     m_ApCount = 3;
@@ -68,16 +75,6 @@ void SettingManager::CreateDefaultData()
     m_ApAddress[1].Y = 1;
     m_ApAddress[2].X = 8;
     m_ApAddress[2].Y = 9;
-
-    /* 草刈り開始時刻 */
-    m_KusakariStart.DayOfWeek = DayOfWeekEnum::Nothing;
-    m_KusakariStart.Hour = 0;
-    m_KusakariStart.Minute = 0;
-
-    /* 夜警開始時刻 */
-    m_YakeiStart.DayOfWeek = DayOfWeekEnum::Nothing;
-    m_YakeiStart.Hour = 0;
-    m_YakeiStart.Minute = 0;
 
     /* 保存する */
     Save();
@@ -116,8 +113,6 @@ ResultEnum SettingManager::Save()
 
     m_LastErrorNo = 0;
 
-#ifdef FILETYPE_TEXT
-
     /* ファイルを開く */
     fp = fopen(&FILE_PATH[0], "w");
     if (fp == NULL)
@@ -127,60 +122,24 @@ ResultEnum SettingManager::Save()
     }
 
     /* 書き込み */
-    fprintf(fp, "RobotLength,%lf\n", m_RobotSize.Length);
-    fprintf(fp, "RobotWidth,%lf\n", m_RobotSize.Width);
-    fprintf(fp, "FarmLength,%lf\n", m_FarmSize.Length);
-    fprintf(fp, "FarmWidth,%lf\n", m_FarmSize.Width);
-    fprintf(fp, "WavePowerCoeff,%lf\n", m_WavePowerCoeff);
+    fprintf(fp, "RobotVertical,%lf\n", m_RobotSize.Vertical);
+    fprintf(fp, "RobotHorizontal,%lf\n", m_RobotSize.Horizontal);
+    fprintf(fp, "FarmVertical,%lf\n", m_FarmSize.Vertical);
+    fprintf(fp, "FarmHorizontal,%lf\n", m_FarmSize.Horizontal);
+    fprintf(fp, "WavePowerCoeff,%f\n", m_WavePowerCoeff);
     fprintf(fp, "KusakariDayOfWeek,%d\n", m_KusakariStart.DayOfWeek);
     fprintf(fp, "KusakariStartHour,%d\n", m_KusakariStart.Hour);
     fprintf(fp, "KusakariStartMinute,%d\n", m_KusakariStart.Minute);
     fprintf(fp, "YakeiDayOfWeek,%d\n", m_YakeiStart.DayOfWeek);
     fprintf(fp, "YakeiStartHour,%d\n", m_YakeiStart.Hour);
     fprintf(fp, "YakeiStartMinute,%d\n", m_YakeiStart.Minute);
+    fprintf(fp, "MoveEndRate,%f\n", m_MoveEndRate);
     fprintf(fp, "APCount,%ld\n", m_ApCount);
     for (size = 0; size < m_ApCount; size++)
     {
         fprintf(fp, "AP%ld(X),%d\n", size + 1, m_ApAddress[size].X);
         fprintf(fp, "AP%ld(Y),%d\n", size + 1, m_ApAddress[size].Y);
     }
-
-#else
-
-    /* ファイルを開く */
-    fp = fopen(&FILE_PATH[0], "wb");
-    if (fp == NULL)
-    {
-        m_LastErrorNo = errno;
-        goto FINISH;
-    }
-
-    /* 保存サイズの合計を算出 */
-    size = calcurateSettingSize();
-
-    /* 保存用領域確保 */
-    buffer = new char[size];
-    if (buffer == NULL)
-    {
-        m_LastErrorNo = errno;
-        goto FINISH;
-    }
-
-    /* 保存データ作成 */
-    memcpy(&buffer[index], &m_RobotSize, sizeof(m_RobotSize));                  index += sizeof(m_RobotSize);
-    memcpy(&buffer[index], &m_FarmSize, sizeof(m_FarmSize));                    index += sizeof(m_FarmSize);
-    memcpy(&buffer[index], &m_MapCount, sizeof(m_MapCount));                    index += sizeof(m_MapCount);
-    memcpy(&buffer[index], &m_WavePowerCoeff, sizeof(m_WavePowerCoeff));        index += sizeof(m_WavePowerCoeff);
-    memcpy(&buffer[index], &m_ApCount, sizeof(m_ApCount));                      index += sizeof(m_ApCount);
-    memcpy(&buffer[index], m_ApAddress, sizeof(m_ApAddress[0]) * m_ApCount);    index += sizeof(m_ApAddress[0]) * m_ApCount;
-
-    if (fwrite(buffer, sizeof(char), size, fp) < 0)
-    {
-        m_LastErrorNo = errno;
-        goto FINISH;
-    }
-
-#endif
 
     retVal = ResultEnum::NormalEnd;
 
@@ -217,8 +176,6 @@ ResultEnum SettingManager::Load()
         m_ApAddress = NULL;
     }
 
-#ifdef FILETYPE_TEXT
-
     /* ファイルを開く */
     fp = fopen(&FILE_PATH[0], "r");
     if (fp == NULL)
@@ -230,19 +187,19 @@ ResultEnum SettingManager::Load()
     /* 読み込み */
     fgets(&buffer[0], sizeof(buffer), fp);
     parseString(&buffer[0], &once[0], ',', sizeof(buffer));
-    m_RobotSize.Length = atof(&once[0]);
+    m_RobotSize.Vertical = atof(&once[0]);
 
     fgets(&buffer[0], sizeof(buffer), fp);
     parseString(&buffer[0], &once[0], ',', sizeof(buffer));
-    m_RobotSize.Width = atof(&once[0]);
+    m_RobotSize.Horizontal = atof(&once[0]);
 
     fgets(&buffer[0], sizeof(buffer), fp);
     parseString(&buffer[0], &once[0], ',', sizeof(buffer));
-    m_FarmSize.Length = atof(&once[0]);
+    m_FarmSize.Vertical = atof(&once[0]);
 
     fgets(&buffer[0], sizeof(buffer), fp);
     parseString(&buffer[0], &once[0], ',', sizeof(buffer));
-    m_FarmSize.Width = atof(&once[0]);
+    m_FarmSize.Horizontal = atof(&once[0]);
 
     /* マップの個数 (= 自動計算) */
     UpdateMapCount();
@@ -277,6 +234,10 @@ ResultEnum SettingManager::Load()
 
     fgets(&buffer[0], sizeof(buffer), fp);
     parseString(&buffer[0], &once[0], ',', sizeof(buffer));
+    m_MoveEndRate = (float)atof(&once[0]);
+
+    fgets(&buffer[0], sizeof(buffer), fp);
+    parseString(&buffer[0], &once[0], ',', sizeof(buffer));
     m_ApCount = atol(&once[0]);
 
     m_ApAddress = new RectStr[m_ApCount];
@@ -290,56 +251,6 @@ ResultEnum SettingManager::Load()
         parseString(&buffer[0], &once[0], ',', sizeof(buffer));
         m_ApAddress[index].Y = atol(&once[0]);
     }
-
-#else
-
-    /* ファイルを開く */
-    fp = fopen(&FILE_PATH[0], "rb");
-    if (fp == NULL)
-    {
-        m_LastErrorNo = errno;
-        goto FINISH;
-    }
-
-    /* 読み込み */
-    if (fread(&m_RobotSize, sizeof(m_RobotSize), 1, fp) < 0)
-    {
-        m_LastErrorNo = errno;
-        goto FINISH;
-    }
-
-    if (fread(&m_FarmSize, sizeof(m_FarmSize), 1, fp) < 0)
-    {
-        m_LastErrorNo = errno;
-        goto FINISH;
-    }
-
-    if (fread(&m_MapCount, sizeof(m_MapCount), 1, fp) < 0)
-    {
-        m_LastErrorNo = errno;
-        goto FINISH;
-    }
-
-    if (fread(&m_WavePowerCoeff, sizeof(m_WavePowerCoeff), 1, fp) < 0)
-    {
-        m_LastErrorNo = errno;
-        goto FINISH;
-    }
-
-    if (fread(&m_ApCount, sizeof(m_ApCount), 1, fp) < 0)
-    {
-        m_LastErrorNo = errno;
-        goto FINISH;
-    }
-
-    m_ApAddress = new RectStr[m_ApCount];
-    if (fread(&m_ApAddress[0], sizeof(RectStr), m_ApCount, fp) < 0)
-    {
-        m_LastErrorNo = errno;
-        goto FINISH;
-    }
-
-#endif
 
     retVal = ResultEnum::NormalEnd;
 
@@ -364,27 +275,27 @@ int SettingManager::GetLastErrorNo()
 /* ロボットサイズ */
 void SettingManager::GetRobotSize(SizeStr* const size)
 {
-    size->Length = m_RobotSize.Length;
-    size->Width = m_RobotSize.Width;
+    size->Vertical = m_RobotSize.Vertical;
+    size->Horizontal = m_RobotSize.Horizontal;
 }
 
 void SettingManager::SetRobotSize(SizeStr* const size)
 {
-    m_RobotSize.Length = size->Length;
-    m_RobotSize.Width = size->Width;
+    m_RobotSize.Vertical = size->Vertical;
+    m_RobotSize.Horizontal = size->Horizontal;
 }
 
 /* 畑のサイズ */
 void SettingManager::GetFarmSize(SizeStr* const size)
 {
-    size->Length = m_FarmSize.Length;
-    size->Width = m_FarmSize.Width;
+    size->Vertical = m_FarmSize.Vertical;
+    size->Horizontal = m_FarmSize.Horizontal;
 }
 
 void SettingManager::SetFarmSize(SizeStr* const size)
 {
-    m_FarmSize.Length = size->Length;
-    m_FarmSize.Width = size->Width;
+    m_FarmSize.Vertical = size->Vertical;
+    m_FarmSize.Horizontal = size->Horizontal;
 }
 
 /* マップの個数 */
@@ -396,8 +307,8 @@ void SettingManager::GetMapCount(RectStr* const count)
 
 void SettingManager::UpdateMapCount()
 {
-    long xCount = (long)(m_FarmSize.Width / m_RobotSize.Width);
-    long yCount = (long)(m_FarmSize.Length / m_RobotSize.Length);
+    long xCount = (long)(m_FarmSize.Horizontal / m_RobotSize.Horizontal);
+    long yCount = (long)(m_FarmSize.Vertical / m_RobotSize.Vertical);
 
     m_MapCount.X = (xCount * 2) + 2;
     m_MapCount.Y = (yCount * 2) + 2;
@@ -438,6 +349,17 @@ void SettingManager::SetYakeStartTime(TimeSettingStr* const date)
     m_YakeiStart.DayOfWeek = date->DayOfWeek;
     m_YakeiStart.Hour = date->Hour;
     m_YakeiStart.Minute = date->Minute;
+}
+
+/* 網羅完了判定割合 */
+float SettingManager::GetMoveEndRate()
+{
+    return m_MoveEndRate;
+}
+
+void SettingManager::SetMoveEndRate(const float rate)
+{
+    m_MoveEndRate = rate;
 }
 
 /* アクセスポイント */

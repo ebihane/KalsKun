@@ -27,12 +27,12 @@ RectStr GyroConverter::Convert(const double baseX, const double baseY)
     m_SettingManager->GetRobotSize(&robotSize);
 
     /* 1 マス分の大きさは、ロボットサイズの半分 */
-    robotSize.Length /= 2;
-    robotSize.Width /= 2;
+    robotSize.Vertical /= 2;
+    robotSize.Horizontal /= 2;
 
     /* 座標はロボットサイズで割った値 */
-    retVal.X = (long)(baseXmm / robotSize.Length);
-    retVal.Y = (long)(baseYmm / robotSize.Width);
+    retVal.X = (long)((baseXmm / robotSize.Horizontal) + 0.5);
+    retVal.Y = (long)((baseYmm / robotSize.Vertical) + 0.5);
 
     /* ただし周辺にわざと進入禁止エリアを設けているため、+1 */
     retVal.X += 1;

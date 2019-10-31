@@ -36,7 +36,7 @@ private:
     ResultEnum doDateTimeAdjust(EventInfo* const pEv);
     ResultEnum doDisconnectEvent();
 
-    void setRobotSizeSetting(const float length, const float width);
-    void setFarmSizeSetting(const float length, const float width);
+    void setRobotSizeSetting(const float vertical, const float horizontal);
+    void setFarmSizeSetting(const float vertical, const float horizontal);
 
 };
