@@ -16,6 +16,8 @@ namespace DetailTool.Components.Monitor.Controller
             this.CommunicationCount = new IntStatus();
             this.Command = new MotorMoveState();
             this.Cutter = new CutterMoveState();
+            this.GyroX = new IntStatus();
+            this.GyroY = new IntStatus();
             this.PointX = new IntStatus();
             this.PointY = new IntStatus();
             this.ErrorStatus = new DetectType();
@@ -26,6 +28,8 @@ namespace DetailTool.Components.Monitor.Controller
         public IntStatus CommunicationCount { get; private set; }
         public MotorMoveState Command { get; private set; }
         public CutterMoveState Cutter { get; private set; }
+        public IntStatus GyroX { get; private set; }
+        public IntStatus GyroY { get; private set; }
         public IntStatus PointX { get; private set; }
         public IntStatus PointY { get; private set; }
         public DetectType ErrorStatus { get; private set; }
@@ -43,6 +47,8 @@ namespace DetailTool.Components.Monitor.Controller
             retVal += this.CommunicationCount.GetSize();
             retVal += this.Command.GetSize();
             retVal += this.Cutter.GetSize();
+            retVal += this.GyroX.GetSize();
+            retVal += this.GyroY.GetSize();
             retVal += this.PointX.GetSize();
             retVal += this.PointY.GetSize();
             retVal += this.ErrorStatus.GetSize();
@@ -71,6 +77,10 @@ namespace DetailTool.Components.Monitor.Controller
 
             // 草刈り刃動作指示
             dataIndex = this.Cutter.Analyze(data, dataIndex);
+
+            // ジャイロデータ
+            dataIndex = this.GyroX.Analyze(data, dataIndex);
+            dataIndex = this.GyroY.Analyze(data, dataIndex);
 
             // 現在位置
             dataIndex = this.PointX.Analyze(data, dataIndex);

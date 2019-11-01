@@ -168,6 +168,8 @@ ResultEnum initialize(const char isMotorSimulator, const char isFrontCameraSimul
     pShareMemory->Motor.CommunicationCount = 0;
     pShareMemory->Motor.Command = MotorCommandEnum::E_COMMAND_STOP;
     pShareMemory->Motor.Cutter = CutterDriveEnum::E_CUTTER_STOP;
+    pShareMemory->Motor.GyroX = 0;
+    pShareMemory->Motor.GyroY = 0;
     pShareMemory->Motor.PointX = 0;
     pShareMemory->Motor.PointY = 0;
     pShareMemory->Motor.ErrorStatus = DetectTypeEnum::NOT_DETECT;

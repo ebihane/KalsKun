@@ -164,7 +164,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnConnection);
             this.Name = "CommControl";
-            this.Size = new System.Drawing.Size(499, 93);
+            this.Size = new System.Drawing.Size(500, 93);
             this.pnlInputField.ResumeLayout(false);
             this.pnlInputField.PerformLayout();
             this.ResumeLayout(false);

@@ -19,7 +19,7 @@ namespace DetailTool.Components.Monitor.Controller
             this.Distance = new List<FloatStatus>();
             for (int index = 0; index < PrivateConstants.SonicSensorCount; index++)
             {
-                FloatStatus value = new FloatStatus();
+                FloatStatus value = new FloatStatus(3);
                 this.Distance.Add(value);
             }
         }

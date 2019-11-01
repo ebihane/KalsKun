@@ -121,6 +121,8 @@ typedef struct
     long                CommunicationCount;
     MotorCommandEnum    Command;
     CutterDriveEnum     Cutter;
+    long                GyroX;
+    long                GyroY;
     long                PointX;
     long                PointY;
     DetectTypeEnum      ErrorStatus;

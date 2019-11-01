@@ -5,10 +5,17 @@ namespace DetailTool.Components.Monitor.Items
     public class FloatStatus : StatusItemBase
     {
         /// <summary>
-        /// デフォルトコンストラクタ
+        /// 小数点以下の桁数
         /// </summary>
-        public FloatStatus()
+        private int m_Digit = 1;
+
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="digit">小数点以下の桁数</param>
+        public FloatStatus(int digit)
         {
+            m_Digit = digit;
         }
 
         /// <summary>
@@ -50,7 +57,7 @@ namespace DetailTool.Components.Monitor.Items
         /// <returns>文字列</returns>
         public override string ToString()
         {
-            return this.Value.ToString();
+            return this.Value.ToString(string.Format("F{0}", m_Digit));
         }
     }
 }

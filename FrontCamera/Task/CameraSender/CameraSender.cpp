@@ -26,7 +26,7 @@ ResultEnum CameraSender::initialize()
         goto FINISH;
     }
 
-    m_UdpSender = new UdpSender((char *)"192.168.3.102", 10000, false);
+    m_UdpSender = new UdpSender((char *)"192.168.3.100", 10000, false);
     if (m_UdpSender == NULL)
     {
         goto FINISH;
@@ -44,6 +44,9 @@ ResultEnum CameraSender::doProcedure()
     ResultEnum retVal = ResultEnum::AbnormalEnd;
     std::vector<unsigned char> vect;
     std::vector<int> param = std::vector<int>(2);
+    Mat resizeMat;
+    Size resizeSize = Size(320, 240);
+    long startCommand = 0;
 
     if (m_UdpSender == NULL)
     {
@@ -56,6 +59,12 @@ ResultEnum CameraSender::doProcedure()
     pShareMemory->Communicate.Index = -1;
 
 RECONNECT :
+
+    if (isStopRequest() == true)
+    {
+        retVal = ResultEnum::NormalEnd;
+        goto FINISH;
+    }
 
     retVal = m_UdpSender->Open();
     if (retVal != ResultEnum::NormalEnd)
@@ -71,6 +80,12 @@ RECONNECT :
         m_Logger->LOG_ERROR("[CameraSender] UdpSender Connection failed.\n");
         delay(5000);
         goto RECONNECT;
+    }
+
+    retVal = m_UdpSender->Receive(&startCommand, sizeof(startCommand));
+    if (retVal != ResultEnum::NormalEnd)
+    {
+
     }
 
     m_Logger->LOG_INFO("[CameraSender] Main loop start.\n");
@@ -94,7 +109,8 @@ RECONNECT :
 
         /* jpeg 形式の画像データに変換 */
         Mat& sendMat = pShareMemory->Capture.Data[pShareMemory->Communicate.Index];
-        imencode(".jpg", sendMat, vect, param);
+        resize(sendMat, resizeMat, resizeSize);
+        imencode(".jpg", resizeMat, vect, param);
         
         if (vect.size() < (UDP_SEND_MAX - sizeof(unsigned long)))
         {
@@ -109,8 +125,11 @@ RECONNECT :
                 m_SendBuffer[4 + index] = vect[index];
             }
 
-            /* 失敗しても無視して送信し続ける */
-            m_UdpSender->Send(&m_SendBuffer[0], size + 4);
+            if (m_UdpSender->Send(&m_SendBuffer[0], size + 4) != ResultEnum::NormalEnd)
+            {
+                vect.clear();
+                goto RECONNECT;
+            }
         }
 
         vect.clear();

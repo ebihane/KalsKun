@@ -46,7 +46,6 @@ namespace DetailTool
 
             initSettingTab();
             initMonitorTab();
-            initDetailTab();
         }
 
         /// <summary>
@@ -66,22 +65,13 @@ namespace DetailTool
         /// <param name="e">e</param>
         private void onConnected(object sender, EventArgs e)
         {
-            this.BeginInvoke(new Action<bool>(
-            (state) =>
-            {
-                pnlSettingMain.Enabled = state;
-                chkMonitor.Enabled = state;
-                btnTimeAdjust.Enabled = state;
-            }),
-            true);
-
             // 設定取得
             if ((usrCommControl.SocketInfo.IPString != "192.168.3.2")
             &&  (usrCommControl.SocketInfo.IPString != "192.168.3.3")
             &&  (usrCommControl.SocketInfo.IPString != "192.168.3.4"))
             {
                 GetSettingCommand command = new GetSettingCommand();
-                command.OnAnalyzed += evSettingReceived;
+                command.OnAnalyzed += evSettingReceivedAtConnected;
                 usrCommControl.Send(command);
             }
         }
@@ -101,6 +91,32 @@ namespace DetailTool
                 btnTimeAdjust.Enabled = state;
             }),
             false);
+        }
+
+        /// <summary>
+        /// 設定受信完了時処理
+        /// </summary>
+        /// <param name="sender">sender</param>
+        /// <param name="e">e</param>
+        private void evSettingReceivedAtConnected(object sender, EventArgs e)
+        {
+            if (this.InvokeRequired == true)
+            {
+                this.BeginInvoke(new Action(delegate
+                {
+                    pnlSettingMain.Enabled = true;
+                    chkMonitor.Enabled = true;
+                    btnTimeAdjust.Enabled = true;
+                    updateSettings();
+                }));
+            }
+            else
+            {
+                pnlSettingMain.Enabled = true;
+                chkMonitor.Enabled = true;
+                btnTimeAdjust.Enabled = true;
+                updateSettings();
+            }
         }
 
         #endregion
@@ -211,46 +227,14 @@ namespace DetailTool
         /// <param name="e">e</param>
         private void evSettingReceived(object sender, EventArgs e)
         {
-            SettingData setting = SettingData.GetInstance();
-            DoubleText doubleText = null;
-
-            // ロボットの縦
-            doubleText = (DoubleText)pnlSetting.Controls[0];
-            doubleText.Value = setting.RobotSize.Vertical;
-
-            // ロボットの横
-            doubleText = (DoubleText)pnlSetting.Controls[1];
-            doubleText.Value = setting.RobotSize.Horizontal;
-
-            // 畑の縦
-            doubleText = (DoubleText)pnlSetting.Controls[2];
-            doubleText.Value = setting.FarmSize.Vertical;
-
-            // 畑の横
-            doubleText = (DoubleText)pnlSetting.Controls[3];
-            doubleText.Value = setting.FarmSize.Horizontal;
-
-            // 草刈り開始時刻
-            usrKusakariStart.DayOfWeek = (int)setting.KusakariStart.DayOfWeek;
-            usrKusakariStart.Hour = setting.KusakariStart.Hour;
-            usrKusakariStart.Minute = setting.KusakariStart.Minulte;
-
-            // 夜警開始時刻
-            usrYakeiStart.DayOfWeek = (int)setting.YakeiStart.DayOfWeek;
-            usrYakeiStart.Hour = setting.YakeiStart.Hour;
-            usrYakeiStart.Minute = setting.YakeiStart.Minulte;
-
-            // 動作完了判定閾値
-            FloatText floatText = (FloatText)pnlSetting.Controls[4];
-            floatText.Value = setting.MoveEndRate * 100;
-
-            // エリアマップ生成
-            AreaMap areaMap = AreaMap.GetInstance();
-            areaMap.Allocate(setting.MapLength, setting.MapWidth);
-
-            // 動作マップ生成
-            MoveMap moveMap = MoveMap.GetInstance();
-            moveMap.Allocate(setting.MapLength, setting.MapWidth);
+            if (this.InvokeRequired == true)
+            {
+                this.BeginInvoke(new Action(delegate { updateSettings(); }));
+            }
+            else
+            {
+                updateSettings();
+            }
         }
 
         /// <summary>
@@ -329,9 +313,9 @@ namespace DetailTool
             setting.MoveEndRate = moveEndRateText.Value;
         }
 
-#endregion
+        #endregion
 
-#region Private Methods -----------------------------------------------------
+        #region Private Methods -----------------------------------------------------
 
         /// <summary>
         /// 設定タブ初期化
@@ -379,13 +363,60 @@ namespace DetailTool
             pnlSetting.Controls.SetChildIndex(floatText, 4);
         }
 
-#endregion
+        /// <summary>
+        /// 設定更新
+        /// </summary>
+        private void updateSettings()
+        {
+            SettingData setting = SettingData.GetInstance();
+            DoubleText doubleText = null;
 
-#endregion
+            // ロボットの縦
+            doubleText = (DoubleText)pnlSetting.Controls[0];
+            doubleText.Value = setting.RobotSize.Vertical;
 
-#region Monitor Tab ---------------------------------------------------------
+            // ロボットの横
+            doubleText = (DoubleText)pnlSetting.Controls[1];
+            doubleText.Value = setting.RobotSize.Horizontal;
 
-#region Private Methods for Event Handler -----------------------------------
+            // 畑の縦
+            doubleText = (DoubleText)pnlSetting.Controls[2];
+            doubleText.Value = setting.FarmSize.Vertical;
+
+            // 畑の横
+            doubleText = (DoubleText)pnlSetting.Controls[3];
+            doubleText.Value = setting.FarmSize.Horizontal;
+
+            // 草刈り開始時刻
+            usrKusakariStart.DayOfWeek = (int)setting.KusakariStart.DayOfWeek;
+            usrKusakariStart.Hour = setting.KusakariStart.Hour;
+            usrKusakariStart.Minute = setting.KusakariStart.Minulte;
+
+            // 夜警開始時刻
+            usrYakeiStart.DayOfWeek = (int)setting.YakeiStart.DayOfWeek;
+            usrYakeiStart.Hour = setting.YakeiStart.Hour;
+            usrYakeiStart.Minute = setting.YakeiStart.Minulte;
+
+            // 動作完了判定閾値
+            FloatText floatText = (FloatText)pnlSetting.Controls[4];
+            floatText.Value = setting.MoveEndRate * 100;
+
+            // エリアマップ生成
+            AreaMap areaMap = AreaMap.GetInstance();
+            areaMap.Allocate(setting.MapLength, setting.MapWidth);
+
+            // 動作マップ生成
+            MoveMap moveMap = MoveMap.GetInstance();
+            moveMap.Allocate(setting.MapLength, setting.MapWidth);
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Monitor Tab ---------------------------------------------------------
+
+        #region Private Methods for Event Handler -----------------------------------
 
         /// <summary>
         /// モニタボタン状態変化イベント
@@ -410,6 +441,57 @@ namespace DetailTool
         }
 
         /// <summary>
+        /// モニター チェック切り替えイベント
+        /// </summary>
+        /// <param name="sender">sender</param>
+        /// <param name="e">e</param>
+        private void RdoMonitor_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rdoMonitor.Checked == true)
+            {
+                pnlMonitor.Visible = true;
+            }
+            else
+            {
+                pnlMonitor.Visible = false;
+            }
+        }
+
+        /// <summary>
+        /// 詳細 チェック切り替えイベント
+        /// </summary>
+        /// <param name="sender">sender</param>
+        /// <param name="e">e</param>
+        private void RdoDetail_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rdoDetail.Checked == true)
+            {
+                pnlDetail.Visible = true;
+            }
+            else
+            {
+                pnlDetail.Visible = false;
+            }
+        }
+
+        /// <summary>
+        /// エラー詳細 チェック切り替えイベント
+        /// </summary>
+        /// <param name="sender">sender</param>
+        /// <param name="e">e</param>
+        private void RdoErrorStatus_CheckedChanged(object sender, EventArgs e)
+        {
+            if (rdoErrorStatus.Checked == true)
+            {
+                pnlSystemError.Visible = true;
+            }
+            else
+            {
+                pnlSystemError.Visible = false;
+            }
+        }
+
+        /// <summary>
         /// 動作マップモニタコマンド 受信完了イベント
         /// </summary>
         /// <param name="sender">sender</param>
@@ -418,10 +500,7 @@ namespace DetailTool
         {
             if (this.InvokeRequired == true)
             {
-                this.BeginInvoke(new Action(delegate
-                {
-                    usrMapMonitor.UpdateMapColor();
-                }));
+                this.BeginInvoke(new Action(delegate { usrMapMonitor.UpdateMapColor(); }));
             }
             else
             {
@@ -438,34 +517,17 @@ namespace DetailTool
         {
             if (this.InvokeRequired == true)
             {
-                this.BeginInvoke(new Action(delegate
-                {
-                    foreach (Control obj in pnlStatus.Controls)
-                    {
-                        MonitorLabel label = (MonitorLabel)obj;
-                        label.UpdateValue();
-                    }
-
-                    lblMovedRate.Text = string.Format("{0:F1}", MoveMap.GetInstance().MovedRate);
-                    lblStateDateTime.Text = MonitorData.GetInstance().Commander.LastStartDate.ToString();
-                }));
+                this.BeginInvoke(new Action(delegate { updateMonitors(); }));
             }
             else
             {
-                foreach (Control obj in pnlStatus.Controls)
-                {
-                    MonitorLabel label = (MonitorLabel)obj;
-                    label.UpdateValue();
-                }
-
-                lblMovedRate.Text = string.Format("{0:F1}", MoveMap.GetInstance().MovedRate);
-                lblStateDateTime.Text = MonitorData.GetInstance().Commander.LastStartDate.ToString();
+                updateMonitors();
             }
         }
 
-#endregion
+        #endregion
 
-#region Private Methods -----------------------------------------------------
+        #region Private Methods -----------------------------------------------------
 
         /// <summary>
         /// モニタータブ初期化
@@ -483,71 +545,29 @@ namespace DetailTool
 
             // ステータス
             label = new MonitorLabel("動作", monitor.Commander.CurrentSequence);
-            pnlStatus.Controls.Add(label);
+            pnlMonitor.Controls.Add(label);
             label = new MonitorLabel("草刈り刃", monitor.Motor.Cutter);
-            pnlStatus.Controls.Add(label);
+            pnlMonitor.Controls.Add(label);
             label = new MonitorLabel("操作モード", monitor.Motor.RemoteMode);
-            pnlStatus.Controls.Add(label);
+            pnlMonitor.Controls.Add(label);
             label = new MonitorLabel("走行禁止エリア", monitor.FrontCamera.RedTape);
-            pnlStatus.Controls.Add(label);
+            pnlMonitor.Controls.Add(label);
             label = new MonitorLabel("障害物", monitor.FrontCamera.BlueObject);
-            pnlStatus.Controls.Add(label);
+            pnlMonitor.Controls.Add(label);
             label = new MonitorLabel("動物検知", monitor.AnimalCamera.Animal);
-            pnlStatus.Controls.Add(label);
+            pnlMonitor.Controls.Add(label);
             label = new MonitorLabel("夜間検知", monitor.AroundCamera.Detect);
-            pnlStatus.Controls.Add(label);
-        }
+            pnlMonitor.Controls.Add(label);
 
-#endregion
-
-#endregion
-
-#region Detail Tab ----------------------------------------------------------
-
-#region Private Methods for Event Handler -----------------------------------
-
-        /// <summary>
-        /// モニタコマンド 受信完了イベント
-        /// </summary>
-        /// <param name="sender">sender</param>
-        /// <param name="e">e</param>
-        private void evDetailReceived(object sender, EventArgs e)
-        {
-            if (this.InvokeRequired == true)
-            {
-                this.BeginInvoke(new Action(delegate
-                {
-                    foreach (Control control in pnlSystemError.Controls)
-                    {
-                        MonitorLabel label = (MonitorLabel)control;
-                        label.UpdateValue();
-                    }
-                }));
-            }
-            else
-            {
-                foreach (Control control in pnlSystemError.Controls)
-                {
-                    MonitorLabel label = (MonitorLabel)control;
-                    label.UpdateValue();
-                }
-            }
-        }
-
-#endregion
-
-#region Private Methods -----------------------------------------------------
-
-        /// <summary>
-        /// 詳細タブ初期化
-        /// </summary>
-        private void initDetailTab()
-        {
-            MonitorLabel label = null;
-            MonitorData monitor = MonitorData.GetInstance();
-
-            // 詳細更新イベント登録
-            m_MonitorSender.OnMonitorReceived += evDetailReceived;
+            // 詳細情報
+            label = new MonitorLabel("ジャイロ (X)", monitor.Motor.GyroX);
+            pnlDetail.Controls.Add(label);
+            label = new MonitorLabel("ジャイロ (Y)", monitor.Motor.GyroY);
+            pnlDetail.Controls.Add(label);
+            label = new MonitorLabel("超音波 (1)", monitor.FrontCamera.Distance[0]);
+            pnlDetail.Controls.Add(label);
+            label = new MonitorLabel("超音波 (2)", monitor.FrontCamera.Distance[1]);
+            pnlDetail.Controls.Add(label);
 
             // システムエラー状態
             label = new MonitorLabel("司令塔", monitor.Commander.SystemError);
@@ -560,12 +580,37 @@ namespace DetailTool
             pnlSystemError.Controls.Add(label);
             label = new MonitorLabel("周辺", monitor.AroundCamera.SystemError);
             pnlSystemError.Controls.Add(label);
-
-            // ジャイロデータ
         }
 
-#endregion
+        /// <summary>
+        /// モニタ更新
+        /// </summary>
+        private void updateMonitors()
+        {
+            foreach (Control control in pnlMonitor.Controls)
+            {
+                MonitorLabel label = (MonitorLabel)control;
+                label.UpdateValue();
+            }
 
-#endregion
+            foreach (Control control in pnlDetail.Controls)
+            {
+                MonitorLabel label = (MonitorLabel)control;
+                label.UpdateValue();
+            }
+
+            foreach (Control control in pnlSystemError.Controls)
+            {
+                MonitorLabel label = (MonitorLabel)control;
+                label.UpdateValue();
+            }
+
+            lblMovedRate.Text = string.Format("{0:F1}", MoveMap.GetInstance().MovedRate);
+            lblStateDateTime.Text = MonitorData.GetInstance().Commander.LastStartDate.ToString();
+        }
+
+        #endregion
+
+        #endregion
     }
 }

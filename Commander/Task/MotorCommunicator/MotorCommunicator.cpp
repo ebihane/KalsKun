@@ -349,6 +349,10 @@ ResultEnum MotorCommunicator::analyze(char* const buffer)
     positionY = (short)(positionY << 8);
     positionY |= (short)buffer[6];
 
+    /* ジャイロデータ記録 */
+    pShareMemory->Motor.GyroX = positionX;
+    pShareMemory->Motor.GyroY = positionY;
+
     /* 座標変換 */
     position = m_Converter->Convert(positionX, positionY);
 
