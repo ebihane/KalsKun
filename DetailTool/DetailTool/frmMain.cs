@@ -76,9 +76,14 @@ namespace DetailTool
             true);
 
             // 設定取得
-            GetSettingCommand command = new GetSettingCommand();
-            command.OnAnalyzed += evSettingReceived;
-            usrCommControl.Send(command);
+            if ((usrCommControl.SocketInfo.IPString != "192.168.3.2")
+            &&  (usrCommControl.SocketInfo.IPString != "192.168.3.3")
+            &&  (usrCommControl.SocketInfo.IPString != "192.168.3.4"))
+            {
+                GetSettingCommand command = new GetSettingCommand();
+                command.OnAnalyzed += evSettingReceived;
+                usrCommControl.Send(command);
+            }
         }
 
         /// <summary>
@@ -179,9 +184,10 @@ namespace DetailTool
             }
 
             FloatText moveEndRateText = (FloatText)pnlSetting.Controls[4];
-            if (setting.MoveEndRate != moveEndRateText.Value)
+            float rate = moveEndRateText.Value / 100.0F;
+            if (setting.MoveEndRate != rate)
             {
-                SetMoveEndRateCommand command = new SetMoveEndRateCommand(moveEndRateText.Value);
+                SetMoveEndRateCommand command = new SetMoveEndRateCommand(rate);
                 command.OnAnalyzed += evMoveEndRateSettingChanged;
                 usrCommControl.Send(command);
             }
@@ -236,7 +242,7 @@ namespace DetailTool
 
             // 動作完了判定閾値
             FloatText floatText = (FloatText)pnlSetting.Controls[4];
-            floatText.Value = setting.MoveEndRate;
+            floatText.Value = setting.MoveEndRate * 100;
 
             // エリアマップ生成
             AreaMap areaMap = AreaMap.GetInstance();
@@ -323,9 +329,9 @@ namespace DetailTool
             setting.MoveEndRate = moveEndRateText.Value;
         }
 
-        #endregion
+#endregion
 
-        #region Private Methods -----------------------------------------------------
+#region Private Methods -----------------------------------------------------
 
         /// <summary>
         /// 設定タブ初期化
@@ -373,13 +379,13 @@ namespace DetailTool
             pnlSetting.Controls.SetChildIndex(floatText, 4);
         }
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
-        #region Monitor Tab ---------------------------------------------------------
+#region Monitor Tab ---------------------------------------------------------
 
-        #region Private Methods for Event Handler -----------------------------------
+#region Private Methods for Event Handler -----------------------------------
 
         /// <summary>
         /// モニタボタン状態変化イベント
@@ -457,9 +463,9 @@ namespace DetailTool
             }
         }
 
-        #endregion
+#endregion
 
-        #region Private Methods -----------------------------------------------------
+#region Private Methods -----------------------------------------------------
 
         /// <summary>
         /// モニタータブ初期化
@@ -492,13 +498,13 @@ namespace DetailTool
             pnlStatus.Controls.Add(label);
         }
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
-        #region Detail Tab ----------------------------------------------------------
+#region Detail Tab ----------------------------------------------------------
 
-        #region Private Methods for Event Handler -----------------------------------
+#region Private Methods for Event Handler -----------------------------------
 
         /// <summary>
         /// モニタコマンド 受信完了イベント
@@ -528,9 +534,9 @@ namespace DetailTool
             }
         }
 
-        #endregion
+#endregion
 
-        #region Private Methods -----------------------------------------------------
+#region Private Methods -----------------------------------------------------
 
         /// <summary>
         /// 詳細タブ初期化
@@ -558,8 +564,8 @@ namespace DetailTool
             // ジャイロデータ
         }
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
     }
 }

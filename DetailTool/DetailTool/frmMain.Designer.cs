@@ -31,25 +31,25 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.pnlSettingMain = new System.Windows.Forms.Panel();
+            this.btnTimeAdjust = new System.Windows.Forms.Button();
             this.btnSettingChange = new System.Windows.Forms.Button();
             this.btnSettingGet = new System.Windows.Forms.Button();
             this.pnlSetting = new System.Windows.Forms.FlowLayoutPanel();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.lblStateDateTime = new System.Windows.Forms.Label();
+            this.lblStartDateTitle = new System.Windows.Forms.Label();
+            this.chkMonitor = new System.Windows.Forms.CheckBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.lblMovedRate = new System.Windows.Forms.Label();
+            this.lblMovedRateTitle = new System.Windows.Forms.Label();
             this.pnlStatus = new System.Windows.Forms.FlowLayoutPanel();
             this.tabPage3 = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.pnlSystemError = new System.Windows.Forms.FlowLayoutPanel();
-            this.lblMovedRate = new System.Windows.Forms.Label();
-            this.lblMovedRateTitle = new System.Windows.Forms.Label();
-            this.label1 = new System.Windows.Forms.Label();
             this.usrYakeiStart = new DetailTool.Controls.DateTimeInputControl();
             this.usrKusakariStart = new DetailTool.Controls.DateTimeInputControl();
             this.usrCommControl = new DetailTool.Controls.CommControl();
             this.usrMapMonitor = new DetailTool.Controls.MapGrid();
-            this.btnTimeAdjust = new System.Windows.Forms.Button();
-            this.chkMonitor = new System.Windows.Forms.CheckBox();
-            this.lblStateDateTime = new System.Windows.Forms.Label();
-            this.lblStartDateTitle = new System.Windows.Forms.Label();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.pnlSettingMain.SuspendLayout();
@@ -67,7 +67,7 @@
             this.tabControl1.Location = new System.Drawing.Point(10, 14);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(778, 464);
+            this.tabControl1.Size = new System.Drawing.Size(778, 557);
             this.tabControl1.TabIndex = 0;
             // 
             // tabPage1
@@ -78,7 +78,7 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 26);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(770, 434);
+            this.tabPage1.Size = new System.Drawing.Size(770, 527);
             this.tabPage1.TabIndex = 1;
             this.tabPage1.Text = "設定";
             // 
@@ -93,8 +93,19 @@
             this.pnlSettingMain.Enabled = false;
             this.pnlSettingMain.Location = new System.Drawing.Point(6, 105);
             this.pnlSettingMain.Name = "pnlSettingMain";
-            this.pnlSettingMain.Size = new System.Drawing.Size(764, 327);
+            this.pnlSettingMain.Size = new System.Drawing.Size(764, 416);
             this.pnlSettingMain.TabIndex = 4;
+            // 
+            // btnTimeAdjust
+            // 
+            this.btnTimeAdjust.Enabled = false;
+            this.btnTimeAdjust.Location = new System.Drawing.Point(642, 3);
+            this.btnTimeAdjust.Name = "btnTimeAdjust";
+            this.btnTimeAdjust.Size = new System.Drawing.Size(119, 52);
+            this.btnTimeAdjust.TabIndex = 8;
+            this.btnTimeAdjust.Text = "時刻合わせ";
+            this.btnTimeAdjust.UseVisualStyleBackColor = true;
+            this.btnTimeAdjust.Click += new System.EventHandler(this.btnTimeAdjust_Click);
             // 
             // btnSettingChange
             // 
@@ -122,7 +133,7 @@
             // 
             this.pnlSetting.Location = new System.Drawing.Point(3, 3);
             this.pnlSetting.Name = "pnlSetting";
-            this.pnlSetting.Size = new System.Drawing.Size(384, 301);
+            this.pnlSetting.Size = new System.Drawing.Size(384, 410);
             this.pnlSetting.TabIndex = 4;
             // 
             // tabPage2
@@ -138,9 +149,75 @@
             this.tabPage2.Controls.Add(this.usrMapMonitor);
             this.tabPage2.Location = new System.Drawing.Point(4, 26);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Size = new System.Drawing.Size(770, 434);
+            this.tabPage2.Size = new System.Drawing.Size(770, 527);
             this.tabPage2.TabIndex = 3;
             this.tabPage2.Text = "モニター";
+            // 
+            // lblStateDateTime
+            // 
+            this.lblStateDateTime.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.lblStateDateTime.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblStateDateTime.Location = new System.Drawing.Point(79, 3);
+            this.lblStateDateTime.Name = "lblStateDateTime";
+            this.lblStateDateTime.Size = new System.Drawing.Size(248, 23);
+            this.lblStateDateTime.TabIndex = 13;
+            this.lblStateDateTime.Text = "-";
+            this.lblStateDateTime.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // lblStartDateTitle
+            // 
+            this.lblStartDateTitle.AutoSize = true;
+            this.lblStartDateTitle.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblStartDateTitle.Location = new System.Drawing.Point(3, 6);
+            this.lblStartDateTitle.Name = "lblStartDateTitle";
+            this.lblStartDateTitle.Size = new System.Drawing.Size(72, 16);
+            this.lblStartDateTitle.TabIndex = 12;
+            this.lblStartDateTitle.Text = "開始日時";
+            // 
+            // chkMonitor
+            // 
+            this.chkMonitor.Appearance = System.Windows.Forms.Appearance.Button;
+            this.chkMonitor.Enabled = false;
+            this.chkMonitor.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.chkMonitor.Location = new System.Drawing.Point(503, 3);
+            this.chkMonitor.Name = "chkMonitor";
+            this.chkMonitor.Size = new System.Drawing.Size(264, 66);
+            this.chkMonitor.TabIndex = 11;
+            this.chkMonitor.Text = "モニター開始";
+            this.chkMonitor.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.chkMonitor.UseVisualStyleBackColor = true;
+            this.chkMonitor.CheckedChanged += new System.EventHandler(this.chkMonitor_CheckedChanged);
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label1.Location = new System.Drawing.Point(734, 499);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(24, 16);
+            this.label1.TabIndex = 10;
+            this.label1.Text = "％";
+            // 
+            // lblMovedRate
+            // 
+            this.lblMovedRate.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.lblMovedRate.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblMovedRate.Location = new System.Drawing.Point(646, 496);
+            this.lblMovedRate.Name = "lblMovedRate";
+            this.lblMovedRate.Size = new System.Drawing.Size(82, 23);
+            this.lblMovedRate.TabIndex = 9;
+            this.lblMovedRate.Text = "-";
+            this.lblMovedRate.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            // 
+            // lblMovedRateTitle
+            // 
+            this.lblMovedRateTitle.AutoSize = true;
+            this.lblMovedRateTitle.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblMovedRateTitle.Location = new System.Drawing.Point(570, 499);
+            this.lblMovedRateTitle.Name = "lblMovedRateTitle";
+            this.lblMovedRateTitle.Size = new System.Drawing.Size(70, 16);
+            this.lblMovedRateTitle.TabIndex = 8;
+            this.lblMovedRateTitle.Text = "走行済み";
             // 
             // pnlStatus
             // 
@@ -155,7 +232,7 @@
             this.tabPage3.Controls.Add(this.groupBox1);
             this.tabPage3.Location = new System.Drawing.Point(4, 26);
             this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(770, 434);
+            this.tabPage3.Size = new System.Drawing.Size(770, 527);
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "詳細";
             // 
@@ -177,37 +254,6 @@
             this.pnlSystemError.Name = "pnlSystemError";
             this.pnlSystemError.Size = new System.Drawing.Size(262, 174);
             this.pnlSystemError.TabIndex = 0;
-            // 
-            // lblMovedRate
-            // 
-            this.lblMovedRate.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.lblMovedRate.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblMovedRate.Location = new System.Drawing.Point(619, 402);
-            this.lblMovedRate.Name = "lblMovedRate";
-            this.lblMovedRate.Size = new System.Drawing.Size(82, 23);
-            this.lblMovedRate.TabIndex = 9;
-            this.lblMovedRate.Text = "-";
-            this.lblMovedRate.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            // 
-            // lblMovedRateTitle
-            // 
-            this.lblMovedRateTitle.AutoSize = true;
-            this.lblMovedRateTitle.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblMovedRateTitle.Location = new System.Drawing.Point(543, 405);
-            this.lblMovedRateTitle.Name = "lblMovedRateTitle";
-            this.lblMovedRateTitle.Size = new System.Drawing.Size(70, 16);
-            this.lblMovedRateTitle.TabIndex = 8;
-            this.lblMovedRateTitle.Text = "走行済み";
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label1.Location = new System.Drawing.Point(707, 405);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(24, 16);
-            this.label1.TabIndex = 10;
-            this.label1.Text = "％";
             // 
             // usrYakeiStart
             // 
@@ -243,60 +289,14 @@
             this.usrMapMonitor.Location = new System.Drawing.Point(0, 27);
             this.usrMapMonitor.Margin = new System.Windows.Forms.Padding(6, 5, 6, 5);
             this.usrMapMonitor.Name = "usrMapMonitor";
-            this.usrMapMonitor.Size = new System.Drawing.Size(500, 408);
+            this.usrMapMonitor.Size = new System.Drawing.Size(500, 492);
             this.usrMapMonitor.TabIndex = 1;
-            // 
-            // btnTimeAdjust
-            // 
-            this.btnTimeAdjust.Enabled = false;
-            this.btnTimeAdjust.Location = new System.Drawing.Point(642, 3);
-            this.btnTimeAdjust.Name = "btnTimeAdjust";
-            this.btnTimeAdjust.Size = new System.Drawing.Size(119, 52);
-            this.btnTimeAdjust.TabIndex = 8;
-            this.btnTimeAdjust.Text = "時刻合わせ";
-            this.btnTimeAdjust.UseVisualStyleBackColor = true;
-            this.btnTimeAdjust.Click += new System.EventHandler(this.btnTimeAdjust_Click);
-            // 
-            // chkMonitor
-            // 
-            this.chkMonitor.Appearance = System.Windows.Forms.Appearance.Button;
-            this.chkMonitor.Enabled = false;
-            this.chkMonitor.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.chkMonitor.Location = new System.Drawing.Point(503, 3);
-            this.chkMonitor.Name = "chkMonitor";
-            this.chkMonitor.Size = new System.Drawing.Size(264, 66);
-            this.chkMonitor.TabIndex = 11;
-            this.chkMonitor.Text = "モニター開始";
-            this.chkMonitor.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.chkMonitor.UseVisualStyleBackColor = true;
-            this.chkMonitor.CheckedChanged += new System.EventHandler(this.chkMonitor_CheckedChanged);
-            // 
-            // lblStateDateTime
-            // 
-            this.lblStateDateTime.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.lblStateDateTime.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblStateDateTime.Location = new System.Drawing.Point(79, 3);
-            this.lblStateDateTime.Name = "lblStateDateTime";
-            this.lblStateDateTime.Size = new System.Drawing.Size(248, 23);
-            this.lblStateDateTime.TabIndex = 13;
-            this.lblStateDateTime.Text = "-";
-            this.lblStateDateTime.TextAlign = System.Drawing.ContentAlignment.TopCenter;
-            // 
-            // lblStartDateTitle
-            // 
-            this.lblStartDateTitle.AutoSize = true;
-            this.lblStartDateTitle.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.lblStartDateTitle.Location = new System.Drawing.Point(3, 6);
-            this.lblStartDateTitle.Name = "lblStartDateTitle";
-            this.lblStartDateTitle.Size = new System.Drawing.Size(72, 16);
-            this.lblStartDateTitle.TabIndex = 12;
-            this.lblStartDateTitle.Text = "開始日時";
             // 
             // frmMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 489);
+            this.ClientSize = new System.Drawing.Size(800, 573);
             this.Controls.Add(this.tabControl1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;

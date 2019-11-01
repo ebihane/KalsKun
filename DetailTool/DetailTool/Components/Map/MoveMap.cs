@@ -77,12 +77,12 @@ namespace DetailTool.Components.Map
         {
             base.Update(data);
 
+            byte movedValue = (byte)MonitorData.GetInstance().Commander.MapMovedValue.Value;
+
+            m_MovedValue = movedValue;
+            m_NotMoveValue = (byte)(movedValue - 1);
+
             Array.Sort(data);
-            byte max = data[data.Length - 1];
-
-            m_MovedValue = max;
-            m_NotMoveValue = (byte)(max - 1);
-
             int notMovedIndex = -1;
             int movedIndex = 0;
             for (int i = 0; i < data.Length; i++)

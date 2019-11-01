@@ -84,12 +84,13 @@ SequencerBase::SequenceTypeEnum HimajinKun::processCore()
     /* 草刈り指定時刻になった */
     if (isTimeArrival(&current, &kusakari) == true)
     {
+#if 0
         /* モータマイコンを Auto モードに切り替える */
         EventInfo ev = { 0 };
         ev.Code = 3;
         ev.lParam[0] = (long)ControlModeEnum::E_MODE_AUTO;
         m_SendQueue.Send((char*)"MotorComm", &ev, sizeof(ev));
-
+#endif
         /* 草刈りモードに移行 */
         m_Logger.LOG_INFO("[processCore] Kusakari Start!! (DateTime Arrivaled)\n");
         retVal = SequenceTypeEnum::E_SEQ_KUSAKARI;
@@ -99,12 +100,13 @@ SequencerBase::SequenceTypeEnum HimajinKun::processCore()
     /* 夜警指定時刻になった */
     if (isTimeArrival(&current, &yakei) == true)
     {
+#if 0
         /* モータマイコンを Auto モードに切り替える */
         EventInfo ev = { 0 };
         ev.Code = 3;
         ev.lParam[0] = (long)ControlModeEnum::E_MODE_AUTO;
         m_SendQueue.Send((char*)"MotorComm", &ev, sizeof(ev));
-
+#endif
         /* 夜警モードに移行 */
         m_Logger.LOG_INFO("[processCore] Yakei Start!! (DateTime Arrivaled)\n");
         retVal = SequenceTypeEnum::E_SEQ_YAKEI;
@@ -127,7 +129,6 @@ bool HimajinKun::isTimeArrival(SettingManager::TimeSettingStr* current, SettingM
     long day = 0;
     long hour = 0;
     long minute = 0;
-    long second = 0;
 
     /* 動作無し */
     if (target->DayOfWeek == SettingManager::DayOfWeekEnum::Nothing)
@@ -165,18 +166,15 @@ bool HimajinKun::isTimeArrival(SettingManager::TimeSettingStr* current, SettingM
     day = tmPtr->tm_mday;
     hour = tmPtr->tm_hour;
     minute = tmPtr->tm_min;
-    second = tmPtr->tm_sec;
 
     if ((year == pShareMemory->Commander.LastStartDateTime.Year)
     &&  (month == pShareMemory->Commander.LastStartDateTime.Month)
     &&  (day == pShareMemory->Commander.LastStartDateTime.Day)
     &&  (hour == pShareMemory->Commander.LastStartDateTime.Hour)
-    &&  (minute == pShareMemory->Commander.LastStartDateTime.Minute)
-    &&  (second == pShareMemory->Commander.LastStartDateTime.Second))
+    &&  (minute == pShareMemory->Commander.LastStartDateTime.Minute))
     {
         goto FINISH;
     }
-
 
     retVal = true;
 

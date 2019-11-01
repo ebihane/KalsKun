@@ -80,6 +80,7 @@ typedef struct
     LightModeEnum   LightMode;
     DateTimeStr     LastStartDateTime;
     long            ModeState;
+    long            MapMovedValue;
     bool            SystemError;
 } CommanderStateStr;
 

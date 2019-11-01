@@ -103,6 +103,17 @@ namespace DetailTool.Controls
             }
         }
 
+        /// <summary>
+        /// Gets ソケット情報
+        /// </summary>
+        public SocketInfomation SocketInfo
+        {
+            get
+            {
+                return m_Address;
+            }
+        }
+
         #endregion
 
         #region Public Events -------------------------------------------------------

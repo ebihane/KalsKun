@@ -3,7 +3,7 @@
 #include <wiringPi.h>
 #include <softTone.h>
 
-#define AUTO_CHANGE_TRIGGER
+/* #define AUTO_CHANGE_TRIGGER */
 
 /* GPIO ’è‹` */
 #define GPIO_USE_PIN_COUNT  (13)

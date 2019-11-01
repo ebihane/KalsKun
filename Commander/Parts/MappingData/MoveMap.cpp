@@ -1,3 +1,4 @@
+#include "Parts/ShareMemory/ShareMemory.h"
 #include "Parts/Setting/SettingManager.h"
 #include "AreaMap.h"
 #include "MoveMap.h"
@@ -47,6 +48,8 @@ void MoveMap::SetInitialData()
             }
         }
     }
+
+    pShareMemory->Commander.MapMovedValue = m_MovedValue;
 }
 
 /* Žw’è‚µ‚½À•W‚ªˆÚ“®‰Â”\‚©”»’f‚·‚é */
@@ -209,6 +212,8 @@ void MoveMap::UpdateMovedValue()
         m_NotMoveValue = m_MovedValue;
         m_MovedValue = tempValue;
     }
+
+    pShareMemory->Commander.MapMovedValue = m_MovedValue;
 }
 
 /* “Ç‚Ýž‚ÝŒã‚Ìˆ— */
@@ -248,4 +253,5 @@ void MoveMap::loadedProc()
 
     m_MovedValue = maxValue;
     m_NotMoveValue = (unsigned char)(maxValue - 1);
+    pShareMemory->Commander.MapMovedValue = m_MovedValue;
 }

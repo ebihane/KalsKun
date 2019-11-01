@@ -25,6 +25,7 @@ namespace DetailTool.Components.Monitor.Controller
             this.LightMode = new LightMode();
             this.LastStartDate = new DateTimeData();
             this.CurrentSequence = new SequenceType();
+            this.MapMovedValue = new IntStatus();
             this.SystemError = new ErrorState();
         }
 
@@ -33,6 +34,7 @@ namespace DetailTool.Components.Monitor.Controller
         public LightMode LightMode { get; private set; }
         public DateTimeData LastStartDate { get; private set; }
         public SequenceType CurrentSequence { get; private set; }
+        public IntStatus MapMovedValue { get; private set; }
         public ErrorState SystemError { get; private set; }
 
         /// <summary>
@@ -52,6 +54,7 @@ namespace DetailTool.Components.Monitor.Controller
             retVal += this.LightMode.GetSize();
             retVal += this.LastStartDate.GetSize();
             retVal += this.CurrentSequence.GetSize();
+            retVal += this.MapMovedValue.GetSize();
             retVal += this.SystemError.GetSize();
 
             return retVal;
@@ -86,6 +89,9 @@ namespace DetailTool.Components.Monitor.Controller
 
             // シーケンス
             dataIndex = this.CurrentSequence.Analyze(data, dataIndex);
+
+            // 動作マップ 移動完了データ
+            dataIndex = this.MapMovedValue.Analyze(data, dataIndex);
 
             // システムエラー
             dataIndex = this.SystemError.Analyze(data, dataIndex);

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DetailTool.Components
 {
-    class SocketInfomation
+    public class SocketInfomation
     {
         private string m_BaseIp = string.Empty;
 
@@ -24,6 +24,9 @@ namespace DetailTool.Components
             m_PortNo = port;
         }
 
+        /// <summary>
+        /// Gets IP
+        /// </summary>
         public IPAddress IP
         {
             get
@@ -45,6 +48,14 @@ namespace DetailTool.Components
 
                 return retVal;
             }
+        }
+
+        /// <summary>
+        /// Gets IP アドレス
+        /// </summary>
+        public string IPString
+        {
+            get { return m_BaseIp; }
         }
 
         public IPEndPoint EndPoint

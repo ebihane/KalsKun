@@ -33,6 +33,7 @@ namespace DetailTool.Command.Setting
             expectedSize = sizeof(int);
 
             retVal.Code = 1001;
+            retVal.LParam[0] = 4;
             retVal.FParam[0] = m_MoveEndRate;
 
             return retVal;

@@ -16,6 +16,31 @@ YakeiKun::~YakeiKun()
 
 ResultEnum YakeiKun::initializeCore()
 {
+    /* モータマイコンを Auto モードに切り替える */
+    EventInfo ev = { 0 };
+    ev.Code = 3;
+    ev.lParam[0] = (long)ControlModeEnum::E_MODE_AUTO;
+    m_SendQueue.Send((char*)"MotorComm", &ev, sizeof(ev));
+
+    char cnt = 0;
+    while (1)
+    {
+        if (pShareMemory->Motor.RemoteMode == ControlModeEnum::E_MODE_AUTO)
+        {
+            m_Logger.LOG_INFO("[YakeiKun] AUTO Change.\n");
+            break;
+        }
+
+        cnt++;
+        if (50 <= cnt)
+        {
+            m_Logger.LOG_ERROR("[YakeiKun] AUTO Change Timeout.\n");
+            break;
+        }
+
+        delay(100);
+    }
+
     /* 直前の状態情報を初期化 */
     m_PreviewState.MoveType = MoveTypeEnum::NOT_REQUEST;
     m_PreviewState.Human = DetectTypeEnum::NOT_DETECT;
@@ -62,6 +87,25 @@ void YakeiKun::destroyCore()
     ev.Code = 3;
     ev.lParam[0] = (long)ControlModeEnum::E_MODE_MANUAL;
     m_SendQueue.Send((char*)"MotorComm", &ev, sizeof(ev));
+
+    char cnt = 0;
+    while (1)
+    {
+        if (pShareMemory->Motor.RemoteMode == ControlModeEnum::E_MODE_MANUAL)
+        {
+            m_Logger.LOG_INFO("[YakeiKun] MANUAL Change.\n");
+            break;
+        }
+
+        cnt++;
+        if (50 <= cnt)
+        {
+            m_Logger.LOG_ERROR("[YakeiKun] MANUAL Change Timeout.\n");
+            break;
+        }
+
+        delay(100);
+    }
 }
 
 SequencerBase::SequenceTypeEnum YakeiKun::processCore()
